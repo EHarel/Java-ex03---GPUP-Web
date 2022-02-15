@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+
+
+<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.graph.specifictarget.SpecificTargetDependenciesController">
+   <content>
+      <TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab fx:id="dependentOnTab" text="Dependent On">
+               <content>
+                  <fx:include fx:id="dependentOnTable" source="../targettable/TargetTable.fxml" />
+               </content>
+            </Tab>
+          <Tab fx:id="requiredForTab" text="Required For">
+               <content>
+                  <fx:include fx:id="requiredForTableComponent" source="../targettable/TargetTable.fxml" />
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+   </content>
+</ScrollPane>

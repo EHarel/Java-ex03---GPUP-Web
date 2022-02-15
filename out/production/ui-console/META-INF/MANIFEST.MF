@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: Program
+Class-Path: engine.jar dto.jar
+

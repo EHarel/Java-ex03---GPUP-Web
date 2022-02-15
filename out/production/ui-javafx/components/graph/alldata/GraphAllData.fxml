@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="766.0" prefWidth="1086.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.graph.alldata.GraphAllDataController">
+   <content>
+      <SplitPane dividerPositions="0.15526802218114602">
+         <items>
+            <fx:include fx:id="graphChooserMenuComponent" source="menu/GraphChooserMenu.fxml" />
+            <BorderPane fx:id="borderPaneMain" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="762.0" prefWidth="941.0">
+               <top>
+                  <fx:include fx:id="graphOperationsMenuComponent" source="../operations/menu/GraphOperationsMenu.fxml" />
+               </top>
+            </BorderPane>
+         </items>
+      </SplitPane>
+   </content>
+</ScrollPane>
