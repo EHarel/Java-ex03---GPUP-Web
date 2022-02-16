@@ -1,13 +1,11 @@
 package file;
 
 import exception.*;
+import file.jaxb.schema.generated.GPUPConfiguration;
 import file.jaxb.schema.generated.GPUPDescriptor;
 import file.jaxb.schema.generated.GPUPTarget;
 import file.jaxb.schema.generated.GPUPTargetDependencies;
-import graph.DependenciesGraph;
-import graph.SerialSet;
-import graph.SerialSetDTO;
-import graph.Target;
+import graph.*;
 import task.TaskType;
 
 import javax.xml.bind.JAXBContext;
@@ -22,7 +20,7 @@ import java.util.*;
 
 public class FileManager {
     private final static String JAXB_XML_GAME_PACKAGE_NAME = "file.jaxb.schema.generated";
-    public static String saveFilesLocation = "C:/Temp";
+    public static String saveFilesLocation = "C:/gpup-working-dir";
     private static final String savedFilesSuffix = ".txt";
     private static boolean createdDirectories = false;
     private static final String requiredForStr = "requiredFor";
@@ -62,28 +60,52 @@ public class FileManager {
         }
     }
 
-    /**
-     * This method also updates the file path to save the reports into.
-     * @throws InvalidInputRangeException If maxParallelism value is 0 (must be a whole number larger than 1).
-     */
-    public static SaveObject loadXML(String filePath) throws
-            FileNotFoundException,
-            JAXBException,
-            ExistingItemException,
-            DependencyOnNonexistentTargetException,
-            ImmediateCircularDependencyException,
-            NullOrEmptyStringException,
-            InvalidInputRangeException,
-            NonexistentTargetException,
-            SerialSetNameRepetitionException {
-        InputStream inputStream = new FileInputStream(filePath);
+    // Code from ex01 and ex02
+//    /**
+//     * This method also updates the file path to save the reports into.
+//     * @throws InvalidInputRangeException If maxParallelism value is 0 (must be a whole number larger than 1).
+//     */
+//    public static SaveObject loadXML(String filePath) throws
+//            FileNotFoundException,
+//            JAXBException,
+//            ExistingItemException,
+//            DependencyOnNonexistentTargetException,
+//            ImmediateCircularDependencyException,
+//            NullOrEmptyStringException,
+//            InvalidInputRangeException,
+//            NonexistentTargetException,
+//            SerialSetNameRepetitionException {
+//        InputStream inputStream = new FileInputStream(filePath);
+//
+//        return loadXMLFromInputStream(inputStream, uploadingUser);
+//    }
+
+    public static SaveObject loadXMLFromInputStream(InputStream inputStream, String uploadingUser) throws JAXBException, SerialSetNameRepetitionException, NonexistentTargetException, DependencyOnNonexistentTargetException, ExistingItemException, ImmediateCircularDependencyException, NullOrEmptyStringException, InvalidInputRangeException {
         GPUPDescriptor gDesc = deserializeFrom(inputStream);
-        saveFilesLocation = gDesc.getGPUPConfiguration().getGPUPWorkingDirectory();
 
         DependenciesGraph graph = createGraphFromDescriptor(gDesc);
-        int maxParallelism = getMaxParallelism(gDesc);
+        setPricing(gDesc, graph);
+        graph.setUploadingUserName(uploadingUser);
 
-        return new SaveObject(graph, null, maxParallelism);
+        return new SaveObject(graph, null);
+    }
+
+    private static void setPricing(GPUPDescriptor gDesc, DependenciesGraph graph) {
+        List<GPUPConfiguration.GPUPPricing.GPUPTask> juxbPricing = gDesc.getGPUPConfiguration().getGPUPPricing().getGPUPTask();
+
+        juxbPricing.forEach(gpupTask -> {
+            int price = gpupTask.getPricePerTarget();
+
+            switch (gpupTask.getName()) {
+                case "Simulation":
+                    graph.setPriceSimulation(price);
+                    break;
+                case "Compilation":
+                    graph.setPriceCompilation(price);
+                    break;
+            }
+        });
+
     }
 
     private static GPUPDescriptor deserializeFrom(InputStream in) throws JAXBException {
@@ -304,21 +326,6 @@ public class FileManager {
         }
 
         return graph;
-    }
-
-    /**
-     *
-     * @throws InvalidInputRangeException If maxParallelism value is 0 (must be a whole number larger than 1).
-     */
-    private static int getMaxParallelism(GPUPDescriptor gDesc) throws InvalidInputRangeException {
-        int maxParallelism = gDesc.getGPUPConfiguration().getGPUPMaxParallelism();
-
-        if (maxParallelism == 0) {
-            throw new InvalidInputRangeException("maxParallelism must be a whole number larger than 1. Cannot be 0.");
-        }
-
-
-        return maxParallelism;
     }
 
     public static String openTaskExecutionFolder(TaskType type, String taskTypeDirName) throws IOException {

@@ -30,7 +30,7 @@ public interface Graph {
      /**
      * @return general data about the graph and the targets. Returns null if no graph is loaded.
      */
-    GeneralData getGeneralDataAllTargets();
+    GraphGeneralData getGeneralDataAllTargets();
 
     Collection<SerialSetDTO> getSerialSetDTO();
 

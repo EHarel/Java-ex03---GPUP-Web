@@ -16,6 +16,8 @@ public class Constants {
 
     public final static String LOGIN_PAGE = FULL_SERVER_PATH + "/login";
     public final static String USERS_LIST = FULL_SERVER_PATH + "/userlist";
+    public final static String GRAPH_LIST = FULL_SERVER_PATH + "/graphlist";
+    public final static String FILE_UPLOAD = FULL_SERVER_PATH + "/file-upload";
 
 
     // GSON instance

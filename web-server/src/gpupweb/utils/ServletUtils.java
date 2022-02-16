@@ -2,8 +2,10 @@ package gpupweb.utils;
 
 //import engine.chat.ChatManager;
 //import engine.users.UserManager;
+import graph.GraphManager;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
+import logic.Engine;
 import users.UserManager;
 
 import static gpupweb.constants.Constants.INT_PARAMETER_ERROR;
@@ -11,6 +13,7 @@ import static gpupweb.constants.Constants.INT_PARAMETER_ERROR;
 public class ServletUtils {
 
 	private static final String USER_MANAGER_ATTRIBUTE_NAME = "userManager";
+	private static final String GRAPH_MANAGER_ATTRIBUTE_NAME = "graphManager";
 	private static final String CHAT_MANAGER_ATTRIBUTE_NAME = "chatManager";
 
 	/*
@@ -18,6 +21,7 @@ public class ServletUtils {
 	the actual fetch of them is remained un-synchronized for performance POV
 	 */
 	private static final Object userManagerLock = new Object();
+	private static final Object graphManagerLock = new Object();
 	private static final Object chatManagerLock = new Object();
 
 	public static UserManager getUserManager(ServletContext servletContext) {
@@ -28,6 +32,18 @@ public class ServletUtils {
 		}
 
 		return (UserManager) servletContext.getAttribute(USER_MANAGER_ATTRIBUTE_NAME);
+	}
+
+	public static GraphManager getGraphManager(ServletContext servletContext) {
+		return Engine.getInstance().getGraphManager();
+
+//		synchronized (graphManagerLock) {
+//			if (servletContext.getAttribute(GRAPH_MANAGER_ATTRIBUTE_NAME) == null) {
+//				servletContext.setAttribute(GRAPH_MANAGER_ATTRIBUTE_NAME, new GraphManager());
+//			}
+//		}
+//
+//		return (UserManager) servletContext.getAttribute(USER_MANAGER_ATTRIBUTE_NAME);
 	}
 
 //	public static ChatManager getChatManager(ServletContext servletContext) {
