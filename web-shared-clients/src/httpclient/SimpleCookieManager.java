@@ -1,4 +1,4 @@
-package util.http;
+package httpclient;
 
 import okhttp3.Cookie;
 import okhttp3.CookieJar;

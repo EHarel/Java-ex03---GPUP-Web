@@ -1,5 +1,7 @@
 package utilshared;
 
+import com.google.gson.Gson;
+
 public class Constants {
     // Query Parameter Constants
     public final static String QP_USERTYPE = "usertype";
@@ -13,4 +15,9 @@ public class Constants {
     private final static String FULL_SERVER_PATH = BASE_URL + CONTEXT_PATH;
 
     public final static String LOGIN_PAGE = FULL_SERVER_PATH + "/login";
+    public final static String USERS_LIST = FULL_SERVER_PATH + "/userlist";
+
+
+    // GSON instance
+    public final static Gson GSON_INSTANCE = new Gson();
 }

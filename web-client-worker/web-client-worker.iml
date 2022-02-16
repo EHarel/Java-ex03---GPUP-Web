@@ -10,6 +10,7 @@
     <orderEntry type="module" module-name="dto" />
     <orderEntry type="library" name="okHttp" level="project" />
     <orderEntry type="module" module-name="ui-console" />
-    <orderEntry type="module" module-name="web-shared" />
+    <orderEntry type="module" module-name="web-shared-all" />
+    <orderEntry type="module" module-name="web-shared-clients" />
   </component>
 </module>

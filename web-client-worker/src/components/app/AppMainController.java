@@ -1,5 +1,6 @@
 package components.app;
 
+import components.dashboard.DashboardWorkerController;
 import components.login.LoginWorkerController;
 import javafx.event.ActionEvent;
 import javafx.scene.Parent;
@@ -13,6 +14,9 @@ public class AppMainController {
 
     private Parent login;
     private LoginWorkerController loginController;
+
+    private Parent dashboard;
+    private DashboardWorkerController dashboardController;
 
 
     public void setMainScene(Scene scene) {
@@ -40,7 +44,7 @@ public class AppMainController {
         this.root.setBottom(null);
         this.root.setLeft(null);
         this.root.setRight(null);
-        this.root.setCenter(null);
+        this.root.setCenter(dashboard);
     }
 
 
@@ -57,6 +61,12 @@ public class AppMainController {
                     // If failed, present message
                     // If successful, switch views
                 });
+    }
+
+    public void setDashboardComponent(Parent parent, DashboardWorkerController dashboardController) {
+        this.dashboard = parent;
+        this.dashboardController = dashboardController;
+
     }
 }
 

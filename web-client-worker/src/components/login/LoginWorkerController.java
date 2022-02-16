@@ -10,7 +10,7 @@ import javafx.scene.control.*;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import utilshared.Constants;
-import util.http.HttpClientUtil;
+import httpclient.HttpClientUtil;
 import utilshared.UserType;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class LoginWorkerController {
     @FXML
     public void initialize() {
         label_LoginResult.textProperty().bind(resultMessageProperty);
-//        HttpClientUtil.setCookieManagerLoggingFacility(line ->
+//        util.http.HttpClientUtil.setCookieManagerLoggingFacility(line ->
 //                Platform.runLater(() ->
 //                        updateHttpStatusLine(line)));
 
