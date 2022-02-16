@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<ScrollPane fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="168.0" prefWidth="671.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.task.configuration.CompilationConfigurationController">
+   <content>
+      <GridPane maxWidth="1.7976931348623157E308" minHeight="150.0" minWidth="500.0">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="20.0" prefWidth="20.0" />
+          <ColumnConstraints halignment="RIGHT" hgrow="NEVER" maxWidth="120.0" minWidth="120.0" prefWidth="120.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="10.0" minWidth="10.0" prefWidth="10.0" />
+            <ColumnConstraints halignment="RIGHT" hgrow="NEVER" maxWidth="95.0" minWidth="95.0" prefWidth="95.0" />
+            <ColumnConstraints hgrow="NEVER" maxWidth="215.0" minWidth="215.0" prefWidth="215.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="16.0" minWidth="0.0" prefWidth="10.0" />
+            <ColumnConstraints hgrow="NEVER" maxWidth="172.0" minWidth="172.0" prefWidth="172.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="20.0" minWidth="0.0" prefWidth="0.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="Source Code Path:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label text="Output Path:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <TextField fx:id="sourcePathTextField" disable="true" editable="false" onAction="#sou" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+            <TextField fx:id="outputPathTextField" disable="true" editable="false" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+            <Button fx:id="chooseFolderSourceButton" mnemonicParsing="false" onAction="#chooseFolderSourceButtonActionListener" text="Choose Folder" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+            <Button fx:id="chooseFolderOutputButton" mnemonicParsing="false" onAction="#chooseFolderOutputButtonActionListener" text="Choose Folder" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+            <Label text="Configuration Name:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="textFieldConfigName" disable="true" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+            <Label fx:id="labelNameMsg" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" wrapText="true" GridPane.columnIndex="6" GridPane.rowIndex="1" />
+         </children>
+      </GridPane>
+   </content>
+</ScrollPane>

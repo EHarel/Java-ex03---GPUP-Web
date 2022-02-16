@@ -9,6 +9,9 @@
           <element id="module-output" name="dto" />
           <element id="module-output" name="engine" />
         </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="okHttp" />
+        </element>
       </element>
     </root>
   </artifact>

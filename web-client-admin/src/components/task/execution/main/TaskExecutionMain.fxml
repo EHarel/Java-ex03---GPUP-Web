@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<SplitPane fx:id="mainParent" dividerPositions="0.5" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="805.0" prefWidth="1146.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.task.execution.main.TaskExecutionMainController">
+  <items>
+      <BorderPane prefHeight="200.0" prefWidth="200.0">
+         <center>
+            <fx:include fx:id="statusTablesComponent" source="../statustables/ExecutionStatusTables.fxml" />
+         </center>
+         <bottom>
+            <ProgressBar fx:id="progressBar" prefHeight="18.0" prefWidth="389.0" progress="0.0" BorderPane.alignment="CENTER" />
+         </bottom>
+      </BorderPane>
+      <fx:include fx:id="dynamicPanelComponent" source="../dynamicpanel/TaskExecutionDynamicPanel.fxml" />
+  </items>
+</SplitPane>

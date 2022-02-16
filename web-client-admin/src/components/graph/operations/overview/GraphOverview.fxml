@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+
+
+<ScrollPane fx:id="mainScene" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="807.0" prefWidth="1157.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.graph.operations.overview.GraphOverviewController">
+   <content>
+      <SplitPane dividerPositions="0.5" prefHeight="160.0" prefWidth="200.0">
+         <items>
+            <SplitPane dividerPositions="0.1590909090909091" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+              <items>
+                  <fx:include fx:id="graphGeneralDetailsComponent" source="../../general/GraphGeneralDetails.fxml" />
+                  <fx:include fx:id="targetTableComponent" source="../../targettable/TargetTable.fxml" />
+              </items>
+            </SplitPane>
+            <SplitPane dividerPositions="0.1718555417185554" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+              <items>
+                  <fx:include fx:id="specificTargetComponent" source="../../specifictarget/SpecificTarget.fxml" />
+                  <fx:include fx:id="specificTargetDependenciesComponent" source="../../specifictarget/SpecificTargetDependencies.fxml" />
+              </items>
+            </SplitPane>
+         </items>
+      </SplitPane>
+   </content>
+</ScrollPane>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+
+<TabPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.task.settings.TaskSettingsController">
+  <tabs>
+    <Tab text="Task Configuration">
+         <content>
+            <SplitPane fx:id="taskConfigurationSplitPane" dividerPositions="0.34348355663824603" orientation="VERTICAL" prefHeight="313.0" prefWidth="280.0">
+              <items>
+                  <SplitPane dividerPositions="0.7275985663082437" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                    <items>
+                        <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="1098.0">
+                           <content>
+                            <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="191.0" prefWidth="1098.0">
+                                 <children>
+                                    <Pane layoutX="14.0" layoutY="14.0" minHeight="0.0" minWidth="0.0" prefHeight="159.0" prefWidth="142.0">
+                                       <children>
+                                          <Label layoutX="4.0" layoutY="2.0" text="Task Type:" />
+                                          <ListView fx:id="taskTypeListView" layoutX="4.0" layoutY="28.0" prefHeight="124.0" prefWidth="130.0" />
+                                       </children>
+                                    </Pane>
+                                    <Label layoutX="168.0" layoutY="39.0" text="Number of threads in parallel:" />
+                                    <ChoiceBox fx:id="threadNumberChoiceBox" layoutX="336.0" layoutY="35.0" prefHeight="25.0" prefWidth="61.0" />
+                                    <Pane fx:id="paneStartPoint" disable="true" layoutX="157.0" layoutY="77.0" minHeight="0.0" minWidth="0.0" prefHeight="91.0" prefWidth="258.0">
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                       <children>
+                                          <RadioButton fx:id="startPointFromScratchRadioButton" layoutX="38.0" layoutY="40.0" mnemonicParsing="false" onAction="#startPointFromScratchRadioButtonListener" text="From Scratch">
+                                             <toggleGroup>
+                                                <ToggleGroup fx:id="TaskStartPoint" />
+                                             </toggleGroup>
+                                          </RadioButton>
+                                          <RadioButton fx:id="startPointIncrementalRadioButton" layoutX="157.0" layoutY="40.0" mnemonicParsing="false" onAction="#startPointIncrementalRadioButtonActionListener" text="Incremental" toggleGroup="$TaskStartPoint" />
+                                          <Label layoutX="101.0" layoutY="14.0" text="Start Point" underline="true" />
+                                          <Label layoutX="9.0" layoutY="69.0" text="(This will affect what targets you may choose)" />
+                                       </children>
+                                    </Pane>
+                                    <Pane layoutX="418.0" layoutY="9.0" minHeight="0.0" minWidth="0.0" prefHeight="188.0" prefWidth="391.0">
+                                       <children>
+                                          <Label layoutX="44.0" layoutY="6.0" text="Choose Existing Configuration" underline="true" />
+                                          <ListView fx:id="existingConfigurationsListView" layoutX="23.0" layoutY="26.0" prefHeight="124.0" prefWidth="201.0" />
+                                          <Label fx:id="labelSetActiveConfigUpdate" layoutX="18.0" layoutY="165.0" wrapText="true">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                             <padding>
+                                                <Insets left="10.0" />
+                                             </padding>
+                                          </Label>
+                                          <Button fx:id="buttonDeleteConfiguration" layoutX="232.0" layoutY="125.0" mnemonicParsing="false" onAction="#buttonDeleteConfigurationActionListener" prefHeight="25.0" prefWidth="160.0" text="Delete Configuration" />
+                                          <Button fx:id="buttonSetActiveConfig" layoutX="231.0" layoutY="26.0" mnemonicParsing="false" onAction="#buttonSetActiveConfigActionListener" prefHeight="25.0" prefWidth="160.0" text="Set Active Configuration" />
+                                       </children>
+                                    </Pane>
+                                    <Label layoutX="860.0" layoutY="39.0" text="Active Configuration:" underline="true" />
+                                    <Label fx:id="labelActiveConfiguration" alignment="TOP_LEFT" layoutX="859.0" layoutY="58.0" prefHeight="95.0" prefWidth="114.0" text="[None]" wrapText="true" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="20.0" />
+                                 </padding>
+                              </AnchorPane>
+                           </content>
+                        </ScrollPane>
+                        <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="70.0" prefWidth="1098.0" spacing="50.0">
+                           <children>
+                              <Pane minHeight="0.0" minWidth="0.0">
+                                 <children>
+                                    <Button fx:id="buttonCreateNewConfig" layoutX="35.0" layoutY="16.0" mnemonicParsing="false" onAction="#buttonCreateNewConfigActionListener" prefWidth="154.0" text="Create New Configuration" />
+                                    <Label layoutX="-3.0" layoutY="41.0" prefWidth="231.0" text="Allow editing to create a new configuration." wrapText="true" />
+                                 </children>
+                              </Pane>
+                              <Pane minHeight="0.0" minWidth="0.0" prefHeight="41.0" prefWidth="277.0">
+                                 <children>
+                                    <Button fx:id="buttonAddConfiguration" layoutX="63.0" layoutY="14.0" mnemonicParsing="false" onAction="#buttonAddConfigurationActionListener" prefHeight="25.0" prefWidth="151.0" text="Add Configuration" />
+                                    <Label alignment="CENTER" layoutX="22.0" layoutY="39.0" text="Add current settings as a new configuration." wrapText="true" />
+                                    <Label fx:id="labelAddConfigMsg" layoutX="6.0" layoutY="56.0" prefHeight="17.0" prefWidth="265.0" />
+                                 </children>
+                              </Pane>
+                              <Pane prefHeight="200.0" prefWidth="200.0">
+                                 <children>
+                                    <Button fx:id="buttonCancelEdit" layoutX="63.0" layoutY="14.0" mnemonicParsing="false" onAction="#buttonCancelEditActionListener" text="Cancel Edit" />
+                                 </children>
+                              </Pane>
+                           </children>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <padding>
+                              <Insets left="50.0" />
+                           </padding>
+                        </HBox>
+                    </items>
+                  </SplitPane>
+                <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="514.0" prefWidth="1098.0" />
+              </items>
+            </SplitPane>
+         </content></Tab>
+      <Tab text="Target Selection">
+         <content>
+            <SplitPane dividerPositions="0.5409836065573771" prefHeight="200.0" prefWidth="200.0">
+               <items>
+                  <SplitPane dividerPositions="0.24725943970767356" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                    <items>
+                        <fx:include fx:id="graphGeneralDetailsComponent" source="../../graph/general/GraphGeneralDetails.fxml" />
+                        <BorderPane prefHeight="200.0" prefWidth="200.0">
+                           <center>
+                              <fx:include fx:id="targetTableAvailableTargets" source="../../graph/targettable/TargetTable.fxml" />
+                           </center>
+                           <top>
+                              <fx:include fx:id="targetSelectionMenu" source="../../graph/targettable/selection/TableSelection.fxml" />
+                           </top>
+                        </BorderPane>
+                    </items>
+                  </SplitPane>
+                  <SplitPane dividerPositions="0.14419225634178906" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                    <items>
+                        <fx:include fx:id="graphGeneralDetailsComponent_ChosenTargetsGraph" source="../../graph/general/GraphGeneralDetails.fxml" />
+                        <BorderPane prefHeight="200.0" prefWidth="200.0">
+                           <center>
+                              <fx:include fx:id="targetTableChosenTargets" source="../../graph/targettable/TargetTable.fxml" />
+                           </center>
+                           <top>
+                              <ScrollPane fitToHeight="true" fitToWidth="true" minHeight="0.0" minWidth="0.0" prefHeight="47.0" prefWidth="346.0" BorderPane.alignment="CENTER">
+                                 <content>
+                                    <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="50.0">
+                                       <children>
+                                          <Button fx:id="updateChosenTargetsButton" mnemonicParsing="false" text="Update" />
+                                          <Button fx:id="clearAllChosenTargetsButton" mnemonicParsing="false" text="Remove All" />
+                                       </children>
+                                    </HBox>
+                                 </content>
+                              </ScrollPane>
+                           </top>
+                        </BorderPane>
+                    </items>
+                  </SplitPane>
+               </items>
+            </SplitPane>
+         </content>
+      </Tab>
+  </tabs>
+</TabPane>

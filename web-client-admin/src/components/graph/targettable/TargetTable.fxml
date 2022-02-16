@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.StackPane?>
+
+<ScrollPane fx:id="mainScene" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" pannable="true" prefHeight="545.0" prefWidth="965.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.graph.targettable.TargetTableController">
+   <content>
+      <StackPane>
+         <children>
+            <TableView fx:id="tableViewTargets" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="500.0" minWidth="500.0">
+              <columns>
+                  <TableColumn fx:id="tableColumnSelected" prefWidth="25.0" />
+                <TableColumn fx:id="tableColumnTargetName" editable="false" prefWidth="78.0" text="Target Name" />
+                <TableColumn fx:id="tableColumnLevel" editable="false" prefWidth="68.0" text="Level" />
+                  <TableColumn fx:id="tableColumnRequiredForHead" editable="false" prefWidth="130.0" text="Required For">
+                     <columns>
+                        <TableColumn fx:id="tableColumnRequiredForDirect" editable="false" prefWidth="75.0" text="Direct" />
+                        <TableColumn fx:id="tableColumnRequiredForTotal" editable="false" prefWidth="75.0" text="Total" />
+                     </columns></TableColumn>
+                  <TableColumn fx:id="tableColumnDependsOnHead" editable="false" prefWidth="164.0" text="Depends On">
+                     <columns>
+                        <TableColumn fx:id="tableColumnDependsOnDirect" editable="false" prefWidth="75.0" text="Direct" />
+                        <TableColumn fx:id="tableColumnDependsOnTotal" editable="false" prefWidth="75.0" text="Total" />
+                     </columns></TableColumn>
+                  <TableColumn fx:id="tableColumnSerialSetsCount" editable="false" prefWidth="62.0" text="Serial Sets" />
+                  <TableColumn fx:id="tableColumnTargetState" prefWidth="75.0" text="Task State" />
+                  <TableColumn fx:id="tableColumnTaskResult" prefWidth="75.0" text="Task Result" />
+                  <TableColumn fx:id="tableColumnUserData" editable="false" prefWidth="243.0" text="User Data" />
+              </columns>
+            </TableView>
+         </children>
+      </StackPane>
+   </content>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+   </padding>
+</ScrollPane>
