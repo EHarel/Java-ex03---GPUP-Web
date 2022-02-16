@@ -12,5 +12,6 @@
     <orderEntry type="module" module-name="engine" />
     <orderEntry type="module" module-name="ui-console" />
     <orderEntry type="library" name="okHttp" level="project" />
+    <orderEntry type="module" module-name="web-shared" />
   </component>
 </module>

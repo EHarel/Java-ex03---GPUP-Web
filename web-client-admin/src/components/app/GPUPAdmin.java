@@ -1,5 +1,6 @@
 package components.app;
 
+import components.dashboard.DashboardController;
 import components.graph.alldata.GraphAllDataController;
 import components.graph.operations.overview.GraphOverviewController;
 import components.graph.operations.paths.TargetPathsController;
@@ -55,6 +56,7 @@ public class GPUPAdmin extends javafx.application.Application {
     public void loadSubComponents(AppMainController mainController) {
         loadMainMenu(mainController);
         loadLogin(mainController);
+        loadDashboard(mainController);
         loadTaskSettings(mainController);
         loadGraphAllDataComponentWithSubComponents(mainController);
         loadTaskExecution(mainController);
@@ -70,6 +72,32 @@ public class GPUPAdmin extends javafx.application.Application {
             LoginAdminController controller = fxmlLoader.getController();
 
             mainController.setLogin(parent, controller);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadDashboard(AppMainController mainController) {
+//        loadMainDashboard();
+//        loadUserTable();
+//        loadGraphTable();
+//        loadGraphTasks();
+
+        try {
+            System.out.println("[loadDashboard] Start");
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            URL url = getClass().getResource("/components/dashboard/Dashboard.fxml");
+            fxmlLoader.setLocation(url);
+            Parent parent = fxmlLoader.load(url.openStream());
+            DashboardController dashboardController = fxmlLoader.getController();
+
+//            loadGraphOverviewComponent(allDataController);
+//            loadTargetPathsComponent(allDataController);
+//            loadTargetCycleComponent(allDataController);
+//            loadWhatIfComponent(allDataController);
+//            loadGraphSerialSetsComponent(allDataController);
+
+            mainController.setDashboardComponent(parent, dashboardController);
         } catch (IOException e) {
             e.printStackTrace();
         }

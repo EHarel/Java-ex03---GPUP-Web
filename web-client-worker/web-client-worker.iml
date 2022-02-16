@@ -9,5 +9,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="dto" />
     <orderEntry type="library" name="okHttp" level="project" />
+    <orderEntry type="module" module-name="ui-console" />
+    <orderEntry type="module" module-name="web-shared" />
   </component>
 </module>

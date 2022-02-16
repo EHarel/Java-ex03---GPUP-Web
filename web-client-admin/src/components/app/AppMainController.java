@@ -1,6 +1,7 @@
 package components.app;
 
 import components.css.Themes;
+import components.dashboard.DashboardController;
 import components.graph.alldata.GraphAllDataController;
 import components.login.LoginAdminController;
 import components.menu.MenuController;
@@ -79,6 +80,9 @@ public class AppMainController {
 
     private Parent login;
     private LoginAdminController loginController;
+
+    private Parent dashboard;
+    private DashboardController dashboardController;
 
     public boolean getAllowAnimations() { return allowAnimations.get(); }
 
@@ -258,6 +262,12 @@ public class AppMainController {
                     // If failed, present message
                     // If successful, switch views
                 });
+    }
+
+    public void setDashboardComponent(Parent parent, DashboardController dashboardController) {
+        this.dashboard = parent;
+        this.dashboardController = dashboardController;
+        dashboardController.setMainController(this);
     }
 
     public void setMenu(Parent parent, MenuController controller) {
@@ -502,6 +512,10 @@ public class AppMainController {
         this.root.setBottom(null);
         this.root.setLeft(null);
         this.root.setRight(null);
-        this.root.setCenter(null);
+        this.root.setCenter(dashboard);
+    }
+
+    public void dashboardButtonPressed() {
+        this.root.setCenter(dashboard);
     }
 }

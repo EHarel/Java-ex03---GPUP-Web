@@ -1,6 +1,11 @@
 package util;
 
 public class Constants {
+    // Worker Constants
+    public final static int MAX_THREADS = 5;
+
+
+
     // global constants
     public final static String LINE_SEPARATOR = System.getProperty("line.separator");
     public final static String JHON_DOE = "<Anonymous>";

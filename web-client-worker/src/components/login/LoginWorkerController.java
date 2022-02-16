@@ -6,10 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import utilshared.Constants;
@@ -18,7 +15,7 @@ import utilshared.UserType;
 
 import java.io.IOException;
 
-public class LoginAdminController {
+public class LoginWorkerController {
 
     private int counter = 0;
 
@@ -34,6 +31,9 @@ public class LoginAdminController {
     @FXML
     private Label label_LoginResult;
 
+    @FXML
+    private ComboBox<Integer> comboBox_ThreadChoice;
+
     private final StringProperty resultMessageProperty = new SimpleStringProperty();
     private AppMainController appMainController;
 
@@ -47,6 +47,10 @@ public class LoginAdminController {
 //        HttpClientUtil.setCookieManagerLoggingFacility(line ->
 //                Platform.runLater(() ->
 //                        updateHttpStatusLine(line)));
+
+        for(int i = 1 ; i <= util.Constants.MAX_THREADS ; i++) {
+            comboBox_ThreadChoice.getItems().add(i);
+        }
     }
 
 
@@ -61,12 +65,22 @@ public class LoginAdminController {
             return;
         }
 
+        Integer threadCount = comboBox_ThreadChoice.getSelectionModel().getSelectedItem();
+        if (threadCount == null) {
+            resultMessageProperty.set("No thread count chosen. You can't login without threads to dedicate.");
+
+            return;
+        }
+
+
+
+
         //noinspection ConstantConditions
         String finalUrl = HttpUrl
                 .parse(Constants.LOGIN_PAGE)
                 .newBuilder()
                 .addQueryParameter(Constants.QP_USERNAME, userName)
-                .addQueryParameter(Constants.QP_USERTYPE, UserType.Admin.name())
+                .addQueryParameter(Constants.QP_USERTYPE, UserType.Worker.name())
                 .build()
                 .toString();
 

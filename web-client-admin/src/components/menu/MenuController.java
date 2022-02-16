@@ -17,6 +17,7 @@ import task.configuration.Configuration;
 public class MenuController implements ExecutionStartListener, ExecutionEndListener, FileLoadedListener {
     private AppMainController mainController;
 
+    @FXML private Button dashboardButton;
     @FXML private Button taskButton;
     @FXML private Button graphDetailsButton;
     @FXML private Button taskExecutionButton;
@@ -24,6 +25,9 @@ public class MenuController implements ExecutionStartListener, ExecutionEndListe
     @FXML private Label labelFileLoadMsg;
     @FXML private ComboBox<Themes> themesComboBox;
     @FXML private ToggleButton buttonDisableAnimations;
+
+    private Button currentHighlightedButton;
+    private Button newlyClickedButton;
 
 
     @FXML
@@ -51,10 +55,16 @@ public class MenuController implements ExecutionStartListener, ExecutionEndListe
         mainController.addEventListener_FileLoaded(this);
     }
 
+    @FXML
+    void dashboardButtonActionListener(ActionEvent event) {
+        mainController.dashboardButtonPressed();
+//        newlyClickedButton = dashboardButton;
 
+//        buttonClicked();
+    }
 
-
-    @FXML void loadFileButtonActionListener(ActionEvent event) {
+    @FXML
+    void loadFileButtonActionListener(ActionEvent event) {
         mainController.loadFile();
         if (mainController.getAllowAnimations()) {
             rotateButton(taskButton);
@@ -129,5 +139,8 @@ public class MenuController implements ExecutionStartListener, ExecutionEndListe
         String msg = "Failed to load :(";
         Color color = Color.RED;
         AppMainController.AnimationFadeSingle(null, labelFileLoadMsg, msg, color);
+    }
+
+    private void buttonClicked() {
     }
 }
