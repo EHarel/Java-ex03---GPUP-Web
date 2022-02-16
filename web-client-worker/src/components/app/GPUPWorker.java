@@ -1,5 +1,6 @@
 package components.app;
 
+import components.dashboard.DashboardWorkerController;
 import components.login.LoginWorkerController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -43,6 +44,7 @@ public class GPUPWorker extends javafx.application.Application {
     public void loadSubComponents(AppMainController mainController) {
 //        loadMainMenu(mainController);
         loadLogin(mainController);
+        loadDashboard(mainController);
 //        loadTaskSettings(mainController);
 //        loadGraphAllDataComponentWithSubComponents(mainController);
 //        loadTaskExecution(mainController);
@@ -58,6 +60,32 @@ public class GPUPWorker extends javafx.application.Application {
             LoginWorkerController controller = fxmlLoader.getController();
 
             mainController.setLogin(parent, controller);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadDashboard(AppMainController mainController) {
+        //        loadMainDashboard();
+//        loadUserTable();
+//        loadGraphTable();
+//        loadGraphTasks();
+
+        try {
+            System.out.println("[loadDashboard] Start");
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            URL url = getClass().getResource("/components/dashboard/DashboardWorker.fxml");
+            fxmlLoader.setLocation(url);
+            Parent parent = fxmlLoader.load(url.openStream());
+            DashboardWorkerController dashboardController = fxmlLoader.getController();
+
+//            loadGraphOverviewComponent(allDataController);
+//            loadTargetPathsComponent(allDataController);
+//            loadTargetCycleComponent(allDataController);
+//            loadWhatIfComponent(allDataController);
+//            loadGraphSerialSetsComponent(allDataController);
+
+            mainController.setDashboardComponent(parent, dashboardController);
         } catch (IOException e) {
             e.printStackTrace();
         }

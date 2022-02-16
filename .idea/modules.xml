@@ -9,7 +9,8 @@
       <module fileurl="file://$PROJECT_DIR$/web-client-admin/web-client-admin.iml" filepath="$PROJECT_DIR$/web-client-admin/web-client-admin.iml" />
       <module fileurl="file://$PROJECT_DIR$/web-client-worker/web-client-worker.iml" filepath="$PROJECT_DIR$/web-client-worker/web-client-worker.iml" />
       <module fileurl="file://$PROJECT_DIR$/web-server/web-server.iml" filepath="$PROJECT_DIR$/web-server/web-server.iml" />
-      <module fileurl="file://$PROJECT_DIR$/web-shared/web-shared.iml" filepath="$PROJECT_DIR$/web-shared/web-shared.iml" />
+      <module fileurl="file://$PROJECT_DIR$/web-shared-all/web-shared-all.iml" filepath="$PROJECT_DIR$/web-shared-all/web-shared-all.iml" />
+      <module fileurl="file://$PROJECT_DIR$/web-shared-clients/web-shared-clients.iml" filepath="$PROJECT_DIR$/web-shared-clients/web-shared-clients.iml" />
     </modules>
   </component>
 </project>

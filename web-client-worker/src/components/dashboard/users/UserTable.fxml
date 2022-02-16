@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<ScrollPane fx:id="MainPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" pannable="true" prefHeight="537.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.dashboard.users.UserTableController">
+   <content>
+      <TableView fx:id="tableView_Users">
+        <columns>
+          <TableColumn fx:id="tableColumn_UserName" prefWidth="172.0" text="User Name" />
+          <TableColumn fx:id="tableColumn_UserType" minWidth="0.0" prefWidth="83.0" text="User Type" />
+        </columns>
+      </TableView>
+   </content>
+</ScrollPane>

@@ -18,4 +18,8 @@ public class User {
     public UserType getUserType() {
         return userType;
     }
+
+    public UserDTO toDTO() {
+        return new UserDTO(name, userType);
+    }
 }

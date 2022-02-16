@@ -7,10 +7,18 @@
         <servlet-name>LoginServlet</servlet-name>
         <servlet-class>gpupweb.servlets.LoginServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UsersListServlet</servlet-name>
+        <servlet-class>gpupweb.servlets.UserListServlet</servlet-class>
+    </servlet>
 
     <!-- MAPPING -->
     <servlet-mapping>
         <servlet-name>LoginServlet</servlet-name>
         <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UsersListServlet</servlet-name>
+        <url-pattern>/userlist</url-pattern>
     </servlet-mapping>
 </web-app>

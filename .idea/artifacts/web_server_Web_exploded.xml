@@ -8,10 +8,11 @@
           <element id="module-output" name="web-server" />
           <element id="module-output" name="dto" />
           <element id="module-output" name="engine" />
-          <element id="module-output" name="web-shared" />
+          <element id="module-output" name="web-shared-all" />
         </element>
         <element id="directory" name="lib">
           <element id="library" level="project" name="okHttp" />
+          <element id="library" level="project" name="gson-2.1" />
         </element>
       </element>
     </root>

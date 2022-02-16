@@ -1,7 +1,7 @@
 package util;
 
 public class Constants {
-    // Worker Constants
+    // Worker utilsharedclient.Constants
     public final static int MAX_THREADS = 5;
 
 
