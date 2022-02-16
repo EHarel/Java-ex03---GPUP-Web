@@ -2,7 +2,7 @@ package components.graph.general;
 
 import components.graph.alldata.GraphAllDataController;
 import graph.DependenciesGraph;
-import graph.GeneralData;
+import graph.GraphGeneralData;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
@@ -46,13 +46,13 @@ public class GraphGeneralDetailsController {
 
     public void populateData(DependenciesGraph graph) {
         if (graph != null) {
-            GeneralData generalData = graph.getGeneralDataAllTargets();
+            GraphGeneralData graphGeneralData = graph.getGeneralDataAllTargets();
             this.getGraphNameLabel().setText(graph.getName());
-            this.getNumberOfIndependentsLabel().setText(String.valueOf(generalData.getCountIndependents()));
-            this.getNumberOfLeavesLabel().setText(String.valueOf(generalData.getCountLeaves()));
-            this.getNumberOfMiddlesLabel().setText(String.valueOf(generalData.getCountMiddles()));
-            this.getNumberOfRootsLabel().setText(String.valueOf(generalData.getCountRoots()));
-            this.getTargetCountLabel().setText(String.valueOf(generalData.getCountAllTargets()));
+            this.getNumberOfIndependentsLabel().setText(String.valueOf(graphGeneralData.getCountIndependents()));
+            this.getNumberOfLeavesLabel().setText(String.valueOf(graphGeneralData.getCountLeaves()));
+            this.getNumberOfMiddlesLabel().setText(String.valueOf(graphGeneralData.getCountMiddles()));
+            this.getNumberOfRootsLabel().setText(String.valueOf(graphGeneralData.getCountRoots()));
+            this.getTargetCountLabel().setText(String.valueOf(graphGeneralData.getCountAllTargets()));
         }
     }
 

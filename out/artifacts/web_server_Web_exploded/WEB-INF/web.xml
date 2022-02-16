@@ -11,6 +11,10 @@
         <servlet-name>UsersListServlet</servlet-name>
         <servlet-class>gpupweb.servlets.UserListServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>GraphsListServlet</servlet-name>
+        <servlet-class>gpupweb.servlets.GraphListServlet</servlet-class>
+    </servlet>
 
     <!-- MAPPING -->
     <servlet-mapping>
@@ -20,5 +24,9 @@
     <servlet-mapping>
         <servlet-name>UsersListServlet</servlet-name>
         <url-pattern>/userlist</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>GraphsListServlet</servlet-name>
+        <url-pattern>/graphlist</url-pattern>
     </servlet-mapping>
 </web-app>

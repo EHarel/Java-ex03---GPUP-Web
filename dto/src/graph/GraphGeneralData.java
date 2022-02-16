@@ -2,18 +2,55 @@ package graph;
 
 import java.util.Collection;
 
-public class GeneralData {
+public class GraphGeneralData {
+    private String graphName;
+    private String uploadingUserName;
+    private int priceSimulation;
+    private int priceCompilation;
+
     private int countAllTargets;
     private int countLeaves;
     private int countMiddles;
     private int countRoots;
     private int countIndependents;
-    private Collection<String> alLTargetNames;
+    private Collection<String> allTargetNames;
 
 
     // countAlLTargets getter-setter
     public int getCountAllTargets() {
         return countAllTargets;
+    }
+
+    public String getGraphName() {
+        return graphName;
+    }
+
+    public void setGraphName(String graphName) {
+        this.graphName = graphName;
+    }
+
+    public String getUploadingUserName() {
+        return uploadingUserName;
+    }
+
+    public void setUploadingUserName(String uploadingUserName) {
+        this.uploadingUserName = uploadingUserName;
+    }
+
+    public int getPriceSimulation() {
+        return priceSimulation;
+    }
+
+    public void setPriceSimulation(int priceSimulation) {
+        this.priceSimulation = priceSimulation;
+    }
+
+    public int getPriceCompilation() {
+        return priceCompilation;
+    }
+
+    public void setPriceCompilation(int priceCompilation) {
+        this.priceCompilation = priceCompilation;
     }
 
     public boolean setCountAllTargets(int newCount) {
@@ -92,10 +129,10 @@ public class GeneralData {
     }
 
     public void setTargetNames(Collection<String> allTargetNames) {
-        this.alLTargetNames = allTargetNames;
+        this.allTargetNames = allTargetNames;
     }
 
     public Collection<String> getAllTargetNames() {
-        return alLTargetNames;
+        return allTargetNames;
     }
 }

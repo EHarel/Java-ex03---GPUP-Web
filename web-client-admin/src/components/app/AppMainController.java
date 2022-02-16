@@ -17,7 +17,9 @@ import events.ExecutionEndListener;
 import events.ExecutionStartListener;
 import events.FileLoadedListener;
 import exception.*;
+import httpclient.HttpClientUtil;
 import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -29,6 +31,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import logic.Engine;
+import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
 import task.ExecutionData;
 import task.TaskProcess;
 import task.TaskType;
@@ -37,6 +41,8 @@ import task.configuration.ConfigurationCompilation;
 import task.configuration.ConfigurationData;
 import task.configuration.ConfigurationSimulation;
 import task.consumer.ConsumerManager;
+import utilshared.Constants;
+import utilshared.UserType;
 
 import javax.naming.NameNotFoundException;
 import javax.xml.bind.JAXBException;
@@ -49,6 +55,11 @@ import java.util.List;
 import java.util.Optional;
 
 public class AppMainController {
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ------------------------------------------- DATA MEMBERS ------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+
+    /* ----------------------------------------------- FXML ----------------------------------------------- */
     private boolean hasPerformedInitialGraphLoad = false;
 
     private BorderPane root;
@@ -75,7 +86,7 @@ public class AppMainController {
 
     private Scene mainScene;
 
-    private SimpleBooleanProperty allowAnimations = new SimpleBooleanProperty(true);
+    private SimpleBooleanProperty allowAnimations = new SimpleBooleanProperty(false);
 
 
     private Parent login;
@@ -87,12 +98,19 @@ public class AppMainController {
     public boolean getAllowAnimations() { return allowAnimations.get(); }
 
 
+    /* ------------------------------------------ CUSTOM FIELDS ------------------------------------------- */
+
+
+
     // Events
     private List<FileLoadedListener> fileLoadedListeners;
     private List<ExecutionStartListener> executionStartListeners;
     private List<ExecutionEndListener> executionEndListeners;
 
 
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ----------------------------------- CONSTRUCTOR AND INITIALIZER ------------------------------------ */
+    /* ---------------------------------------------------------------------------------------------------- */
     public AppMainController() {
         fileLoadedListeners = new LinkedList<>();
         executionStartListeners = new LinkedList<>();
@@ -100,6 +118,14 @@ public class AppMainController {
     }
 
 
+
+
+
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* --------------------------------------- GETTERS AND SETTERS ---------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
     public void setMainScene(Scene scene) {
         this.mainScene = scene;
     }
@@ -191,48 +217,95 @@ public class AppMainController {
 
     public void loadFile() {
         boolean loaded = false;
-        Engine engine = Engine.getInstance();
+
         FileChooser fileChooser = new FileChooser();
         File selectedFile = fileChooser.showOpenDialog(GPUPAdmin.getStage());
         if (selectedFile != null) {
 
-            try {
-                System.out.println("Loading file.");
-                engine.loadXML(selectedFile.getPath());
-                if (!hasPerformedInitialGraphLoad) {
-                    hasPerformedInitialGraphLoad = true;
-                    loadDefaultConfigurationsToEngine();
-                    menuController.enableTaskSettingsButton();
+            System.out.println("Loading file.");
+
+            RequestBody body =
+                    new MultipartBody.Builder()
+                            .addFormDataPart("file1", selectedFile.getName(), RequestBody.create(selectedFile, MediaType.parse("text/plain")))
+                            .build();
+
+            //noinspection ConstantConditions
+            String finalUrl = HttpUrl
+                    .parse(Constants.FILE_UPLOAD)
+                    .newBuilder()
+                    .build()
+                    .toString();
+
+
+//        updateHttpStatusLine("New request is launched for: " + finalUrl); // Aviad Code
+
+            HttpClientUtil.runAsync(finalUrl, body, new Callback() {
+
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    showFileLoadingErrorMessage("Something went wrong with the file upload!");
+
+//                        Platform.runLater(() ->
+//                                resultMessageProperty.set("Something went wrong: " + e.getMessage()));
                 }
-                loaded = true;
-                fileLoadedListeners.forEach(FileLoadedListener::fileLoaded);
-            } catch (FileNotFoundException e) {
-                showFileLoadingErrorMessage(e.getMessage());
-                e.printStackTrace();
-            } catch (JAXBException e) {
-                e.printStackTrace();
-            } catch (ExistingItemException e) {
-                showFileLoadingErrorMessage(e.getMessage());
-                e.printStackTrace();
-            } catch (DependencyOnNonexistentTargetException e) {
-                showFileLoadingErrorMessage(e.getMessage());
-                e.printStackTrace();
-            } catch (ImmediateCircularDependencyException e) {
-                showFileLoadingErrorMessage(e.getMessage());
-            } catch (NullOrEmptyStringException e) {
-                e.printStackTrace();
-            } catch (InvalidInputRangeException e) {
-                showFileLoadingErrorMessage(e.getMessage());
-                e.printStackTrace();
-            } catch (NonexistentTargetException e) {
-                showFileLoadingErrorMessage(e.getMessage());
-            } catch (SerialSetNameRepetitionException e) {
-                showFileLoadingErrorMessage("Repeating serial set name.\n" + e.getMessage());
-            } finally {
-                if (!loaded) {
-                    menuController.failedToLoad();
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    String responseBody = response.body().string();
+                    if (response.code() != 200) {
+                        Platform.runLater(() ->
+//                                    resultMessageProperty.set("Something went wrong: " + responseBody));
+                                showFileLoadingErrorMessage("Something went wrong with the file upload!"));
+                    } else {
+                        Platform.runLater(() -> {
+                            fileLoadedListeners.forEach(FileLoadedListener::fileLoaded);
+
+//                            showFileLoadingErrorMessage("Yay, file loaded! :)");
+
+//                                appMainController.loginSuccessful(userName);
+//                        chatAppMainController.updateUserName(userName);   // Aviad code
+//                        chatAppMainController.switchToChatRoom();         // Aviad code
+                        });
+                    }
                 }
-            }
+            });
+//
+//            try {
+//
+//                if (!hasPerformedInitialGraphLoad) {
+//                    hasPerformedInitialGraphLoad = true;
+//                    loadDefaultConfigurationsToEngine();
+//                    menuController.enableTaskSettingsButton();
+//                }
+//                loaded = true;
+//                fileLoadedListeners.forEach(FileLoadedListener::fileLoaded);
+//            } catch (FileNotFoundException e) {
+//                showFileLoadingErrorMessage(e.getMessage());
+//                e.printStackTrace();
+//            } catch (JAXBException e) {
+//                e.printStackTrace();
+//            } catch (ExistingItemException e) {
+//                showFileLoadingErrorMessage(e.getMessage());
+//                e.printStackTrace();
+//            } catch (DependencyOnNonexistentTargetException e) {
+//                showFileLoadingErrorMessage(e.getMessage());
+//                e.printStackTrace();
+//            } catch (ImmediateCircularDependencyException e) {
+//                showFileLoadingErrorMessage(e.getMessage());
+//            } catch (NullOrEmptyStringException e) {
+//                e.printStackTrace();
+//            } catch (InvalidInputRangeException e) {
+//                showFileLoadingErrorMessage(e.getMessage());
+//                e.printStackTrace();
+//            } catch (NonexistentTargetException e) {
+//                showFileLoadingErrorMessage(e.getMessage());
+//            } catch (SerialSetNameRepetitionException e) {
+//                showFileLoadingErrorMessage("Repeating serial set name.\n" + e.getMessage());
+//            } finally {
+//                if (!loaded) {
+//                    menuController.failedToLoad();
+//                }
+//            }
         }
     }
 
@@ -518,4 +591,12 @@ public class AppMainController {
     public void dashboardButtonPressed() {
         this.root.setCenter(dashboard);
     }
+
+
+
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ------------------------------------------ MISC. METHODS ------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
 }

@@ -14,15 +14,22 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class DependenciesGraph implements Graph, Serializable {
-    private static final long serialVersionUID = 5; // 11-Dec-2021, target participation count
+//    private static final long serialVersionUID = 5; // 11-Dec-2021, target participation count
+    private static final long serialVersionUID = 6; // 16-Feb-2021 -- Pricing, name of uploading user
+
     private final boolean caseSensitiveNames = false;
 
     /* ---------------------------------------------------------------------------------------------------- */
     /* ------------------------------------------ DATA MEMBERS -------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     private String name;
+    private String uploadingUserName;
     Map<String, Target> targets;
     Collection<SerialSet> serialSets;
+
+    private int priceCompilation;
+    private int priceSimulation;
+
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -39,6 +46,30 @@ public class DependenciesGraph implements Graph, Serializable {
     /* --------------------------------------- SETTERS AND GETTERS ---------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
+    public String getUploadingUserName() {
+        return uploadingUserName;
+    }
+
+    public void setUploadingUserName(String uploadingUserName) {
+        this.uploadingUserName = uploadingUserName;
+    }
+
+    public int getPriceCompilation() {
+        return priceCompilation;
+    }
+
+    public void setPriceCompilation(int priceCompilation) {
+        this.priceCompilation = priceCompilation;
+    }
+
+    public int getPriceSimulation() {
+        return priceSimulation;
+    }
+
+    public void setPriceSimulation(int priceSimulation) {
+        this.priceSimulation = priceSimulation;
+    }
+
     @Override
     public String getName() {
         return name;
@@ -334,18 +365,23 @@ public class DependenciesGraph implements Graph, Serializable {
 
 
     @Override
-    public GeneralData getGeneralDataAllTargets() {
+    public GraphGeneralData getGeneralDataAllTargets() {
         Map<TargetDTO.Dependency, Integer> dependencyIntegerMap = sizeDependency();
-        GeneralData generalData = new GeneralData();
+        GraphGeneralData graphGeneralData = new GraphGeneralData();
 
-        generalData.setCountAllTargets(targets.size());
-        generalData.setCountLeaves(dependencyIntegerMap.get(TargetDTO.Dependency.LEAF));
-        generalData.setCountMiddles(dependencyIntegerMap.get(TargetDTO.Dependency.MIDDLE));
-        generalData.setCountRoots(dependencyIntegerMap.get(TargetDTO.Dependency.ROOT));
-        generalData.setCountIndependents(dependencyIntegerMap.get(TargetDTO.Dependency.INDEPENDENT));
-        generalData.setTargetNames(getAllTargetNames());
+        graphGeneralData.setCountAllTargets(targets.size());
+        graphGeneralData.setCountLeaves(dependencyIntegerMap.get(TargetDTO.Dependency.LEAF));
+        graphGeneralData.setCountMiddles(dependencyIntegerMap.get(TargetDTO.Dependency.MIDDLE));
+        graphGeneralData.setCountRoots(dependencyIntegerMap.get(TargetDTO.Dependency.ROOT));
+        graphGeneralData.setCountIndependents(dependencyIntegerMap.get(TargetDTO.Dependency.INDEPENDENT));
+        graphGeneralData.setTargetNames(getAllTargetNames());
 
-        return generalData;
+        graphGeneralData.setGraphName(this.name);
+        graphGeneralData.setUploadingUserName(this.uploadingUserName);
+        graphGeneralData.setPriceCompilation(this.priceCompilation);
+        graphGeneralData.setPriceSimulation(this.priceSimulation);
+
+        return graphGeneralData;
     }
 
     @Override

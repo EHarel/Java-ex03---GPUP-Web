@@ -17,18 +17,22 @@ import java.time.Instant;
 import java.util.*;
 
 public class Engine implements Serializable {
-//    private static final long serialVersionUID = 2; // 19-Nov-2021
+    //    private static final long serialVersionUID = 2; // 19-Nov-2021
     private static final long serialVersionUID = 3; // 29-Nov-2021
 
     private static Engine singleInstance = null;
+    private static Object lock = new Object();
 
     private DependenciesGraph dependenciesGraph;
     private TaskManager taskManager;
+    private GraphManager graphManager;
 
 
     private Engine() {
         dependenciesGraph = new DependenciesGraph();
         // taskManager = new TaskManager(dependenciesGraph);
+
+        graphManager = new GraphManager();
     }
 
     public static synchronized Engine getInstance() {
@@ -53,6 +57,10 @@ public class Engine implements Serializable {
 
 
 
+    public synchronized GraphManager getGraphManager() {
+        return graphManager;
+    }
+
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -60,9 +68,9 @@ public class Engine implements Serializable {
     /* -------------------------------------------TASK METHODS -------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
+
     /**
-     *
-     * @param taskType the type of task you which to add to.
+     * @param taskType  the type of task you which to add to.
      * @param newConfig new configuration to add.
      * @return true if added, false if configuration by such name exists already.
      */
@@ -114,10 +122,11 @@ public class Engine implements Serializable {
     /**
      * This method does not initialize the consumers for the different stages of the task process.
      * That must be done separately via the addConsumer methods.
+     *
      * @param chosenTargetNames if this parameter is null or empty, the engine assumes all targets are meant
-     *                                  to participate, since it makes no sense to run a task with no targets in it.
-     *                                  So the default (i.e. null\empty) means ALL targets. Only if this parameter has
-     *                                  values does it include and exclude targets accordingly.
+     *                          to participate, since it makes no sense to run a task with no targets in it.
+     *                          So the default (i.e. null\empty) means ALL targets. Only if this parameter has
+     *                          values does it include and exclude targets accordingly.
      */
     public void executeTask(TaskType taskType, TaskProcess.StartPoint startPoint, ConsumerManager consumerManager, Collection<String> chosenTargetNames) throws UninitializedTaskException, IOException, NoConfigurationException {
         String directoryPath = openExecutionFolderWithStartPointName(taskType, startPoint);
@@ -172,15 +181,17 @@ public class Engine implements Serializable {
         return EngineUtils.getFormalizedConfigurationString(config);
     }
 
-    public String formatTimeDuration(Instant start, Instant end) { return EngineUtils.formatTimeDuration(start, end); }
+    public String formatTimeDuration(Instant start, Instant end) {
+        return EngineUtils.formatTimeDuration(start, end);
+    }
 
-    public String getDateTimeFromInstant(Instant instant) { return EngineUtils.getDateTimeFromInstant(instant); }
+    public String getDateTimeFromInstant(Instant instant) {
+        return EngineUtils.getDateTimeFromInstant(instant);
+    }
 
-    public void pauseExecution(boolean isPaused) { taskManager.pause(isPaused); }
-
-
-
-
+    public void pauseExecution(boolean isPaused) {
+        taskManager.pause(isPaused);
+    }
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -189,7 +200,7 @@ public class Engine implements Serializable {
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     public void save(String filePathWithoutSuffix) throws IOException {
-        SaveObject saveObject = new SaveObject(dependenciesGraph, taskManager, taskManager.getMaxParallelism());
+        SaveObject saveObject = new SaveObject(dependenciesGraph, taskManager);
         FileManager.saveNonXML(filePathWithoutSuffix, saveObject);
     }
 
@@ -204,10 +215,24 @@ public class Engine implements Serializable {
         taskManager = saveObject.getTaskManager();
     }
 
-    /**
-     * @throws InvalidInputRangeException If maxParallelism value is 0 (must be a whole number larger than 1).
-     */
-    public void loadXML(String filePath) throws
+//    /**
+//     * @throws InvalidInputRangeException If maxParallelism value is 0 (must be a whole number larger than 1).
+//     */
+//    public void loadXML(String filePath) throws
+//            FileNotFoundException,
+//            JAXBException,
+//            ExistingItemException,
+//            DependencyOnNonexistentTargetException,
+//            ImmediateCircularDependencyException,
+//            NullOrEmptyStringException,
+//            InvalidInputRangeException,
+//            NonexistentTargetException,
+//            SerialSetNameRepetitionException {
+//        SaveObject saveObject = FileManager.loadXML(filePath);
+//        addNewSaveObject(saveObject);
+//    }
+
+    public void loadXMLFromInputStream(InputStream inputStream, String uploadingUser) throws
             FileNotFoundException,
             JAXBException,
             ExistingItemException,
@@ -217,9 +242,13 @@ public class Engine implements Serializable {
             InvalidInputRangeException,
             NonexistentTargetException,
             SerialSetNameRepetitionException {
-        SaveObject saveObject = FileManager.loadXML(filePath);
-        this.dependenciesGraph = saveObject.getDependenciesGraph();
-        this.taskManager = new TaskManager(dependenciesGraph, saveObject.getMaxParallelism());
+        SaveObject saveObject = FileManager.loadXMLFromInputStream(inputStream, uploadingUser);
+        addNewSaveObject(saveObject);
+    }
+
+    private void addNewSaveObject(SaveObject saveObject) {
+        getGraphManager().addGraph(saveObject.getDependenciesGraph());
+//        this.taskManager = new TaskManager(dependenciesGraph, saveObject.getMaxParallelism());
     }
 
     public void toggleRememberLastConfiguration(TaskType taskType) {
@@ -228,6 +257,7 @@ public class Engine implements Serializable {
 
     /**
      * Checks if a task is set to remember its last configuration for next executions.
+     *
      * @return true if remembers, false if doesn't.
      */
     public boolean isPersistentConfiguration(TaskType taskType) {
