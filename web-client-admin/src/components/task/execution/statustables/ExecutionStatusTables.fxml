@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+
+<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="545.0" prefWidth="753.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.task.execution.statustables.ExecutionStatusTablesController">
+   <content>
+      <TabPane fx:id="tabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+            <Tab text="All Targets">
+               <content>
+                  <fx:include fx:id="tableAllTargetsComponent" source="../../../graph/targettable/TargetTable.fxml" />
+               </content></Tab>
+          <Tab fx:id="tabUnprocessed" text="Unprocessed">
+               <content>
+                  <fx:include fx:id="tableUnprocessedComponent" source="../../../graph/targettable/TargetTable.fxml" />
+               </content>
+            </Tab>
+          <Tab text="Processed">
+               <content>
+                  <fx:include fx:id="tableProcessedComponent" source="../../../graph/targettable/TargetTable.fxml" />
+               </content>
+            </Tab>
+            <Tab text="Failed">
+               <content>
+                  <fx:include fx:id="tableFailedComponent" source="../../../graph/targettable/TargetTable.fxml" />
+               </content>
+            </Tab>
+            <Tab text="Succeeded">
+               <content>
+                  <fx:include fx:id="tableSucceededComponent" source="../../../graph/targettable/TargetTable.fxml" />
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+   </content>
+</ScrollPane>
