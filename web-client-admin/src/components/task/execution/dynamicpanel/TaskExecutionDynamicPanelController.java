@@ -198,7 +198,7 @@ public class TaskExecutionDynamicPanelController {
     }
 
     public void newFileLoaded() {
-        AppMainController.setThreadNumberChoiceBox(threadNumCB);
+//        AppMainController.setThreadNumberChoiceBox(threadNumCB);
         reset();
     }
 

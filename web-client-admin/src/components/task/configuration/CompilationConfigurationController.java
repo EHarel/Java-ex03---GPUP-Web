@@ -1,5 +1,6 @@
 package components.task.configuration;
 
+import components.app.AppMainController;
 import components.app.GPUPAdmin;
 import components.task.settings.TaskSettingsController;
 import javafx.event.ActionEvent;
@@ -9,7 +10,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
-import logic.Engine;
 import task.TaskType;
 import task.configuration.*;
 
@@ -19,14 +19,6 @@ import java.io.File;
 public class CompilationConfigurationController {
 
     private TaskSettingsController taskSettingsController;
-
-    public void setTaskSettingsController(TaskSettingsController taskSettingsController) {
-        this.taskSettingsController = taskSettingsController;
-
-        taskSettingsController.getIsEditingNewConfigProperty().addListener(((observable, oldValue, newValue) -> {
-            setControlsDisabled(!newValue);
-        }));
-    }
 
     @FXML
     private Label labelNameMsg;
@@ -48,6 +40,14 @@ public class CompilationConfigurationController {
 
     private void setNameListener() {
         TaskSettingsController.SetNameListener(textFieldConfigName, labelNameMsg);
+    }
+
+    public void setTaskSettingsController(TaskSettingsController taskSettingsController) {
+        this.taskSettingsController = taskSettingsController;
+
+        taskSettingsController.getIsEditingNewConfigProperty().addListener(((observable, oldValue, newValue) -> {
+            setControlsDisabled(!newValue);
+        }));
     }
 
     @FXML
@@ -77,13 +77,12 @@ public class CompilationConfigurationController {
 
     }
 
-    public ConfigurationCompilation getConfig(Integer threadNum) {
+    public ConfigurationCompilation getConfig() {
         ConfigurationCompilation compConfig = null;
 
-        if (threadNum != null) {
             try {
                 String name = getName();
-                int numberOfThreads = threadNum;
+                int numberOfThreads = 1; // TODO: delete when I can, old code from ex02
                 String sourceCodePath = getSourceCodePath();
                 String outPath = getOutPath();
 
@@ -92,7 +91,6 @@ public class CompilationConfigurationController {
                 showNoNameError();
             } catch (Exception ignore) {
             }
-        }
 
         return compConfig;
     }
@@ -116,8 +114,9 @@ public class CompilationConfigurationController {
         return textFieldConfigName.getText();
     }
 
-    public void loadConfig(String configName) {
-        ConfigurationDataCompilation configData = (ConfigurationDataCompilation) Engine.getInstance().getConfigSpecific(TaskType.COMPILATION, configName);
+    public void loadConfig(String configName, AppMainController mainController) {
+//        ConfigurationDataCompilation configData = (ConfigurationDataCompilation) Engine.getInstance().getConfigSpecific(TaskType.COMPILATION, configName);
+        ConfigurationDataCompilation configData = (ConfigurationDataCompilation) mainController.getConfigDataSpecific(TaskType.COMPILATION, configName);
 
         if (configData == null)
             return;
@@ -130,11 +129,11 @@ public class CompilationConfigurationController {
     public void lockControls() {
         setControlsDisabled(true);
     }
-    
+
     public void unlockControls() {
         setControlsDisabled(false);
     }
-    
+
     private void setControlsDisabled(boolean isDisabled) {
         textFieldConfigName.setDisable(isDisabled);
         chooseFolderOutputButton.setDisable(isDisabled);

@@ -25,8 +25,8 @@ public class DependenciesGraph implements Graph, Serializable {
     Map<String, Target> targets;
     Collection<SerialSet> serialSets;
 
-    private int priceCompilation;
-    private int priceSimulation;
+    private Integer priceCompilation;
+    private Integer priceSimulation;
 
 
 
@@ -36,6 +36,8 @@ public class DependenciesGraph implements Graph, Serializable {
     public DependenciesGraph() {
         targets = new HashMap<>();
         serialSets = new LinkedList<>();
+        priceSimulation = null;
+        priceCompilation = null;
     }
 
     /**
@@ -105,19 +107,19 @@ public class DependenciesGraph implements Graph, Serializable {
         this.uploadingUserName = uploadingUserName;
     }
 
-    public int getPriceCompilation() {
+    public Integer getPriceCompilation() {
         return priceCompilation;
     }
 
-    public void setPriceCompilation(int priceCompilation) {
+    public void setPriceCompilation(Integer priceCompilation) {
         this.priceCompilation = priceCompilation;
     }
 
-    public int getPriceSimulation() {
+    public Integer getPriceSimulation() {
         return priceSimulation;
     }
 
-    public void setPriceSimulation(int priceSimulation) {
+    public void setPriceSimulation(Integer priceSimulation) {
         this.priceSimulation = priceSimulation;
     }
 
@@ -759,8 +761,14 @@ public class DependenciesGraph implements Graph, Serializable {
         duplicationAddTargetsWithoutDependencies(duplicateGraph);
         duplicationAddDependencies(duplicateGraph);
         duplicateSerialSets(duplicateGraph);
+        duplicatePrices(duplicateGraph);
 
         return duplicateGraph;
+    }
+
+    private void duplicatePrices(DependenciesGraph duplicateGraph) {
+        duplicateGraph.priceCompilation = this.priceCompilation;
+        duplicateGraph.priceSimulation = this.priceSimulation;
     }
 
     /**
@@ -781,6 +789,7 @@ public class DependenciesGraph implements Graph, Serializable {
             duplicationAddTargetsWithoutDependenciesChosenOnly(subGraph, chosenTargets);
             duplicationAddDependenciesChosenOnly(subGraph, chosenTargets);
             duplicateSerialSetsChosenOnly(subGraph, chosenTargets);
+            duplicatePrices(subGraph);
         }
 
         return subGraph;

@@ -123,7 +123,7 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
     public void TaskSettingsEvent_UpdateChosenTargetsAction() {
         TaskSettingsController settingsController = mainController.getTaskSettingsController();
 
-        workingGraph = settingsController.getChosenGraph();
+        workingGraph = settingsController.getGraphOfChosenTargets();
 
         setWorkingGraph(workingGraph);
         statusTablesComponentController.updateUnprocessed(workingGraph);

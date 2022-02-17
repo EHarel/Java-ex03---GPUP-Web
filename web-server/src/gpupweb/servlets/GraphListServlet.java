@@ -1,6 +1,7 @@
 package gpupweb.servlets;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import gpupweb.utils.ServletUtils;
 import graph.DependenciesGraph;
 import graph.GraphDTO;
@@ -22,7 +23,8 @@ public class GraphListServlet extends HttpServlet {
         //returning JSON objects, not HTML
         response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
-            Gson gson = new Gson();
+//            Gson gson = new Gson();
+            Gson gson = new GsonBuilder().serializeNulls().create();
 
             GraphManager graphManager = ServletUtils.getGraphManager(getServletContext());
             Set<DependenciesGraph> graphList = graphManager.getGraphs();

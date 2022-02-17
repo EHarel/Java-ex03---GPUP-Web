@@ -6,8 +6,8 @@ import java.util.Set;
 public class GraphDTO {
     private String graphName;
     private String uploadingUserName;
-    private int priceSimulation;
-    private int priceCompilation;
+    private Integer priceSimulation;
+    private Integer priceCompilation;
 
     private int countAllTargets;
     private int countLeaves;
@@ -39,19 +39,19 @@ public class GraphDTO {
         this.uploadingUserName = uploadingUserName;
     }
 
-    public int getPriceSimulation() {
+    public Integer getPriceSimulation() {
         return priceSimulation;
     }
 
-    public void setPriceSimulation(int priceSimulation) {
+    public void setPriceSimulation(Integer priceSimulation) {
         this.priceSimulation = priceSimulation;
     }
 
-    public int getPriceCompilation() {
+    public Integer getPriceCompilation() {
         return priceCompilation;
     }
 
-    public void setPriceCompilation(int priceCompilation) {
+    public void setPriceCompilation(Integer priceCompilation) {
         this.priceCompilation = priceCompilation;
     }
 

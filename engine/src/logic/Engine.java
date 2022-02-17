@@ -264,9 +264,9 @@ public class Engine implements Serializable {
         return taskManager.isPersistentConfiguration(taskType);
     }
 
-    public int getThreadCount_maxParallelism() {
-        return taskManager.getMaxParallelism();
-    }
+//    public int getThreadCount_maxParallelism() {
+//        return taskManager.getMaxParallelism();
+//    }
 
     public int getThreadCount_currentParallelism() {
         return taskManager.getCurrentParallelism();

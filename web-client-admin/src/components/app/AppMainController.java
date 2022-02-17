@@ -34,7 +34,9 @@ import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import task.ExecutionData;
 import task.TaskType;
+import task.configuration.Configuration;
 import task.configuration.ConfigurationCompilation;
+import task.configuration.ConfigurationData;
 import task.configuration.ConfigurationSimulation;
 import utilshared.Constants;
 
@@ -92,6 +94,7 @@ public class AppMainController {
     private String chosenGraphName;
     DependenciesGraph chosenGraph;
     GraphManager graphManager;
+    ConfigurationManager configManager;
 
 
     // Events
@@ -110,6 +113,7 @@ public class AppMainController {
         executionEndListeners = new LinkedList<>();
         graphChosenListeners = new LinkedList<>();
         graphManager = new GraphManager();
+        configManager = new ConfigurationManager();
     }
 
 
@@ -204,10 +208,6 @@ public class AppMainController {
         if (targetTableController != null) {
             targetTableController.setMainController(this);
         }
-    }
-
-    public boolean isHasPerformedInitialGraphLoad() {
-        return hasPerformedInitialGraphLoad;
     }
 
     public TaskSettingsController getTaskSettingsController() {
@@ -402,6 +402,11 @@ public class AppMainController {
     }
 
     public void taskButtonPressed() {
+        displayTaskSettings();
+    }
+
+    private void displayTaskSettings() {
+        dashboardController.setActive(false);
         root.setCenter(taskSettings);
     }
 
@@ -419,77 +424,6 @@ public class AppMainController {
 
         controller.setMainController(this);
     }
-//
-//    public void startExecutionButtonPressed() {
-////        Configuration configuration = taskSettingsController.getTaskConfigurationWithParticipatingTargets();
-////        if (configuration == null) {
-////            return;
-////        }
-//        String errorTitle = "Execution start error";
-//
-//        TaskProcess.StartPoint taskStartPoint = taskSettingsController.GetTaskStartPoint();
-//        if (taskStartPoint == null) {
-//            AlertErrorMessage(errorTitle, "No start point defined");
-//            return;
-//        }
-//
-//        TaskType taskType = taskSettingsController.getChosenTaskType();
-//        if (taskType == null) {
-//            AlertErrorMessage(errorTitle, "No task type defined");
-//            return;
-//        }
-//
-//        ConfigurationData configData = Engine.getInstance().getConfigActive(taskType);
-//        if (configData == null) {
-//            AlertErrorMessage(errorTitle, "No active configuration set. Go to the settings and define an active config.");
-//            return;
-//        }
-//
-//        ConsumerManager consumerManager = getTaskConsumers();
-//
-//        Integer threadNum = taskSettingsController.getThreadNum();
-//        if (threadNum == null) {
-//            AlertErrorMessage(errorTitle, "No thread number specified. Go to the settings and define how many threads to use.");
-//            return;
-//        }
-//
-//        Collection<String> participatingTargetNames = taskSettingsController.getParticipatingTargets();
-//        if (participatingTargetNames == null || participatingTargetNames.isEmpty()) {
-//            AlertErrorMessage(errorTitle, "No participating targets defined. Go to target selection and choose targets.");
-//            return;
-//        }
-//
-//        try {
-//            Engine.getInstance().activeConfig_UpdateThreadCount(taskType, threadNum.intValue());
-//            Engine.getInstance().activeConfig_UpdateParticipatingTargets(taskType, participatingTargetNames);
-//
-//            Configuration activeConfig = Engine.getInstance().getActiveConfigNotData(taskType);
-//
-//
-//            Engine.getInstance().executeTask(taskType, taskStartPoint, consumerManager, participatingTargetNames);
-//
-//
-//            executionStartListeners.forEach(executionStartListener -> executionStartListener.executionStarted(activeConfig));
-//        } catch (UninitializedTaskException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (NoConfigurationException e) {
-//            e.printStackTrace();
-//        } catch (InvalidInputRangeException invalidInputRangeException) {
-//            AlertErrorMessage(errorTitle, "Invalid number of threads chosen");
-//        }
-//    }
-
-//    private ConsumerManager getTaskConsumers() {
-//        ConsumerManager consumerManager = TaskGeneral.getTaskConsumers(); // TODO: change to something GUI related
-//        consumerManager.getEndTargetConsumers().add(new ConsumerFinishedTargetJavaFX(taskExecutionController));
-//        consumerManager.getEndProcessConsumers().add(new ConsumerFinishedTaskProcessJavaFX(this));
-//        consumerManager.getTargetStateChangedConsumers().add(new ConsumerTargetStateChangedJavaFX(taskExecutionController));
-//        consumerManager.getStartTargetProcessingConsumers().add(new ConsumerStartProcessingTargetsJavaFX(taskExecutionController));
-//
-//        return consumerManager;
-//    }
 
     public void pauseButtonPressed() {
         Engine.getInstance().pauseExecution(true);
@@ -499,17 +433,6 @@ public class AppMainController {
     public void continueButtonPressed() {
         System.out.println("[continueButtonPressed - AppMainController] About to continue execution..");
         Engine.getInstance().pauseExecution(false);
-    }
-
-    public static void setThreadNumberChoiceBox(ChoiceBox<Integer> threadNumCB) {
-        int maxParallelism = Engine.getInstance().getThreadCount_maxParallelism();
-        threadNumCB.getItems().clear();
-        for (int i = 0; i < maxParallelism; i++) {
-            int value = i + 1;
-            threadNumCB.getItems().add(value);
-        }
-
-        threadNumCB.getSelectionModel().select(0);
     }
 
     public void threadChangedDuringExecution(int newValue) {
@@ -618,6 +541,26 @@ public class AppMainController {
         graphManager.addGraphs(graphDTOs);
     }
 
+    public boolean addConfiguration(Configuration configuration) {
+        return configManager.addConfiguration(configuration);
+    }
+
+    public Collection<ConfigurationData> getConfigDataAll(TaskType taskType) {
+        return configManager.getConfigDataAll(taskType);
+    }
+
+    public ConfigurationData getActiveConfigData(TaskType taskType) {
+        return configManager.getActiveConfigData(taskType);
+    }
+
+    public void setActiveConfig(TaskType taskType, String configName) {
+        configManager.setActiveConfig(taskType, configName);
+    }
+
+    public ConfigurationData getConfigDataSpecific(TaskType taskType, String configName) {
+        return configManager.getConfigDataSpecific(taskType, configName);
+    }
+
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -626,3 +569,94 @@ public class AppMainController {
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
 }
+
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------- */
+/* --------------------------------------------- OLD CODE --------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------- */
+//    public static void setThreadNumberChoiceBox(ChoiceBox<Integer> threadNumCB) {
+//        int maxParallelism = Engine.getInstance().getThreadCount_maxParallelism();
+//        threadNumCB.getItems().clear();
+//        for (int i = 0; i < maxParallelism; i++) {
+//            int value = i + 1;
+//            threadNumCB.getItems().add(value);
+//        }
+//
+//        threadNumCB.getSelectionModel().select(0);
+//    }
+
+
+
+//
+//    public void startExecutionButtonPressed() {
+////        Configuration configuration = taskSettingsController.getTaskConfigurationWithParticipatingTargets();
+////        if (configuration == null) {
+////            return;
+////        }
+//        String errorTitle = "Execution start error";
+//
+//        TaskProcess.StartPoint taskStartPoint = taskSettingsController.GetTaskStartPoint();
+//        if (taskStartPoint == null) {
+//            AlertErrorMessage(errorTitle, "No start point defined");
+//            return;
+//        }
+//
+//        TaskType taskType = taskSettingsController.getChosenTaskType();
+//        if (taskType == null) {
+//            AlertErrorMessage(errorTitle, "No task type defined");
+//            return;
+//        }
+//
+//        ConfigurationData configData = Engine.getInstance().getConfigActive(taskType);
+//        if (configData == null) {
+//            AlertErrorMessage(errorTitle, "No active configuration set. Go to the settings and define an active config.");
+//            return;
+//        }
+//
+//        ConsumerManager consumerManager = getTaskConsumers();
+//
+//        Integer threadNum = taskSettingsController.getThreadNum();
+//        if (threadNum == null) {
+//            AlertErrorMessage(errorTitle, "No thread number specified. Go to the settings and define how many threads to use.");
+//            return;
+//        }
+//
+//        Collection<String> participatingTargetNames = taskSettingsController.getParticipatingTargets();
+//        if (participatingTargetNames == null || participatingTargetNames.isEmpty()) {
+//            AlertErrorMessage(errorTitle, "No participating targets defined. Go to target selection and choose targets.");
+//            return;
+//        }
+//
+//        try {
+//            Engine.getInstance().activeConfig_UpdateThreadCount(taskType, threadNum.intValue());
+//            Engine.getInstance().activeConfig_UpdateParticipatingTargets(taskType, participatingTargetNames);
+//
+//            Configuration activeConfig = Engine.getInstance().getActiveConfigNotData(taskType);
+//
+//
+//            Engine.getInstance().executeTask(taskType, taskStartPoint, consumerManager, participatingTargetNames);
+//
+//
+//            executionStartListeners.forEach(executionStartListener -> executionStartListener.executionStarted(activeConfig));
+//        } catch (UninitializedTaskException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (NoConfigurationException e) {
+//            e.printStackTrace();
+//        } catch (InvalidInputRangeException invalidInputRangeException) {
+//            AlertErrorMessage(errorTitle, "Invalid number of threads chosen");
+//        }
+//    }
+
+//    private ConsumerManager getTaskConsumers() {
+//        ConsumerManager consumerManager = TaskGeneral.getTaskConsumers(); // TODO: change to something GUI related
+//        consumerManager.getEndTargetConsumers().add(new ConsumerFinishedTargetJavaFX(taskExecutionController));
+//        consumerManager.getEndProcessConsumers().add(new ConsumerFinishedTaskProcessJavaFX(this));
+//        consumerManager.getTargetStateChangedConsumers().add(new ConsumerTargetStateChangedJavaFX(taskExecutionController));
+//        consumerManager.getStartTargetProcessingConsumers().add(new ConsumerStartProcessingTargetsJavaFX(taskExecutionController));
+//
+//        return consumerManager;
+//    }
