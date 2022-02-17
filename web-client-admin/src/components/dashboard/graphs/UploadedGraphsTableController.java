@@ -1,17 +1,15 @@
 package components.dashboard.graphs;
 
+import components.dashboard.DashboardController;
+import events.FileLoadedListener;
 import graph.GraphGeneralData;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import users.UserDTO;
 import utilsharedclient.Constants;
 
 import java.util.Collection;
@@ -47,12 +45,14 @@ public class UploadedGraphsTableController {
     private TableColumn<GraphGeneralData, Integer> tableColumn_PricingCompilation;
 
 
-
     private GraphGeneralData currentlySelectedGraph;
+
 
     private Timer timer;
     private TimerTask listRefresher;
     private final BooleanProperty autoUpdate;
+    private DashboardController dashboardController;
+
     public BooleanProperty getAutoUpdateProperty() {
         return autoUpdate;
     }
@@ -75,16 +75,35 @@ public class UploadedGraphsTableController {
         tableColumn_PricingSimulation.setCellValueFactory(new PropertyValueFactory<GraphGeneralData, Integer>("priceSimulation"));
         tableColumn_PricingCompilation.setCellValueFactory(new PropertyValueFactory<GraphGeneralData, Integer>("priceCompilation"));
 
-        setActive();
+        setDoubleClickEvent();
+
+        setActive(false);
+        startRefresher();
+    }
+
+    private void setDoubleClickEvent() {
+        tableView_GraphDetails.setRowFactory( tv -> {
+            TableRow<GraphGeneralData> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    GraphGeneralData rowData = row.getItem();
+                    System.out.println("[Graph TableView] chosen row data: " + rowData);
+
+                    currentlySelectedGraph = row.getItem();
+                    dashboardController.rowChangedEvent();
+                }
+            });
+
+            return row ;
+        });
     }
 
     public TableView<GraphGeneralData> getTableView_GraphDetails() {
         return tableView_GraphDetails;
     }
 
-    public void setActive() {
-        getAutoUpdateProperty().set(true);
-        startRefresher();
+    public void setActive(boolean isActive) {
+        getAutoUpdateProperty().set(isActive);
     }
 
     public void startRefresher() {
@@ -119,6 +138,18 @@ public class UploadedGraphsTableController {
         graphs.forEach(graphDTO -> {
             tableView_GraphDetails.getItems().add(graphDTO);
         });
+    }
+
+
+
+
+
+    public void setDashboardController(DashboardController dashboardController) {
+        this.dashboardController = dashboardController;
+    }
+
+    public GraphGeneralData getCurrentlySelectedGraph() {
+        return currentlySelectedGraph;
     }
 }
 

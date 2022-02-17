@@ -10,7 +10,7 @@
    <content>
       <BorderPane fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
          <left>
-            <fx:include source="users/UserTable.fxml" />
+            <fx:include fx:id="component_UserTable" source="users/UserTable.fxml" />
          </left>
          <center>
             <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
