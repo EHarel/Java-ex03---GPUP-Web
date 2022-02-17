@@ -7,13 +7,11 @@ import console.menu.system.MenuManager;
 import exception.InvalidInputRangeException;
 import exception.NonexistentElementException;
 import logic.Engine;
-import task.TaskType;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationCompilation;
 import task.configuration.ConfigurationSimulation;
 
 import javax.naming.NameNotFoundException;
-import java.util.Optional;
 import java.util.Scanner;
 
 public class TaskSetConfiguration implements DoesAction {

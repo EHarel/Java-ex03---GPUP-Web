@@ -6,17 +6,16 @@ import components.graph.alldata.GraphAllDataController;
 import components.login.LoginAdminController;
 import components.menu.MenuController;
 import components.graph.targettable.TargetTableController;
-import components.task.consumer.ConsumerFinishedTargetJavaFX;
-import components.task.consumer.ConsumerFinishedTaskProcessJavaFX;
-import components.task.consumer.ConsumerStartProcessingTargetsJavaFX;
-import components.task.consumer.ConsumerTargetStateChangedJavaFX;
 import components.task.execution.main.TaskExecutionMainController;
 import components.task.settings.TaskSettingsController;
-import console.task.TaskGeneral;
+//import console.task.TaskGeneral;
 import events.ExecutionEndListener;
 import events.ExecutionStartListener;
 import events.FileLoadedListener;
+import events.GraphChosenListener;
 import exception.*;
+import graph.DependenciesGraph;
+import graph.GraphDTO;
 import httpclient.HttpClientUtil;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -34,25 +33,15 @@ import logic.Engine;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import task.ExecutionData;
-import task.TaskProcess;
 import task.TaskType;
-import task.configuration.Configuration;
 import task.configuration.ConfigurationCompilation;
-import task.configuration.ConfigurationData;
 import task.configuration.ConfigurationSimulation;
-import task.consumer.ConsumerManager;
 import utilshared.Constants;
-import utilshared.UserType;
 
 import javax.naming.NameNotFoundException;
-import javax.xml.bind.JAXBException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class AppMainController {
     /* ---------------------------------------------------------------------------------------------------- */
@@ -95,17 +84,21 @@ public class AppMainController {
     private Parent dashboard;
     private DashboardController dashboardController;
 
+
     public boolean getAllowAnimations() { return allowAnimations.get(); }
 
 
     /* ------------------------------------------ CUSTOM FIELDS ------------------------------------------- */
     private String chosenGraphName;
+    DependenciesGraph chosenGraph;
+    GraphManager graphManager;
 
 
     // Events
     private List<FileLoadedListener> fileLoadedListeners;
     private List<ExecutionStartListener> executionStartListeners;
     private List<ExecutionEndListener> executionEndListeners;
+    private List<GraphChosenListener> graphChosenListeners;
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -115,6 +108,8 @@ public class AppMainController {
         fileLoadedListeners = new LinkedList<>();
         executionStartListeners = new LinkedList<>();
         executionEndListeners = new LinkedList<>();
+        graphChosenListeners = new LinkedList<>();
+        graphManager = new GraphManager();
     }
 
 
@@ -193,6 +188,10 @@ public class AppMainController {
 
     public void addEventListener_ExecutionEnded(ExecutionEndListener newListener) {
         executionEndListeners.add(newListener);
+    }
+
+    public void addEventListener_GraphChosen(GraphChosenListener newListener) {
+        graphChosenListeners.add(newListener);
     }
 
     @FXML
@@ -420,77 +419,77 @@ public class AppMainController {
 
         controller.setMainController(this);
     }
-
-    public void startExecutionButtonPressed() {
-//        Configuration configuration = taskSettingsController.getTaskConfigurationWithParticipatingTargets();
-//        if (configuration == null) {
+//
+//    public void startExecutionButtonPressed() {
+////        Configuration configuration = taskSettingsController.getTaskConfigurationWithParticipatingTargets();
+////        if (configuration == null) {
+////            return;
+////        }
+//        String errorTitle = "Execution start error";
+//
+//        TaskProcess.StartPoint taskStartPoint = taskSettingsController.GetTaskStartPoint();
+//        if (taskStartPoint == null) {
+//            AlertErrorMessage(errorTitle, "No start point defined");
 //            return;
 //        }
-        String errorTitle = "Execution start error";
+//
+//        TaskType taskType = taskSettingsController.getChosenTaskType();
+//        if (taskType == null) {
+//            AlertErrorMessage(errorTitle, "No task type defined");
+//            return;
+//        }
+//
+//        ConfigurationData configData = Engine.getInstance().getConfigActive(taskType);
+//        if (configData == null) {
+//            AlertErrorMessage(errorTitle, "No active configuration set. Go to the settings and define an active config.");
+//            return;
+//        }
+//
+//        ConsumerManager consumerManager = getTaskConsumers();
+//
+//        Integer threadNum = taskSettingsController.getThreadNum();
+//        if (threadNum == null) {
+//            AlertErrorMessage(errorTitle, "No thread number specified. Go to the settings and define how many threads to use.");
+//            return;
+//        }
+//
+//        Collection<String> participatingTargetNames = taskSettingsController.getParticipatingTargets();
+//        if (participatingTargetNames == null || participatingTargetNames.isEmpty()) {
+//            AlertErrorMessage(errorTitle, "No participating targets defined. Go to target selection and choose targets.");
+//            return;
+//        }
+//
+//        try {
+//            Engine.getInstance().activeConfig_UpdateThreadCount(taskType, threadNum.intValue());
+//            Engine.getInstance().activeConfig_UpdateParticipatingTargets(taskType, participatingTargetNames);
+//
+//            Configuration activeConfig = Engine.getInstance().getActiveConfigNotData(taskType);
+//
+//
+//            Engine.getInstance().executeTask(taskType, taskStartPoint, consumerManager, participatingTargetNames);
+//
+//
+//            executionStartListeners.forEach(executionStartListener -> executionStartListener.executionStarted(activeConfig));
+//        } catch (UninitializedTaskException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (NoConfigurationException e) {
+//            e.printStackTrace();
+//        } catch (InvalidInputRangeException invalidInputRangeException) {
+//            AlertErrorMessage(errorTitle, "Invalid number of threads chosen");
+//        }
+//    }
 
-        TaskProcess.StartPoint taskStartPoint = taskSettingsController.GetTaskStartPoint();
-        if (taskStartPoint == null) {
-            AlertErrorMessage(errorTitle, "No start point defined");
-            return;
-        }
-
-        TaskType taskType = taskSettingsController.getChosenTaskType();
-        if (taskType == null) {
-            AlertErrorMessage(errorTitle, "No task type defined");
-            return;
-        }
-
-        ConfigurationData configData = Engine.getInstance().getConfigActive(taskType);
-        if (configData == null) {
-            AlertErrorMessage(errorTitle, "No active configuration set. Go to the settings and define an active config.");
-            return;
-        }
-
-        ConsumerManager consumerManager = getTaskConsumers();
-
-        Integer threadNum = taskSettingsController.getThreadNum();
-        if (threadNum == null) {
-            AlertErrorMessage(errorTitle, "No thread number specified. Go to the settings and define how many threads to use.");
-            return;
-        }
-
-        Collection<String> participatingTargetNames = taskSettingsController.getParticipatingTargets();
-        if (participatingTargetNames == null || participatingTargetNames.isEmpty()) {
-            AlertErrorMessage(errorTitle, "No participating targets defined. Go to target selection and choose targets.");
-            return;
-        }
-
-        try {
-            Engine.getInstance().activeConfig_UpdateThreadCount(taskType, threadNum.intValue());
-            Engine.getInstance().activeConfig_UpdateParticipatingTargets(taskType, participatingTargetNames);
-
-            Configuration activeConfig = Engine.getInstance().getActiveConfigNotData(taskType);
-
-
-            Engine.getInstance().executeTask(taskType, taskStartPoint, consumerManager, participatingTargetNames);
-
-
-            executionStartListeners.forEach(executionStartListener -> executionStartListener.executionStarted(activeConfig));
-        } catch (UninitializedTaskException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NoConfigurationException e) {
-            e.printStackTrace();
-        } catch (InvalidInputRangeException invalidInputRangeException) {
-            AlertErrorMessage(errorTitle, "Invalid number of threads chosen");
-        }
-    }
-
-    private ConsumerManager getTaskConsumers() {
-        ConsumerManager consumerManager = TaskGeneral.getTaskConsumers(); // TODO: change to something GUI related
-        consumerManager.getEndTargetConsumers().add(new ConsumerFinishedTargetJavaFX(taskExecutionController));
-        consumerManager.getEndProcessConsumers().add(new ConsumerFinishedTaskProcessJavaFX(this));
-        consumerManager.getTargetStateChangedConsumers().add(new ConsumerTargetStateChangedJavaFX(taskExecutionController));
-        consumerManager.getStartTargetProcessingConsumers().add(new ConsumerStartProcessingTargetsJavaFX(taskExecutionController));
-
-        return consumerManager;
-    }
+//    private ConsumerManager getTaskConsumers() {
+//        ConsumerManager consumerManager = TaskGeneral.getTaskConsumers(); // TODO: change to something GUI related
+//        consumerManager.getEndTargetConsumers().add(new ConsumerFinishedTargetJavaFX(taskExecutionController));
+//        consumerManager.getEndProcessConsumers().add(new ConsumerFinishedTaskProcessJavaFX(this));
+//        consumerManager.getTargetStateChangedConsumers().add(new ConsumerTargetStateChangedJavaFX(taskExecutionController));
+//        consumerManager.getStartTargetProcessingConsumers().add(new ConsumerStartProcessingTargetsJavaFX(taskExecutionController));
+//
+//        return consumerManager;
+//    }
 
     public void pauseButtonPressed() {
         Engine.getInstance().pauseExecution(true);
@@ -602,7 +601,21 @@ public class AppMainController {
      * This graph must be read from the dashboard, and then be made relevant to all the other components.
      */
     public void newGraphChosen() {
-//        dashboardController.get0
+        String chosenGraphName = dashboardController.getChosenGraphName();
+
+        chosenGraph = null;
+
+        if (chosenGraphName != null) {
+            chosenGraph = graphManager.getGraph(chosenGraphName);
+        }
+
+        graphChosenListeners.forEach(GraphChosenListener::graphChosen);
+    }
+
+    public DependenciesGraph getChosenGraph() { return chosenGraph; }
+
+    public void addGraphs(GraphDTO[] graphDTOs) {
+        graphManager.addGraphs(graphDTOs);
     }
 
 

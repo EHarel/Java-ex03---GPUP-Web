@@ -1,7 +1,6 @@
 package components.task.consumer;
 
 import components.app.AppMainController;
-import console.task.TaskGeneral;
 import javafx.application.Platform;
 import task.ExecutionData;
 import java.util.function.Consumer;

@@ -1,8 +1,9 @@
 package graph;
 
 import java.util.Collection;
+import java.util.Set;
 
-public class GraphGeneralData {
+public class GraphDTO {
     private String graphName;
     private String uploadingUserName;
     private int priceSimulation;
@@ -14,6 +15,7 @@ public class GraphGeneralData {
     private int countRoots;
     private int countIndependents;
     private Collection<String> allTargetNames;
+    private Set<TargetDTO> targetDTOs;
 
 
     // countAlLTargets getter-setter
@@ -51,6 +53,10 @@ public class GraphGeneralData {
 
     public void setPriceCompilation(int priceCompilation) {
         this.priceCompilation = priceCompilation;
+    }
+
+    public Set<TargetDTO> getTargetDTOs() {
+        return targetDTOs;
     }
 
     public boolean setCountAllTargets(int newCount) {
@@ -134,5 +140,9 @@ public class GraphGeneralData {
 
     public Collection<String> getAllTargetNames() {
         return allTargetNames;
+    }
+
+    public void setTargetDTOs(Set<TargetDTO> targetDTOS) {
+        this.targetDTOs = targetDTOS;
     }
 }

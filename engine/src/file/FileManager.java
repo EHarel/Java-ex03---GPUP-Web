@@ -340,33 +340,6 @@ public class FileManager {
         return fullPath;
     }
 
-    /**
-     * <pre>
-     * Checks if a string is a valid path.
-     * Null safe.
-     *
-     * Calling examples:
-     *    isValidPath("c:/test");      //returns true
-     *    isValidPath("c:/te:t");      //returns false
-     *    isValidPath("c:/te?t");      //returns false
-     *    isValidPath("c/te*t");       //returns false
-     *    isValidPath("good.txt");     //returns true
-     *    isValidPath("not|good.txt"); //returns false
-     *    isValidPath("not:good.txt"); //returns false
-     * </pre>
-     */
-    public static boolean isValidPath(String path) {
-        boolean validPath = true;
-
-        try {
-            Paths.get(path);
-        } catch (Exception e) {
-            validPath = false;
-        }
-
-        return validPath;
-    }
-
     public static void createDirectory(String path) throws IOException {
         Files.createDirectories(Paths.get(path));
     }

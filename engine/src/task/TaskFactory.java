@@ -4,8 +4,6 @@ import exception.InvalidInputRangeException;
 import graph.DependenciesGraph;
 import graph.Target;
 import task.configuration.Configuration;
-import task.configuration.ConfigurationCompilation;
-import task.configuration.ConfigurationSimulation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,10 +46,10 @@ public class TaskFactory {
 
         switch (taskType) {
             case SIMULATION:
-                task = new Simulation(target, configuration, workingGraph, executionData);
+                task = new TaskSimulation(target, configuration, workingGraph, executionData);
                 break;
             case COMPILATION:
-                task = new Compilation(target, configuration, workingGraph, executionData);
+                task = new TaskCompilation(target, configuration, workingGraph, executionData);
                 break;
         }
 

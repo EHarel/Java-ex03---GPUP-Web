@@ -1,13 +1,13 @@
 package components.dashboard.graphs;
 
-import graph.GraphGeneralData;
+import components.dashboard.DashboardController;
+import graph.GraphDTO;
 import httpclient.HttpClientUtil;
 import javafx.beans.property.BooleanProperty;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
-import users.UserDTO;
 import utilshared.Constants;
 
 import java.io.IOException;
@@ -21,16 +21,22 @@ import static utilshared.Constants.GSON_INSTANCE;
 public class GraphListRefresher extends TimerTask {
 
     //    private final Consumer<String> httpRequestLoggerConsumer;
-    private final Consumer<List<GraphGeneralData>> GraphListConsumer;
+    private final Consumer<List<GraphDTO>> GraphListConsumer;
+    private DashboardController dashboardController;
     private int requestNumber;
     private final BooleanProperty shouldUpdate;
 
 
-    public GraphListRefresher(BooleanProperty shouldUpdate, Consumer<String> httpRequestLoggerConsumer, Consumer<List<GraphGeneralData>> usersListConsumer) {
+    public GraphListRefresher(BooleanProperty shouldUpdate, Consumer<String> httpRequestLoggerConsumer, Consumer<List<GraphDTO>> usersListConsumer, DashboardController dashboardController) {
         this.shouldUpdate = shouldUpdate;
 //        this.httpRequestLoggerConsumer = httpRequestLoggerConsumer;
         this.GraphListConsumer = usersListConsumer;
         requestNumber = 0;
+        this.dashboardController = dashboardController;
+    }
+
+    public void setDashboardController(DashboardController dashboardController) {
+        this.dashboardController = dashboardController;
     }
 
     @Override
@@ -56,10 +62,14 @@ public class GraphListRefresher extends TimerTask {
                 String jsonArrayOfGraphs = response.body().string();
 //                httpRequestLoggerConsumer.accept("Users Request # " + finalRequestNumber + " | Response: " + jsonArrayOfUsersNames);
 
-                GraphGeneralData[] graphDTOs = GSON_INSTANCE.fromJson(jsonArrayOfGraphs, GraphGeneralData[].class);
+                GraphDTO[] graphDTOs = GSON_INSTANCE.fromJson(jsonArrayOfGraphs, GraphDTO[].class);
 
                 // TODO: need to convert to list of UserDTO
                 GraphListConsumer.accept(Arrays.asList(graphDTOs));
+
+                if (dashboardController != null) {
+                    dashboardController.addGraphs(graphDTOs);
+                }
             }
         });
     }

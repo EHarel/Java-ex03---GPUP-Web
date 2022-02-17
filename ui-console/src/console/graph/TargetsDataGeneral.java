@@ -1,7 +1,7 @@
 package console.graph;
 
 import console.menu.system.DoesAction;
-import graph.GraphGeneralData;
+import graph.GraphDTO;
 import graph.Graph;
 import graph.SerialSetDTO;
 
@@ -21,9 +21,9 @@ public class TargetsDataGeneral implements DoesAction {
 
     private void printAllTargetBasicDetails() {
         System.out.println("[Graph \"" + graph.getName() + "\" general details]");
-        GraphGeneralData graphGeneralData = graph.getGeneralDataAllTargets();
+        GraphDTO graphDTO = graph.getGeneralDataAllTargets();
 
-        if (graphGeneralData == null) {
+        if (graphDTO == null) {
             System.out.println("Whoa there, graph isn't loaded yet!");
             /* TODO
              * (1) This shouldn't even be allowed. Is there a way to avoid this section?
@@ -31,12 +31,12 @@ public class TargetsDataGeneral implements DoesAction {
              *
              */
         } else {
-            System.out.println("Number of all targets: " + graphGeneralData.getCountAllTargets());
-            System.out.println("Number of leaves: " + graphGeneralData.getCountLeaves());
-            System.out.println("Number of middles: " + graphGeneralData.getCountMiddles());
-            System.out.println("Number of roots: " + graphGeneralData.getCountRoots());
-            System.out.println("Number of independents: " + graphGeneralData.getCountIndependents());
-            System.out.println("All targets: " + graphGeneralData.getAllTargetNames());
+            System.out.println("Number of all targets: " + graphDTO.getCountAllTargets());
+            System.out.println("Number of leaves: " + graphDTO.getCountLeaves());
+            System.out.println("Number of middles: " + graphDTO.getCountMiddles());
+            System.out.println("Number of roots: " + graphDTO.getCountRoots());
+            System.out.println("Number of independents: " + graphDTO.getCountIndependents());
+            System.out.println("All targets: " + graphDTO.getAllTargetNames());
             printSerialSets();
         }
     }

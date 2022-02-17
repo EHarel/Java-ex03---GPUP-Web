@@ -4,10 +4,8 @@ import algorithm.DFS;
 import algorithm.TopologicalSort;
 import datastructure.QueueLinkedList;
 import exception.*;
-import logic.EngineUtils;
-import task.configuration.ChosenTarget;
 import task.configuration.Configuration;
-import task.consumer.ConsumerUpdateParticipation;
+import util.GraphUtils;
 
 import java.io.Serializable;
 import java.util.*;
@@ -38,6 +36,59 @@ public class DependenciesGraph implements Graph, Serializable {
     public DependenciesGraph() {
         targets = new HashMap<>();
         serialSets = new LinkedList<>();
+    }
+
+    /**
+     * Creates (recreates) a dependencies graph from a DTO.
+     * @param graphDTO
+     */
+    public DependenciesGraph(GraphDTO graphDTO) {
+
+        targets = new HashMap<>();
+        serialSets = new LinkedList<>();
+
+        this.name = graphDTO.getGraphName();
+        this.uploadingUserName = graphDTO.getUploadingUserName();
+        this.priceCompilation = graphDTO.getPriceCompilation();
+        this.priceSimulation = graphDTO.getPriceSimulation();
+
+        Collection<TargetDTO> targetDTOs = graphDTO.getTargetDTOs();
+
+        targetDTOs.forEach(targetDTO -> {
+            targets.put(targetDTO.getName(), Target.recreateTargetWithoutDependencies(targetDTO));
+        });
+
+
+        // Add connections
+        for (Target target : targets.values()) {
+            // Find the relevant target DTO which holds all the neighbor data
+            TargetDTO targetDTO = null;
+            for (TargetDTO dto : targetDTOs) {
+                if (dto.getName().equals(target.getName())) {
+                    targetDTO = dto;
+                    break;
+                }
+            }
+
+            // Go over all the targets it depends on and add the connection
+            for (String targetThisDependsOnName : targetDTO.getTargetsThisDirectlyDependsOn()) {
+                Target targetThisDependsOn = targets.get(targetThisDependsOnName);
+
+                targetThisDependsOn.addTargetThatRequiresThis(target);
+
+//                Target duplicatedDependsOn = duplicateGraph.get(targetThisDependsOn.getName());
+//                duplicateGraph.addRequiredDependency(duplicatedDependsOn, duplicatedTarget);
+            }
+
+            // Go over all the targets it is required for and add the connection
+            for (String targetThatDependsOnThisName : targetDTO.getTargetsThisIsDirectlyRequiredFor()) {
+                Target targetThatDependsOnThis = targets.get(targetThatDependsOnThisName);
+                targetThatDependsOnThis.addTargetThisDependsOn(target);
+
+//                Target duplicatedDependent = duplicateGraph.get(targetThatDependsOnThis.getName());
+//                duplicateGraph.addRequiredDependency(duplicatedTarget, duplicatedDependent);
+            }
+        }
     }
 
 
@@ -365,23 +416,36 @@ public class DependenciesGraph implements Graph, Serializable {
 
 
     @Override
-    public GraphGeneralData getGeneralDataAllTargets() {
+    public GraphDTO getGeneralDataAllTargets() {
         Map<TargetDTO.Dependency, Integer> dependencyIntegerMap = sizeDependency();
-        GraphGeneralData graphGeneralData = new GraphGeneralData();
+        GraphDTO graphDTO = new GraphDTO();
 
-        graphGeneralData.setCountAllTargets(targets.size());
-        graphGeneralData.setCountLeaves(dependencyIntegerMap.get(TargetDTO.Dependency.LEAF));
-        graphGeneralData.setCountMiddles(dependencyIntegerMap.get(TargetDTO.Dependency.MIDDLE));
-        graphGeneralData.setCountRoots(dependencyIntegerMap.get(TargetDTO.Dependency.ROOT));
-        graphGeneralData.setCountIndependents(dependencyIntegerMap.get(TargetDTO.Dependency.INDEPENDENT));
-        graphGeneralData.setTargetNames(getAllTargetNames());
+        graphDTO.setCountAllTargets(targets.size());
+        graphDTO.setCountLeaves(dependencyIntegerMap.get(TargetDTO.Dependency.LEAF));
+        graphDTO.setCountMiddles(dependencyIntegerMap.get(TargetDTO.Dependency.MIDDLE));
+        graphDTO.setCountRoots(dependencyIntegerMap.get(TargetDTO.Dependency.ROOT));
+        graphDTO.setCountIndependents(dependencyIntegerMap.get(TargetDTO.Dependency.INDEPENDENT));
+        graphDTO.setTargetNames(getAllTargetNames());
 
-        graphGeneralData.setGraphName(this.name);
-        graphGeneralData.setUploadingUserName(this.uploadingUserName);
-        graphGeneralData.setPriceCompilation(this.priceCompilation);
-        graphGeneralData.setPriceSimulation(this.priceSimulation);
+        graphDTO.setGraphName(this.name);
+        graphDTO.setUploadingUserName(this.uploadingUserName);
+        graphDTO.setPriceCompilation(this.priceCompilation);
+        graphDTO.setPriceSimulation(this.priceSimulation);
 
-        return graphGeneralData;
+        Set<TargetDTO> targetDTOS = getTargetsDTOs();
+        graphDTO.setTargetDTOs(targetDTOS);
+
+        return graphDTO;
+    }
+
+    private Set<TargetDTO> getTargetsDTOs() {
+        Set<TargetDTO> targetDTOs = new HashSet<>();
+
+        targets.values().forEach(target -> {
+            targetDTOs.add(target.toData());
+        });
+
+        return targetDTOs;
     }
 
     @Override
@@ -403,7 +467,6 @@ public class DependenciesGraph implements Graph, Serializable {
                 targetDTOList.add(target.toData());
             }
         }
-
 
         return targetDTOList;
     }
@@ -472,7 +535,7 @@ public class DependenciesGraph implements Graph, Serializable {
         try {
             Collection<List<TargetDTO>> allPaths = getTargetPaths(targetName, direction);
             if (allPaths != null) {
-                allDependencies = EngineUtils.GetTargetDTOsFromPaths_Exclude(allPaths, targetName);
+                allDependencies = GraphUtils.GetTargetDTOsFromPaths_Exclude(allPaths, targetName);
             }
         } catch (Exception ignore) {
         }
@@ -589,7 +652,7 @@ public class DependenciesGraph implements Graph, Serializable {
 
         paths = new DFS(this, sourceTarget, destinationTarget, direction, consumersWhenArriving).run();
 
-        return EngineUtils.pathToDTO(paths);
+        return GraphUtils.pathToDTO(paths);
     }
 
 
@@ -737,7 +800,7 @@ public class DependenciesGraph implements Graph, Serializable {
             for (Target graphTarget : targets()) {
 
                 // For all targets, check if they appear in the chosen targets collection
-                if (!EngineUtils.isNameInCollection(chosenTargets, graphTarget.getName())) {
+                if (!GraphUtils.isNameInCollection(chosenTargets, graphTarget.getName())) {
 
                     // Target doesn't appear in collection
                     areAllGraphTargets = false;
@@ -873,53 +936,48 @@ public class DependenciesGraph implements Graph, Serializable {
         subGraph.setSerialSets(duplicateSets);
     }
 
-    public void setAllTargetsParticipating() {
-        for (Target target : targets.values()) {
-            target.setParticipatesInExecution(true);
-        }
-    }
-
-    public void setParticipatingTargets(Collection<ChosenTarget> participatingTargets) {
-        if (participatingTargets == null) {
-            return;
-        }
-
-        for (ChosenTarget chosenTarget : participatingTargets) {
-            boolean dependsOnDirection;
-            boolean requiredForDirection;
-            Target target = this.get(chosenTarget.getName());
-
-            Collection<Consumer<Target>> collection = new LinkedList<>();
-            collection.add(new ConsumerUpdateParticipation(true));
-
-            if (target != null) {
-                if (chosenTarget.getRelationshipDirection() == ChosenTarget.RelationshipDirection.BOTH) {
-                    dependsOnDirection = true;
-                    requiredForDirection = true;
-                } else if (chosenTarget.getRelationshipDirection() == ChosenTarget.RelationshipDirection.DEPENDENT_ON) {
-                    dependsOnDirection = true;
-                    requiredForDirection = false;
-                } else {
-                    dependsOnDirection = false;
-                    requiredForDirection = true;
-                }
-
-                try {
-                    if (dependsOnDirection) {
-                        new DFS(this, target, null, DFS.EdgeDirection.DEPENDENT_ON, collection).run();
-                    }
-
-                    if (requiredForDirection) {
-                        new DFS(this, target, null, DFS.EdgeDirection.REQUIRED_FOR, collection).run();
-                    }
-                } catch (NonexistentTargetException e) {
-                    e.printStackTrace();
-                } catch (UninitializedNullException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
+//
+//    public void setParticipatingTargets(Collection<ChosenTarget> participatingTargets) {
+//        if (participatingTargets == null) {
+//            return;
+//        }
+//
+//        for (ChosenTarget chosenTarget : participatingTargets) {
+//            boolean dependsOnDirection;
+//            boolean requiredForDirection;
+//            Target target = this.get(chosenTarget.getName());
+//
+//            Collection<Consumer<Target>> collection = new LinkedList<>();
+//            collection.add(new ConsumerUpdateParticipation(true));
+//
+//            if (target != null) {
+//                if (chosenTarget.getRelationshipDirection() == ChosenTarget.RelationshipDirection.BOTH) {
+//                    dependsOnDirection = true;
+//                    requiredForDirection = true;
+//                } else if (chosenTarget.getRelationshipDirection() == ChosenTarget.RelationshipDirection.DEPENDENT_ON) {
+//                    dependsOnDirection = true;
+//                    requiredForDirection = false;
+//                } else {
+//                    dependsOnDirection = false;
+//                    requiredForDirection = true;
+//                }
+//
+//                try {
+//                    if (dependsOnDirection) {
+//                        new DFS(this, target, null, DFS.EdgeDirection.DEPENDENT_ON, collection).run();
+//                    }
+//
+//                    if (requiredForDirection) {
+//                        new DFS(this, target, null, DFS.EdgeDirection.REQUIRED_FOR, collection).run();
+//                    }
+//                } catch (NonexistentTargetException e) {
+//                    e.printStackTrace();
+//                } catch (UninitializedNullException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//    }
 
 //    /**
 //     * This method returns the total number of targets affected by the given target name, in a certain direction.

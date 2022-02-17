@@ -1,8 +1,8 @@
 package graph;
 
-import logic.EngineUtils;
-import task.configuration.Configuration;
+import task.configuration.*;
 import exception.NullOrEmptyStringException;
+import util.GraphUtils;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -51,6 +51,18 @@ public class Target implements Serializable {
         this.userData = "";
         this.taskStatus = new TaskStatus();
         serialSets = new LinkedList<>();
+    }
+
+    public static Target recreateTargetWithoutDependencies(TargetDTO targetDTO) {
+        Target newTarget = null;
+
+        try {
+            newTarget = new Target(targetDTO.getName());
+            newTarget.userData = targetDTO.getUserData();
+            newTarget.taskStatus = new TaskStatus(targetDTO.getTaskStatusDTO());
+        } catch (NullOrEmptyStringException ignore) { }
+
+        return newTarget;
     }
 
 
@@ -284,8 +296,8 @@ public class Target implements Serializable {
         TargetDTO res =  new TargetDTO(
                 this.name,
                 this.dependency,
-                EngineUtils.getNamesOfTargets(this.targetsThisIsDependentOn),
-                EngineUtils.getNamesOfTargets(this.targetsThisIsRequiredFor),
+                GraphUtils.getNamesOfTargets(this.targetsThisIsDependentOn),
+                GraphUtils.getNamesOfTargets(this.targetsThisIsRequiredFor),
                 this.userData,
                 serialSetDTOS,
                 taskStatusDTO
@@ -449,6 +461,55 @@ public class Target implements Serializable {
             reset();
         }
 
+        public TaskStatus(TargetDTO.TaskStatusDTO taskStatusDTO) {
+            reset();
+
+            if (taskStatusDTO != null) {
+                this.executionNum = taskStatusDTO.getExecutionNum();
+                this.participatesInExecution = taskStatusDTO.isParticipatesInExecution();
+                this.startInstant = taskStatusDTO.getStartInstant();
+                this.endInstant = taskStatusDTO.getEndInstant();
+                this.targetState = taskStatusDTO.getState();
+                this.taskResult = taskStatusDTO.getResult();
+
+                this.targetsOpenedAsResult = new LinkedList<>();
+                taskStatusDTO.getTargetsOpenedAsResult().forEach(s -> {
+                    this.targetsOpenedAsResult.add(s);
+                });
+
+                this.targetsSkippedAsResult = new LinkedList<>();
+                taskStatusDTO.getTargetsSkippedAsResult().forEach(s -> {
+                    this.targetsSkippedAsResult.add(s);
+                });
+
+                this.errorDetails = getErrorDetails();
+
+                this.targetsSkippedAsResult_AllPaths = new ArrayList<>();
+
+                for (List<String> strings : taskStatusDTO.getTargetsSkippedAsResult_AllPaths()) {
+                    List<String> newList = new LinkedList<>();
+
+                    strings.forEach(s -> {newList.add(s); });
+
+                    this.targetsSkippedAsResult_AllPaths.add(newList);
+                }
+
+                try {
+
+                switch (taskStatusDTO.getConfigData().getTaskType()) {
+                    case COMPILATION:
+                        ConfigurationDataCompilation configDataComp = (ConfigurationDataCompilation) taskStatusDTO.getConfigData();
+                        this.config = new ConfigurationCompilation(configDataComp);
+                        break;
+                    case SIMULATION:
+                        ConfigurationDataSimulation configDataSim = (ConfigurationDataSimulation) taskStatusDTO.getConfigData();
+                        this.config = new ConfigurationSimulation(configDataSim);
+                        break;
+                }
+                } catch (Exception ignore) {}
+            }
+        }
+
         public void reset() {
             reset(0, null);
         }
@@ -569,7 +630,7 @@ public class Target implements Serializable {
 
         // TODO: change to immutable?
         private Collection<String> getNamesFromCollection(Collection<Target> targetCollection) {
-            return EngineUtils.getNamesOfTargets(targetCollection);
+            return GraphUtils.getNamesOfTargets(targetCollection);
         }
 
         @Override
@@ -587,9 +648,9 @@ public class Target implements Serializable {
             clone.config = configClone;
             clone.taskResult = this.taskResult;
             clone.targetState = this.targetState;
-            clone.targetsOpenedAsResult = EngineUtils.cloneCollection(targetsOpenedAsResult);
-            clone.targetsSkippedAsResult = EngineUtils.cloneCollection(targetsSkippedAsResult);
-            clone.targetsSkippedAsResult_AllPaths = EngineUtils.cloneListCollection(targetsSkippedAsResult_AllPaths);
+            clone.targetsOpenedAsResult = GraphUtils.cloneCollection(targetsOpenedAsResult);
+            clone.targetsSkippedAsResult = GraphUtils.cloneCollection(targetsSkippedAsResult);
+            clone.targetsSkippedAsResult_AllPaths = GraphUtils.cloneListCollection(targetsSkippedAsResult_AllPaths);
             clone.errorDetails = this.errorDetails;
 
             return clone;

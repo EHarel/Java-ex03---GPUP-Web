@@ -2,7 +2,6 @@ package task;
 
 import exception.*;
 import graph.DependenciesGraph;
-import task.configuration.ChosenTarget;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationData;
 import task.consumer.ConsumerManager;

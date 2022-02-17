@@ -12,6 +12,7 @@ import components.graph.targettable.TargetDTOTable;
 import datastructure.Queue;
 import events.ExecutionEndListener;
 import events.FileLoadedListener;
+import events.GraphChosenListener;
 import exception.NonexistentTargetException;
 import exception.UninitializedNullException;
 import graph.DependenciesGraph;
@@ -27,7 +28,7 @@ import task.ExecutionData;
 import java.util.Collection;
 import java.util.List;
 
-public class GraphAllDataController implements FileLoadedListener, ExecutionEndListener {
+public class GraphAllDataController implements FileLoadedListener, ExecutionEndListener, GraphChosenListener {
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------- FXML DATA MEMBERS ----------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
@@ -103,6 +104,7 @@ public class GraphAllDataController implements FileLoadedListener, ExecutionEndL
         this.mainController = mainController;
         mainController.addEventListener_FileLoaded(this);
         mainController.addEventListener_ExecutionEnded(this);
+        mainController.addEventListener_GraphChosen(this);
     }
 
     public void setGraphOverviewController(GraphOverviewController graphOverviewController) {
@@ -168,6 +170,12 @@ public class GraphAllDataController implements FileLoadedListener, ExecutionEndL
     }
 
     @Override
+    public void graphChosen() {
+        workingGraph = mainController.getChosenGraph();
+        populateData(workingGraph);
+    }
+
+    @Override
     public void fileLoaded() {
         loadMainGraph();
 
@@ -178,7 +186,6 @@ public class GraphAllDataController implements FileLoadedListener, ExecutionEndL
 
     private void loadMainGraph() {
         workingGraph = (DependenciesGraph) Engine.getInstance().getGraph();
-
         populateData(workingGraph);
     }
 
