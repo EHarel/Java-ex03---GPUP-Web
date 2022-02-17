@@ -1,7 +1,6 @@
 package graph;
 
 import users.User;
-import users.UserDTO;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,20 +18,17 @@ public class GraphManager {
         graphs = new HashSet<>();
     }
 
-    public synchronized boolean addGraph(DependenciesGraph graph) {
-        boolean is_added = false;
+    public synchronized void addGraph(DependenciesGraph graph) {
+        String originalGraphName = graph.getName().trim();          // GraphName
+        String currGraphName = originalGraphName;                   // GraphName
+        int i = 1;
 
-//        if (!isUserExists(userDTO.getName())) {
-//            User newUser = new User(userDTO.getName().trim(), userDTO.getType());
-//
-//            users.add(newUser);
-//            is_added = true;
-//        }
+        while (isExistingGraphName(currGraphName)) {
+            currGraphName = originalGraphName + " (" + i++ + ")";   // GraphName (1)
+        }
 
+        graph.setName(currGraphName);
         graphs.add(graph);
-        is_added = true;
-
-        return is_added;
     }
 
     public synchronized Set<DependenciesGraph> getGraphs() {
@@ -40,19 +36,23 @@ public class GraphManager {
         return graphs;
     }
 
-//    public boolean isUserExists(String username) {
-//        boolean is_exists = false;
-//
-//        username = username.trim();
-//
-//        for (User user :
-//                users) {
-//            if (user.getName().equals(username)) {
-//                is_exists = true;
-//                break;
-//            }
-//        }
-//
-//        return is_exists;
-//    }
+    /**
+     * Determines if a graph exists by the given name. It trims the names to avoid pointless spaces.
+     * @param graphName
+     */
+    public boolean isExistingGraphName(String graphName) {
+        boolean is_exists = false;
+
+        graphName = graphName.trim();
+
+        for (DependenciesGraph graph :
+                graphs) {
+            if (graph.getName().equals(graphName)) {
+                is_exists = true;
+                break;
+            }
+        }
+
+        return is_exists;
+    }
 }

@@ -1,12 +1,7 @@
 package components.dashboard.users;
 
 import componentcode.usertable.UserTableControllerShared;
-import components.app.AppMainController;
-import components.graph.targettable.TargetDTOTable;
-import graph.TargetDTO;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -15,8 +10,6 @@ import users.UserDTO;
 import utilshared.UserType;
 
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Timer;
 
 public class UserTableController {
 
@@ -49,7 +42,12 @@ public class UserTableController {
 
         sharedController = new UserTableControllerShared(tableView_Users);
 
-        setActive();
+        setActive(false);
+        sharedController.startListRefresher();
+    }
+
+    public void setActive(boolean isActive) {
+        sharedController.getAutoUpdateProperty().set(isActive);
     }
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -107,10 +105,7 @@ public class UserTableController {
 //        return tableViewTargets.getSelectionModel().getSelectedItem();
 //    }
 
-    public void setActive() {
-        sharedController.getAutoUpdateProperty().set(true);
-        sharedController.startListRefresher();
-    }
+
 
 
 

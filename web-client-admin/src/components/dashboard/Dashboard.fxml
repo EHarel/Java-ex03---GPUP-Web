@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+
+<ScrollPane fx:id="MainPane" fitToHeight="true" fitToWidth="true" pannable="true" prefHeight="597.0" prefWidth="1076.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.dashboard.DashboardController">
+   <content>
+      <BorderPane fx:id="borderPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity">
+         <left>
+            <fx:include fx:id="component_UserTable" source="users/UserTable.fxml" />
+         </left>
+         <center>
+            <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
+              <items>
+                  <fx:include source="execution/ExecutionTableAdmin.fxml" />
+                  <fx:include fx:id="component_GraphTable" source="graphs/UploadedGraphsTable.fxml" />
+              </items>
+            </SplitPane>
+         </center>
+         <bottom>
+            <AnchorPane prefHeight="54.0" prefWidth="1074.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Label layoutX="14.0" layoutY="6.0" text="To add an execution to a task, view its details, and perform other operations on it (e.g. finding paths), click a graph from the table." />
+                  <Label layoutX="14.0" layoutY="32.0" text="Selected Graph:" underline="true" />
+                  <Label fx:id="label_SelectedGraphName" layoutX="107.0" layoutY="32.0" prefHeight="17.0" prefWidth="499.0" text="None" />
+               </children>
+            </AnchorPane>
+         </bottom></BorderPane>
+   </content>
+</ScrollPane>

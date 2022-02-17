@@ -99,7 +99,7 @@ public class AppMainController {
 
 
     /* ------------------------------------------ CUSTOM FIELDS ------------------------------------------- */
-
+    private String chosenGraphName;
 
 
     // Events
@@ -585,11 +585,24 @@ public class AppMainController {
         this.root.setBottom(null);
         this.root.setLeft(null);
         this.root.setRight(null);
+        displayDashboard();
+    }
+
+    private void displayDashboard() {
         this.root.setCenter(dashboard);
+        dashboardController.setActive(true);
     }
 
     public void dashboardButtonPressed() {
-        this.root.setCenter(dashboard);
+        displayDashboard();
+    }
+
+    /**
+     * This event is responsible for handling all the implications of a new graph being chosen by the admin.
+     * This graph must be read from the dashboard, and then be made relevant to all the other components.
+     */
+    public void newGraphChosen() {
+//        dashboardController.get0
     }
 
 
