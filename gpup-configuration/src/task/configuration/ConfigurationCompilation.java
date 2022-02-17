@@ -2,7 +2,6 @@ package task.configuration;
 
 import exception.InvalidInputRangeException;
 import exception.NonexistentElementException;
-import file.FileManager;
 import task.TaskType;
 
 import javax.naming.NameNotFoundException;
@@ -34,6 +33,13 @@ public class ConfigurationCompilation extends Configuration implements Serializa
         outDirectoryCreated = false;
     }
 
+    public ConfigurationCompilation(ConfigurationDataCompilation compData) throws NameNotFoundException, InvalidInputRangeException, NonexistentElementException {
+        super(TaskType.COMPILATION, compData.getName(), compData.getThreadCount());
+        setSourceCodePath(compData.getSourceCodePath());
+        setOutPath(compData.getOutPath());
+        outDirectoryCreated = compData.isOutDirectoryCreated();
+    }
+
     public String getSourceCodePath() {
         return sourceCodePath;
     }
@@ -62,11 +68,38 @@ public class ConfigurationCompilation extends Configuration implements Serializa
             throw  new NullPointerException("No out path given");
         }
 
-        if (FileManager.isValidPath(outPath)) {
+        if (isValidPath(outPath)) {
             this.outPath = outPath;
         } else {
             throw new InvalidPathException(outPath, "Invalid path!");
         }
+    }
+
+    /**
+     * <pre>
+     * Checks if a string is a valid path.
+     * Null safe.
+     *
+     * Calling examples:
+     *    isValidPath("c:/test");      //returns true
+     *    isValidPath("c:/te:t");      //returns false
+     *    isValidPath("c:/te?t");      //returns false
+     *    isValidPath("c/te*t");       //returns false
+     *    isValidPath("good.txt");     //returns true
+     *    isValidPath("not|good.txt"); //returns false
+     *    isValidPath("not:good.txt"); //returns false
+     * </pre>
+     */
+    public static boolean isValidPath(String path) {
+        boolean validPath = true;
+
+        try {
+            Paths.get(path);
+        } catch (Exception e) {
+            validPath = false;
+        }
+
+        return validPath;
     }
 
     public boolean isOutDirectoryCreated() {

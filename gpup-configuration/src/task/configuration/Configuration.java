@@ -1,7 +1,6 @@
 package task.configuration;
 
 import exception.InvalidInputRangeException;
-import logic.Engine;
 import task.TaskType;
 
 import javax.naming.NameNotFoundException;
@@ -31,6 +30,13 @@ public abstract class Configuration implements Serializable {
         this.participatingTargetNames = new LinkedList<>();
     }
 
+    public Configuration(ConfigurationData configData) {
+        this.taskType = configData.getTaskType();
+        this.name = configData.getName();
+        this.numberOfThreads = configData.getThreadCount();
+        this.participatingTargetNames = getParticipatingTargetsNames();
+    }
+
     public String getName() { return name; }
 
     public TaskType getTaskType() {
@@ -43,12 +49,9 @@ public abstract class Configuration implements Serializable {
 
     public void setNumberOfThreads(int numberOfThreads) throws InvalidInputRangeException {
         String errorMsg = "Thread number (" + numberOfThreads + ") ";
-        int maxParallelism = Engine.getInstance().getThreadCount_maxParallelism();
 
         if (numberOfThreads == 0) {
             throw new InvalidInputRangeException(errorMsg + "must be an integer above 0.");
-        } else if (numberOfThreads > maxParallelism) {
-            throw new InvalidInputRangeException(errorMsg + "cannot be larger than max parallelism (" + maxParallelism + ").");
         } else {
             this.numberOfThreads = numberOfThreads;
         }

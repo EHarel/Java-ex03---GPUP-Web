@@ -5,7 +5,6 @@ import file.FileManager;
 import graph.DependenciesGraph;
 import graph.Target;
 import graph.TargetDTO;
-import logic.Engine;
 import logic.EngineUtils;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationCompilation;
@@ -16,13 +15,13 @@ import java.nio.file.Files;
 import java.time.Instant;
 import java.util.List;
 
-public class Compilation extends Task {
+public class TaskCompilation extends Task {
     private static final int SUCCESS_CODE = 0;
 
-    public Compilation(@NotNull Target target,
-                       @NotNull Configuration configuration,
-                       DependenciesGraph workingGraph,
-                       ExecutionData executionData) throws IllegalArgumentException {
+    public TaskCompilation(@NotNull Target target,
+                           @NotNull Configuration configuration,
+                           DependenciesGraph workingGraph,
+                           ExecutionData executionData) throws IllegalArgumentException {
         super(TaskType.COMPILATION, target, configuration, workingGraph, executionData);
     }
 

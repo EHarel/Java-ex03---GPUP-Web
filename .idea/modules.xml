@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/dto/dto.iml" filepath="$PROJECT_DIR$/dto/dto.iml" />
       <module fileurl="file://$PROJECT_DIR$/engine/engine.iml" filepath="$PROJECT_DIR$/engine/engine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gpup-configuration/gpup-configuration.iml" filepath="$PROJECT_DIR$/gpup-configuration/gpup-configuration.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gpup-graph/gpup-graph.iml" filepath="$PROJECT_DIR$/gpup-graph/gpup-graph.iml" />
       <module fileurl="file://$PROJECT_DIR$/ui-console/ui-console.iml" filepath="$PROJECT_DIR$/ui-console/ui-console.iml" />
       <module fileurl="file://$PROJECT_DIR$/ui-javafx/ui-javafx.iml" filepath="$PROJECT_DIR$/ui-javafx/ui-javafx.iml" />
       <module fileurl="file://$PROJECT_DIR$/web-client-admin/web-client-admin.iml" filepath="$PROJECT_DIR$/web-client-admin/web-client-admin.iml" />

@@ -8,13 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="dto" />
-    <orderEntry type="module" module-name="web-server" />
-    <orderEntry type="module" module-name="engine" />
-    <orderEntry type="library" name="okHttp" level="project" />
     <orderEntry type="module" module-name="web-shared-all" />
-    <orderEntry type="module" module-name="web-shared-clients" />
-    <orderEntry type="library" name="gson-2.1" level="project" />
-    <orderEntry type="module" module-name="gpup-configuration" />
-    <orderEntry type="module" module-name="gpup-graph" />
   </component>
 </module>

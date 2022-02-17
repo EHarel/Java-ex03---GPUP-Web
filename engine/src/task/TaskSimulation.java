@@ -1,20 +1,20 @@
 package task;
 
 import com.sun.istack.internal.NotNull;
+import graph.*;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationSimulation;
-import graph.*;
 
 import java.util.Random;
 
 
-public class Simulation extends Task {
+public class TaskSimulation extends Task {
     private static final int minSleepTime = 0;
 
-    public Simulation(@NotNull Target target,
-                      @NotNull Configuration configuration,
-                      DependenciesGraph workingGraph,
-                      ExecutionData executionData)
+    public TaskSimulation(@NotNull Target target,
+                          @NotNull Configuration configuration,
+                          DependenciesGraph workingGraph,
+                          ExecutionData executionData)
             throws IllegalArgumentException {
         super(TaskType.SIMULATION, target, configuration, workingGraph, executionData);
     }

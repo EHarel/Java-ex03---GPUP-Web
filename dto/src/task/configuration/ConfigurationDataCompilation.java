@@ -27,6 +27,10 @@ public class ConfigurationDataCompilation extends ConfigurationData implements S
         return outPath;
     }
 
+    public boolean isOutDirectoryCreated() {
+        return outDirectoryCreated;
+    }
+
     @Override // TODO: this is immutable, maybe no point to clone?
     public ConfigurationData clone() {
         return new ConfigurationDataCompilation(

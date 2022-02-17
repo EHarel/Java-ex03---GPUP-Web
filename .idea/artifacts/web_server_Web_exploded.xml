@@ -9,6 +9,9 @@
           <element id="module-output" name="dto" />
           <element id="module-output" name="engine" />
           <element id="module-output" name="web-shared-all" />
+          <element id="module-output" name="gpup-graph" />
+          <element id="module-output" name="gpup-task" />
+          <element id="module-output" name="gpup-configuration" />
         </element>
         <element id="directory" name="lib">
           <element id="library" level="project" name="okHttp" />

@@ -20,8 +20,10 @@ public class ConfigurationSimulation extends Configuration implements Serializab
         update(successProbability, processingTime, randomProcessingTime, warningsProbability);
     }
 
-
-
+    public ConfigurationSimulation(ConfigurationDataSimulation configData) throws NameNotFoundException, InvalidInputRangeException {
+        super(TaskType.SIMULATION, configData.getName(), configData.threadCount);
+        update(configData);
+    }
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -29,11 +31,14 @@ public class ConfigurationSimulation extends Configuration implements Serializab
     /* --------------------------------------- SETTERS AND GETTERS ---------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
-    public void update(ConfigurationSimulation config) throws InvalidInputRangeException {
-        setProcessingTime(config.getProcessingTime());
-        setRandomProcessingTime(config.isRandomProcessingTime());
-        setSuccessProbability(config.getSuccessProbability());
-        setWarningsProbability(config.getWarningsProbability());
+    private void update(ConfigurationDataSimulation configData) {
+        try {
+            setProcessingTime(configData.getProcessingTime());
+            setRandomProcessingTime(configData.isRandomProcessingTime());
+            setSuccessProbability(configData.getSuccessProbability());
+            setWarningsProbability(configData.getWarningsProbability());
+        } catch (Exception ignore) {
+        }
     }
 
     private void update(double successProbability, int processingTime, boolean randomProcessingTime, double warningsProbability)
@@ -42,6 +47,13 @@ public class ConfigurationSimulation extends Configuration implements Serializab
         setRandomProcessingTime(randomProcessingTime);
         setSuccessProbability(successProbability);
         setWarningsProbability(warningsProbability);
+    }
+
+    public void update(ConfigurationSimulation config) throws InvalidInputRangeException {
+        setProcessingTime(config.getProcessingTime());
+        setRandomProcessingTime(config.isRandomProcessingTime());
+        setSuccessProbability(config.getSuccessProbability());
+        setWarningsProbability(config.getWarningsProbability());
     }
 
     public ConfigurationDataSimulation getData() {
@@ -65,7 +77,6 @@ public class ConfigurationSimulation extends Configuration implements Serializab
     }
 
     /**
-     *
      * @param processingTime a milliseconds value representing an INTEGER! Meaning while numbers only.
      * @throws InvalidInputRangeException if the value doesn't represent an integer.
      */
@@ -98,9 +109,6 @@ public class ConfigurationSimulation extends Configuration implements Serializab
     }
 
 
-
-
-
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     /* ----------------------------------------- VALIDITY CHECKS ------------------------------------------ */
@@ -118,16 +126,13 @@ public class ConfigurationSimulation extends Configuration implements Serializab
         return isIntegerInMilliseconds(processingTimeCandidate);
     }
 
-    public static  boolean isValidSuccessProbability(double successProbabilityCandidate) {
+    public static boolean isValidSuccessProbability(double successProbabilityCandidate) {
         return isProbabilityValue(successProbabilityCandidate);
     }
 
     public static boolean isValidWarningsProbability(double warningsProbabilityCandidate) {
         return isProbabilityValue(warningsProbabilityCandidate);
     }
-
-
-
 
 
     /* ---------------------------------------------------------------------------------------------------- */

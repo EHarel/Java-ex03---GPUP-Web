@@ -1,8 +1,7 @@
 package components.dashboard.graphs;
 
 import components.dashboard.DashboardController;
-import events.FileLoadedListener;
-import graph.GraphGeneralData;
+import graph.GraphDTO;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -23,33 +22,33 @@ public class UploadedGraphsTableController {
     private ScrollPane MainPane;
 
     @FXML
-    private TableView<GraphGeneralData> tableView_GraphDetails;
+    private TableView<GraphDTO> tableView_GraphDetails;
 
     @FXML
-    private TableColumn<GraphGeneralData, String> tableColumn_GraphName;
+    private TableColumn<GraphDTO, String> tableColumn_GraphName;
     @FXML
-    private TableColumn<GraphGeneralData, String> tableColumn_UploadingUser;
+    private TableColumn<GraphDTO, String> tableColumn_UploadingUser;
     @FXML
-    private TableColumn<GraphGeneralData, Integer> tableColumn_CountTotal;
+    private TableColumn<GraphDTO, Integer> tableColumn_CountTotal;
     @FXML
-    private TableColumn<GraphGeneralData, Integer> tableColumn_CountLeaves;
+    private TableColumn<GraphDTO, Integer> tableColumn_CountLeaves;
     @FXML
-    private TableColumn<GraphGeneralData, Integer> tableColumn_CountMiddles;
+    private TableColumn<GraphDTO, Integer> tableColumn_CountMiddles;
     @FXML
-    private TableColumn<GraphGeneralData, Integer> tableColumn_CountRoots;
+    private TableColumn<GraphDTO, Integer> tableColumn_CountRoots;
     @FXML
-    private TableColumn<GraphGeneralData, Integer> tableColumn_CountIndependents;
+    private TableColumn<GraphDTO, Integer> tableColumn_CountIndependents;
     @FXML
-    private TableColumn<GraphGeneralData, Integer> tableColumn_PricingSimulation;
+    private TableColumn<GraphDTO, Integer> tableColumn_PricingSimulation;
     @FXML
-    private TableColumn<GraphGeneralData, Integer> tableColumn_PricingCompilation;
+    private TableColumn<GraphDTO, Integer> tableColumn_PricingCompilation;
 
 
-    private GraphGeneralData currentlySelectedGraph;
+    private GraphDTO currentlySelectedGraph;
 
 
     private Timer timer;
-    private TimerTask listRefresher;
+    private GraphListRefresher listRefresher;
     private final BooleanProperty autoUpdate;
     private DashboardController dashboardController;
 
@@ -65,15 +64,15 @@ public class UploadedGraphsTableController {
     public void initialize() {
         tableView_GraphDetails.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
-        tableColumn_GraphName.setCellValueFactory(new PropertyValueFactory<GraphGeneralData, String>("graphName"));
-        tableColumn_UploadingUser.setCellValueFactory(new PropertyValueFactory<GraphGeneralData, String>("uploadingUserName"));
-        tableColumn_CountTotal.setCellValueFactory(new PropertyValueFactory<GraphGeneralData, Integer>("countAllTargets"));
-        tableColumn_CountLeaves.setCellValueFactory(new PropertyValueFactory<GraphGeneralData, Integer>("countLeaves"));
-        tableColumn_CountMiddles.setCellValueFactory(new PropertyValueFactory<GraphGeneralData, Integer>("countMiddles"));
-        tableColumn_CountRoots.setCellValueFactory(new PropertyValueFactory<GraphGeneralData, Integer>("countRoots"));
-        tableColumn_CountIndependents.setCellValueFactory(new PropertyValueFactory<GraphGeneralData, Integer>("countIndependents"));
-        tableColumn_PricingSimulation.setCellValueFactory(new PropertyValueFactory<GraphGeneralData, Integer>("priceSimulation"));
-        tableColumn_PricingCompilation.setCellValueFactory(new PropertyValueFactory<GraphGeneralData, Integer>("priceCompilation"));
+        tableColumn_GraphName.setCellValueFactory(new PropertyValueFactory<GraphDTO, String>("graphName"));
+        tableColumn_UploadingUser.setCellValueFactory(new PropertyValueFactory<GraphDTO, String>("uploadingUserName"));
+        tableColumn_CountTotal.setCellValueFactory(new PropertyValueFactory<GraphDTO, Integer>("countAllTargets"));
+        tableColumn_CountLeaves.setCellValueFactory(new PropertyValueFactory<GraphDTO, Integer>("countLeaves"));
+        tableColumn_CountMiddles.setCellValueFactory(new PropertyValueFactory<GraphDTO, Integer>("countMiddles"));
+        tableColumn_CountRoots.setCellValueFactory(new PropertyValueFactory<GraphDTO, Integer>("countRoots"));
+        tableColumn_CountIndependents.setCellValueFactory(new PropertyValueFactory<GraphDTO, Integer>("countIndependents"));
+        tableColumn_PricingSimulation.setCellValueFactory(new PropertyValueFactory<GraphDTO, Integer>("priceSimulation"));
+        tableColumn_PricingCompilation.setCellValueFactory(new PropertyValueFactory<GraphDTO, Integer>("priceCompilation"));
 
         setDoubleClickEvent();
 
@@ -83,10 +82,10 @@ public class UploadedGraphsTableController {
 
     private void setDoubleClickEvent() {
         tableView_GraphDetails.setRowFactory( tv -> {
-            TableRow<GraphGeneralData> row = new TableRow<>();
+            TableRow<GraphDTO> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
-                    GraphGeneralData rowData = row.getItem();
+                    GraphDTO rowData = row.getItem();
                     System.out.println("[Graph TableView] chosen row data: " + rowData);
 
                     currentlySelectedGraph = row.getItem();
@@ -98,7 +97,7 @@ public class UploadedGraphsTableController {
         });
     }
 
-    public TableView<GraphGeneralData> getTableView_GraphDetails() {
+    public TableView<GraphDTO> getTableView_GraphDetails() {
         return tableView_GraphDetails;
     }
 
@@ -110,14 +109,15 @@ public class UploadedGraphsTableController {
         listRefresher = new GraphListRefresher(
                 autoUpdate,
                 null, // Aviad code sent something else here
-                this::updateUsersList);
+                this::updateUsersList,
+                dashboardController);
         timer = new Timer();
         timer.schedule(listRefresher, Constants.REFRESH_RATE, Constants.REFRESH_RATE);
     }
 
-    private void updateUsersList(List<GraphGeneralData> usersNames) {
+    private void updateUsersList(List<GraphDTO> usersNames) {
         Platform.runLater(() -> {
-            ObservableList<GraphGeneralData> items = tableView_GraphDetails.getItems();
+            ObservableList<GraphDTO> items = tableView_GraphDetails.getItems();
             items.clear();
             items.addAll(usersNames);
         });
@@ -132,7 +132,7 @@ public class UploadedGraphsTableController {
      *
      * @param graphs new data to replace the old.
      */
-    public void fillUsers(Collection<GraphGeneralData> graphs) {
+    public void fillUsers(Collection<GraphDTO> graphs) {
         clear();
 
         graphs.forEach(graphDTO -> {
@@ -140,15 +140,12 @@ public class UploadedGraphsTableController {
         });
     }
 
-
-
-
-
     public void setDashboardController(DashboardController dashboardController) {
         this.dashboardController = dashboardController;
+        this.listRefresher.setDashboardController(dashboardController);
     }
 
-    public GraphGeneralData getCurrentlySelectedGraph() {
+    public GraphDTO getCurrentlySelectedGraph() {
         return currentlySelectedGraph;
     }
 }

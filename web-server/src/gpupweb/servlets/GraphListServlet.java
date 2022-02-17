@@ -3,15 +3,12 @@ package gpupweb.servlets;
 import com.google.gson.Gson;
 import gpupweb.utils.ServletUtils;
 import graph.DependenciesGraph;
-import graph.GraphGeneralData;
+import graph.GraphDTO;
 import graph.GraphManager;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import users.User;
-import users.UserDTO;
-import users.UserManager;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,7 +27,7 @@ public class GraphListServlet extends HttpServlet {
             GraphManager graphManager = ServletUtils.getGraphManager(getServletContext());
             Set<DependenciesGraph> graphList = graphManager.getGraphs();
 
-            Set<GraphGeneralData> graphDataSet = new HashSet<>();
+            Set<GraphDTO> graphDataSet = new HashSet<>();
             graphList.forEach(graph -> {
                 graphDataSet.add(graph.getGeneralDataAllTargets());
             });

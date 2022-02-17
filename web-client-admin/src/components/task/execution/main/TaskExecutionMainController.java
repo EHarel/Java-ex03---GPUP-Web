@@ -5,7 +5,6 @@ import components.graph.targettable.TargetDTOTable;
 import components.task.execution.dynamicpanel.TaskExecutionDynamicPanelController;
 import components.task.execution.statustables.ExecutionStatusTablesController;
 import components.task.settings.TaskSettingsController;
-import console.task.TaskGeneral;
 import events.ExecutionEndListener;
 import events.ExecutionStartListener;
 import events.FileLoadedListener;
@@ -15,7 +14,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
 import task.ExecutionData;
 import task.configuration.Configuration;
 
@@ -147,7 +145,7 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
     }
 
     public void startButtonPressed() {
-        mainController.startExecutionButtonPressed();
+//        mainController.startExecutionButtonPressed();
     }
 
     public void finishedProcessingTarget(TargetDTO targetDTO) {

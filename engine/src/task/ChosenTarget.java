@@ -1,4 +1,4 @@
-package task.configuration;
+package task;
 
 import java.io.Serializable;
 

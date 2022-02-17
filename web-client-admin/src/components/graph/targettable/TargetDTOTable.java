@@ -1,6 +1,5 @@
 package components.graph.targettable;
 
-import console.task.TaskGeneral;
 import graph.TargetDTO;
 import javafx.scene.control.CheckBox;
 

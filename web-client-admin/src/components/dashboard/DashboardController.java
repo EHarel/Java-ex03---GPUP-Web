@@ -3,7 +3,7 @@ package components.dashboard;
 import components.app.AppMainController;
 import components.dashboard.graphs.UploadedGraphsTableController;
 import components.dashboard.users.UserTableController;
-import graph.GraphGeneralData;
+import graph.GraphDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -29,7 +29,7 @@ public class DashboardController {
     @FXML private UploadedGraphsTableController component_GraphTableController;
 
 
-    private GraphGeneralData currentlyChosenGraph;
+    private GraphDTO currentlyChosenGraph;
 
 
     @FXML
@@ -60,7 +60,7 @@ public class DashboardController {
     }
 
     public void rowChangedEvent() {
-        GraphGeneralData currentlySelectedGraphData = component_GraphTableController.getCurrentlySelectedGraph();
+        GraphDTO currentlySelectedGraphData = component_GraphTableController.getCurrentlySelectedGraph();
 
         String name = "None";
         if (currentlySelectedGraphData != null) {
@@ -70,6 +70,22 @@ public class DashboardController {
         label_SelectedGraphName.setText(name);
 
         mainController.newGraphChosen();
+    }
+
+    public String getChosenGraphName() {
+        String selectedGraphName = null;
+
+        GraphDTO selectedGraph = component_GraphTableController.getCurrentlySelectedGraph();
+
+        if (selectedGraph != null) {
+            selectedGraphName = selectedGraph.getGraphName();
+        }
+
+        return selectedGraphName;
+    }
+
+    public void addGraphs(GraphDTO[] graphDTOs) {
+        mainController.addGraphs(graphDTOs);
     }
 }
 

@@ -9,5 +9,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="dto" />
     <orderEntry type="module" module-name="web-shared-all" />
+    <orderEntry type="module" module-name="gpup-graph" />
+    <orderEntry type="module" module-name="gpup-configuration" />
   </component>
 </module>

@@ -21,8 +21,6 @@ import logic.Engine;
 import task.ExecutionData;
 import task.configuration.Configuration;
 
-import javax.swing.*;
-
 public class TaskExecutionDynamicPanelController {
     @FXML private Parent mainScene;
     @FXML private SplitPane splitPane;
