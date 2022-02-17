@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+
+<ScrollPane fx:id="mainPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" pannable="true" prefHeight="400.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.dashboard.execution.ExecutionTableAdminController">
+   <content>
+      <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+         <children>
+            <TableView fx:id="tableView_Executions" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="25.0">
+              <columns>
+                <TableColumn fx:id="tableColumn_ExecutionName" prefWidth="102.0" text="Execution Name" />
+                <TableColumn fx:id="tableColumn_UploadingUser" prefWidth="102.0" text="Uploading User" />
+                  <TableColumn fx:id="tableColumn_GraphName" minWidth="5.0" text="Graph Name" />
+                  <TableColumn prefWidth="75.0" text="Target Count">
+                     <columns>
+                        <TableColumn fx:id="tableColumn_Count_Total" prefWidth="75.0" text="Total" />
+                        <TableColumn fx:id="tableColumn_Count_Independent" prefWidth="75.0" text="Independent" />
+                        <TableColumn fx:id="tableColumn_Count_Leaf" prefWidth="75.0" text="Leaf" />
+                        <TableColumn fx:id="tableColumn_Count_Middle" prefWidth="75.0" text="Middle" />
+                        <TableColumn fx:id="tableColumn_Count_Root" prefWidth="75.0" text="Root" />
+                     </columns>
+                  </TableColumn>
+                  <TableColumn fx:id="tableColumn_TotalPrice" prefWidth="75.0" text="Total Price" />
+                  <TableColumn fx:id="tableColumn_Workers" prefWidth="75.0" text="Workers" />
+                  <TableColumn fx:id="tableColumn_Status" prefWidth="75.0" text="Status" />
+              </columns>
+            </TableView>
+            <Label alignment="CENTER" layoutX="439.0" layoutY="6.0" text="Execution Table" textAlignment="CENTER" underline="true" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="6.0">
+               <font>
+                  <Font name="Aharoni Bold" size="12.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+   </content>
+</ScrollPane>

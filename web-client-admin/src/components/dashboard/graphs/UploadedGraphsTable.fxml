@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane fx:id="MainPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" pannable="true" prefHeight="510.0" prefWidth="893.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.dashboard.graphs.UploadedGraphsTableController">
+   <content>
+      <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+         <children>
+            <TableView fx:id="tableView_GraphDetails" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="25.0">
+              <columns>
+                <TableColumn fx:id="tableColumn_GraphName" prefWidth="95.0" text="Graph Name" />
+                <TableColumn fx:id="tableColumn_UploadingUser" prefWidth="103.0" text="Uploading User" />
+                  <TableColumn prefWidth="342.0" text="Target Count">
+                     <columns>
+                        <TableColumn fx:id="tableColumn_CountTotal" prefWidth="85.0" text="Total" />
+                        <TableColumn fx:id="tableColumn_CountLeaves" prefWidth="85.0" text="Leaves" />
+                        <TableColumn fx:id="tableColumn_CountMiddles" prefWidth="85.0" text="Middles" />
+                        <TableColumn fx:id="tableColumn_CountRoots" prefWidth="85.0" text="Roots" />
+                        <TableColumn fx:id="tableColumn_CountIndependents" prefWidth="85.0" text="Independents" />
+                     </columns>
+                  </TableColumn>
+                  <TableColumn prefWidth="75.0" text="Pricing">
+                     <columns>
+                        <TableColumn fx:id="tableColumn_PricingSimulation" prefWidth="75.0" text="Simulation" />
+                        <TableColumn fx:id="tableColumn_PricingCompilation" prefWidth="75.0" text="Compilation" />
+                     </columns>
+                  </TableColumn>
+              </columns>
+            </TableView>
+            <Label alignment="CENTER" layoutY="7.0" text="Uploaded Graphs" underline="true" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="6.0">
+               <font>
+                  <Font name="Aharoni Bold" size="12.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
+   </content>
+</ScrollPane>
