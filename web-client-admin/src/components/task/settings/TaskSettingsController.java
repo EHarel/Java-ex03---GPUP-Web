@@ -1,6 +1,8 @@
 package components.task.settings;
 
 import algorithm.DFS;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import components.app.AppMainController;
 import components.app.AppUtils;
 import components.graph.general.GraphGeneralDetailsController;
@@ -9,8 +11,11 @@ import components.graph.targettable.selection.TableSelectionController;
 import components.task.configuration.CompilationConfigurationController;
 import components.task.configuration.SimulationConfigurationController;
 import events.FileLoadedListener;
+import events.GraphChosenListener;
 import graph.DependenciesGraph;
 import graph.TargetDTO;
+import httpclient.HttpClientUtil;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,63 +24,109 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import logic.Engine;
-import task.ExecutionData;
+import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
+import task.Execution;
 import task.TaskProcess;
 import task.TaskType;
 import task.configuration.Configuration;
-import task.configuration.ConfigurationData;
+import task.configuration.ConfigurationDTO;
+import task.configuration.ConfigurationDTOCompilation;
+import task.configuration.ConfigurationDTOSimulation;
+import task.execution.ExecutionDTO;
+import task.execution.ExecutionStatus;
+import utilsharedall.Constants;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 
-public class TaskSettingsController implements FileLoadedListener {
+public class TaskSettingsController implements FileLoadedListener, GraphChosenListener {
     /* ---------------------------------------------------------------------------------------------------- */
     /* ------------------------------------------- DATA MEMBERS ------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
 
     /* ----------------------------------------------- FXML ----------------------------------------------- */
-    @FXML private Label graphNameLabel;
-    @FXML private Label targetCountLabel;
-    @FXML private Label numberOfRootsLabel;
-    @FXML private Label numberOfMiddlesLabel;
-    @FXML private Label numberOfLeavesLabel;
-    @FXML private Label numberOfIndependentsLabel;
-    @FXML private Label labelActiveConfiguration;
-    @FXML private Pane paneStartPoint;
-    @FXML private Label labelAddConfigMsg;
-    @FXML private Button buttonCancelEdit;
-    @FXML private Button buttonDeleteConfiguration;
-    @FXML private Button buttonAddConfiguration;
-    @FXML private Button buttonCreateNewConfig;
-    @FXML private Button buttonSetActiveConfig;
-    @FXML private Label labelSetActiveConfigUpdate;
-    @FXML private ChoiceBox<Integer> threadNumberChoiceBox;
-    @FXML private ListView<TaskType> taskTypeListView;
-    @FXML private ListView<String> existingConfigurationsListView;
-    @FXML private ToggleGroup TaskStartPoint;
-    @FXML private SplitPane taskConfigurationSplitPane;
-    @FXML private RadioButton startPointFromScratchRadioButton;
-    @FXML private RadioButton startPointIncrementalRadioButton;
-    @FXML private Button updateChosenTargetsButton;
-    @FXML private Button clearAllChosenTargetsButton;
+    @FXML
+    private Label graphNameLabel;
+    @FXML
+    private Label targetCountLabel;
+    @FXML
+    private Label numberOfRootsLabel;
+    @FXML
+    private Label numberOfMiddlesLabel;
+    @FXML
+    private Label numberOfLeavesLabel;
+    @FXML
+    private Label numberOfIndependentsLabel;
+    @FXML
+    private Label labelActiveConfiguration;
+    @FXML
+    private Pane paneStartPoint;
+    @FXML
+    private Label labelAddConfigMsg;
+    @FXML
+    private Button buttonCancelEdit;
+    @FXML
+    private Button buttonDeleteConfiguration;
+    @FXML
+    private Button buttonAddConfiguration;
+    @FXML
+    private Button buttonCreateNewConfig;
+    @FXML
+    private Button buttonSetActiveConfig;
+    @FXML
+    private Label labelSetActiveConfigUpdate;
+    @FXML
+    private ListView<TaskType> taskTypeListView;
+    @FXML
+    private ListView<String> existingConfigurationsListView;
+    @FXML
+    private ToggleGroup TaskStartPoint;
+    @FXML
+    private SplitPane taskConfigurationSplitPane;
+    @FXML
+    private RadioButton startPointFromScratchRadioButton;
+    @FXML
+    private RadioButton startPointIncrementalRadioButton;
+    @FXML
+    private Button updateChosenTargetsButton;
+    @FXML
+    private Button clearAllChosenTargetsButton;
+    @FXML
+    private Label label_SubmissionResult;
+    @FXML
+    private Button button_SubmitExecution;
+    @FXML
+    private TextField textField_ExecutionName;
 
 
     /* --------------------------------------- EXTERNAL COMPONENTS ---------------------------------------- */
     // External controllers
-    @FXML private ScrollPane graphGeneralDetailsComponent;
-    @FXML private GraphGeneralDetailsController graphGeneralDetailsComponentController;
+    @FXML
+    private ScrollPane graphGeneralDetailsComponent;
+    @FXML
+    private GraphGeneralDetailsController graphGeneralDetailsComponentController;
 
-    @FXML private ScrollPane targetTableAvailableTargets;
-    @FXML private TargetTableController targetTableAvailableTargetsController;
+    @FXML
+    private ScrollPane targetTableAvailableTargets;
+    @FXML
+    private TargetTableController targetTableAvailableTargetsController;
 
-    @FXML private ScrollPane targetTableChosenTargets;
-    @FXML private TargetTableController targetTableChosenTargetsController;
+    @FXML
+    private ScrollPane targetTableChosenTargets;
+    @FXML
+    private TargetTableController targetTableChosenTargetsController;
 
-    @FXML private ScrollPane targetSelectionMenu;
-    @FXML private TableSelectionController targetSelectionMenuController;
+    @FXML
+    private ScrollPane targetSelectionMenu;
+    @FXML
+    private TableSelectionController targetSelectionMenuController;
 
-    @FXML private Parent graphGeneralDetailsComponent_ChosenTargetsGraph;
-    @FXML private GraphGeneralDetailsController graphGeneralDetailsComponent_ChosenTargetsGraphController;
+    @FXML
+    private Parent graphGeneralDetailsComponent_ChosenTargetsGraph;
+    @FXML
+    private GraphGeneralDetailsController graphGeneralDetailsComponent_ChosenTargetsGraphController;
 
 
     /* ------------------------------------------ CUSTOM FIELDS ------------------------------------------- */
@@ -88,6 +139,7 @@ public class TaskSettingsController implements FileLoadedListener {
     private SimulationConfigurationController simulationConfigurationController;
     private SimpleBooleanProperty isEditingNewConfig;
     private DependenciesGraph chosenGraph;
+    private DependenciesGraph graphOfChosenTargets;
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -108,20 +160,20 @@ public class TaskSettingsController implements FileLoadedListener {
             taskTypeListView.getItems().add(taskTypes[i]);
         }
 
-
         taskTypeListView.getSelectionModel().selectedItemProperty().addListener(observable -> {
             TaskType taskType = taskTypeListView.getSelectionModel().getSelectedItem();
             loadTaskType(taskType);
             updateActiveConfig(taskType);
-            if(taskType != null) {
+            if (taskType != null) {
                 paneStartPoint.setDisable(false);
                 boolean isDisableIncremental = true;
-                try {
-                    ExecutionData lastExecution = Engine.getInstance().getExecutionLast(taskType);
-                    isDisableIncremental = (lastExecution == null);
-                } catch (Exception e) {
-                    isDisableIncremental = true;
-                }
+                // TODO: old code from ex02
+//                try {
+//                    ExecutionData lastExecution = Engine.getInstance().getExecutionLast(taskType);
+//                    isDisableIncremental = (lastExecution == null);
+//                } catch (Exception e) {
+//                    isDisableIncremental = true;
+//                }
 
                 startPointIncrementalRadioButton.setDisable(isDisableIncremental);
             }
@@ -140,7 +192,6 @@ public class TaskSettingsController implements FileLoadedListener {
     }
 
 
-
     /* ---------------------------------------------------------------------------------------------------- */
     /* ------------------------------------------- BIND METHODS ------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
@@ -149,9 +200,6 @@ public class TaskSettingsController implements FileLoadedListener {
         buttonAddConfiguration.disableProperty().bind(isEditingNewConfig.not());
         buttonCreateNewConfig.disableProperty().bind(isEditingNewConfig);
     }
-
-
-
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -163,21 +211,22 @@ public class TaskSettingsController implements FileLoadedListener {
         return taskTypeListView.getSelectionModel().getSelectedItem();
     }
 
-    public Integer getThreadNum() {
-        return threadNumberChoiceBox.getSelectionModel().getSelectedItem();
+    public Button getButtonUpdateChosenTargets() {
+        return updateChosenTargetsButton;
     }
 
-    public Button getButtonUpdateChosenTargets() { return updateChosenTargetsButton; }
+    public Button getButtonClearAllChosenTargets() {
+        return clearAllChosenTargetsButton;
+    }
 
-    public Button getButtonClearAllChosenTargets() { return clearAllChosenTargetsButton; }
-
-    public DependenciesGraph getChosenGraph() {
-        return chosenGraph;
+    public DependenciesGraph getGraphOfChosenTargets() {
+        return graphOfChosenTargets;
     }
 
     public void SetMainController(AppMainController mainController) {
         this.mainController = mainController;
-        mainController.addEventListener_FileLoaded(this);
+//        mainController.addEventListener_FileLoaded(this);
+        mainController.addEventListener_GraphChosen(this);
     }
 
     public void SetCompilationConfigurationController(Parent parent, CompilationConfigurationController controller) {
@@ -210,12 +259,17 @@ public class TaskSettingsController implements FileLoadedListener {
         DependenciesGraph graph = null;
 
         if (isRunFromScratch()) {
-            graph = (DependenciesGraph) Engine.getInstance().getGraph();
+//            graph = (DependenciesGraph) Engine.getInstance().getGraph();
+//            graph = mainController.getChosenGraph();
+            graph = chosenGraph;
         } else {
-            ExecutionData lastExecution = Engine.getInstance().getExecutionLast(getChosenTaskType());
-            if (lastExecution != null) {
-                graph = getLastGraphReset(lastExecution);
-            }
+            graph = chosenGraph;
+
+//            TODO: fix later, commented out from ex02
+//            ExecutionData lastExecution = Engine.getInstance().getExecutionLast(getChosenTaskType());
+//            if (lastExecution != null) {
+//                graph = getLastGraphReset(lastExecution);
+//            }
         }
 
         return graph;
@@ -262,7 +316,7 @@ public class TaskSettingsController implements FileLoadedListener {
 
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------- GETTERS AND SETTERS (PRIVATE) ----------------------------------- */
-    private DependenciesGraph getLastGraphReset(ExecutionData lastExecution) {
+    private DependenciesGraph getLastGraphReset(Execution lastExecution) {
         DependenciesGraph graph = null;
 
         if (lastExecution != null) {
@@ -284,10 +338,10 @@ public class TaskSettingsController implements FileLoadedListener {
             if (configName != null && taskType != null) {
                 switch (taskType) {
                     case COMPILATION:
-                        compilationConfigurationController.loadConfig(configName);
+                        compilationConfigurationController.loadConfig(configName, mainController);
                         break;
                     case SIMULATION:
-                        simulationConfigurationController.loadConfig(configName);
+                        simulationConfigurationController.loadConfig(configName, mainController);
                         break;
                 }
             }
@@ -312,6 +366,7 @@ public class TaskSettingsController implements FileLoadedListener {
                 event -> {
                     targetTableChosenTargetsController.clear();
                     graphGeneralDetailsComponent_ChosenTargetsGraphController.clear();
+                    graphOfChosenTargets = null;
                 });
     }
 
@@ -319,8 +374,6 @@ public class TaskSettingsController implements FileLoadedListener {
         updateChosenTargetsButton.setOnAction(event -> {
             Collection<TargetDTO> selectedTargets = targetTableAvailableTargetsController.getSelectedTargets();
 
-            // TODO: I can improve efficiency of the following functions using a map
-            // Without it I keep manually checking if a target already appears at O(n)
             if (targetSelectionMenuController.getDependentOnRB().isSelected()) {
                 addTargetDependencies(selectedTargets, DFS.EdgeDirection.DEPENDENT_ON);
             }
@@ -333,9 +386,6 @@ public class TaskSettingsController implements FileLoadedListener {
             mainController.TaskSettingsEvent_updateChosenButtonAction();
         });
     }
-
-
-
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -421,10 +471,10 @@ public class TaskSettingsController implements FileLoadedListener {
 
     private void updateSelectedTargets(Collection<TargetDTO> selectedTargets) {
         Collection<String> names = AppUtils.getNamesFromCollection(selectedTargets);
-        chosenGraph = getWorkingGraph().DuplicateChosenOnly(names);
-        chosenGraph.resetState();
+        graphOfChosenTargets = getWorkingGraph().DuplicateChosenOnly(names);
+        graphOfChosenTargets.resetState();
         targetTableChosenTargetsController.populateData_SpecificTargets_SubGraph(chosenGraph, selectedTargets);
-        graphGeneralDetailsComponent_ChosenTargetsGraphController.populateData(chosenGraph);
+        graphGeneralDetailsComponent_ChosenTargetsGraphController.populateData(graphOfChosenTargets);
     }
 
     private void loadTaskType(TaskType taskType) {
@@ -443,15 +493,20 @@ public class TaskSettingsController implements FileLoadedListener {
             }
         }
 
-        updateConfigurationList(taskType);
+//        updateConfigurationList(taskType);
     }
 
+    // TODO: fix this for the rest of ex03. I commented this out because the method relies on old ex02 code
+    // of addressing the engine for old configurations
     private void updateConfigurationList(TaskType taskType) {
         if (taskType == null) {
             return;
         }
 
-        Collection<ConfigurationData> configData = Engine.getInstance().getConfigAll(taskType);
+//        Collection<ConfigurationData> configData = Engine.getInstance().getConfigAll(taskType);
+        Collection<ConfigurationDTO> configData = mainController.getConfigDataAll(taskType);
+
+
         existingConfigurationsListView.getItems().clear();
 
         configData.forEach(configurationData -> {
@@ -459,14 +514,16 @@ public class TaskSettingsController implements FileLoadedListener {
         });
     }
 
-    private void loadInitialGraph() {
-        DependenciesGraph graph = (DependenciesGraph) Engine.getInstance().getGraph();
-        if (graph == null) {
-            return;
-        }
-
-        populateAvailableGraphData(graph);
-    }
+//    private void loadInitialGraph() {
+////        DependenciesGraph graph = (DependenciesGraph) Engine.getInstance().getGraph();
+//        DependenciesGraph graph = mainController.getChosenGraph();
+//
+//        if (graph == null) {
+//            return;
+//        }
+//
+//        populateAvailableGraphData(graph);
+//    }
 
     private void populateAvailableGraphData(DependenciesGraph graph) {
         if (graph != null) {
@@ -495,16 +552,15 @@ public class TaskSettingsController implements FileLoadedListener {
     private Configuration getTaskConfigurationWithoutParticipatingTargets() {
         Configuration configuration = null;
         TaskType taskType = getChosenTaskType();
-        Integer threadNum = getThreadNum();
 
-        if (taskType != null && threadNum != null) {
+        if (taskType != null) {
             switch (taskType) {
                 case SIMULATION: {
-                    configuration = simulationConfigurationController.getConfig(threadNum);
+                    configuration = simulationConfigurationController.getConfig();
                     break;
                 }
                 case COMPILATION: {
-                    configuration = compilationConfigurationController.getConfig(threadNum);
+                    configuration = compilationConfigurationController.getConfig();
                     break;
                 }
             }
@@ -552,9 +608,6 @@ public class TaskSettingsController implements FileLoadedListener {
     }
 
 
-
-
-
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------- EVENTS ---------------------------------------------- */
@@ -562,19 +615,23 @@ public class TaskSettingsController implements FileLoadedListener {
     /* ---------------------------------------------------------------------------------------------------- */
     private void updateActiveConfig(TaskType taskType) {
         try {
-            ConfigurationData configData = Engine.getInstance().getConfigActive(taskType);
+//            ConfigurationData configData = Engine.getInstance().getConfigActive(taskType);
+            ConfigurationDTO configData = mainController.getActiveConfigData(taskType);
+
             if (configData != null) {
                 labelActiveConfiguration.setText(configData.getName());
             } else {
                 labelActiveConfiguration.setText("[None]");
             }
-        } catch (Exception ignore) {}
+        } catch (Exception ignore) {
+        }
     }
 
     @FXML
     void startPointFromScratchRadioButtonListener(ActionEvent event) {
         startPointRBSwitched();
-        loadInitialGraph();
+        populateAvailableGraphData(chosenGraph);
+//        loadInitialGraph(); // TODO: leftover from ex02
     }
 
     private void startPointRBSwitched() {
@@ -592,19 +649,29 @@ public class TaskSettingsController implements FileLoadedListener {
         }
 
         startPointRBSwitched();
-        ExecutionData lastExecution = Engine.getInstance().getExecutionLast(taskType);
-        if (lastExecution == null) {
-            loadInitialGraph();
-        } else {
-            DependenciesGraph lastGraph = lastExecution.getEndGraph();
-            populateAvailableGraphData(lastGraph);
-        }
+
+        populateAvailableGraphData(chosenGraph); // TODO: quick-and-dirty, before I deal with incremental
+
+// TODO: ex02 code
+//        ExecutionData lastExecution = Engine.getInstance().getExecutionLast(taskType);
+//        if (lastExecution == null) {
+//            loadInitialGraph();
+//        } else {
+//            DependenciesGraph lastGraph = lastExecution.getEndGraph();
+//            populateAvailableGraphData(lastGraph);
+//        }
+    }
+
+    @Override
+    public void graphChosen() {
+        clear();
+        chosenGraph = mainController.getChosenGraph();
     }
 
     @Override
     public void fileLoaded() {
-        AppMainController.setThreadNumberChoiceBox(threadNumberChoiceBox);
-        clear();
+////        AppMainController.setThreadNumberChoiceBox(threadNumberChoiceBox);
+//        clear();
     }
 
     private void clear() {
@@ -645,13 +712,19 @@ public class TaskSettingsController implements FileLoadedListener {
         if (isValidTaskAndConfigChosen()) {
             String configName = getChosenConfiguration();
             TaskType taskType = getChosenTaskType();
-            boolean newActiveSet = Engine.getInstance().setActiveConfig(taskType, configName);
-            if (newActiveSet) {
-                displayMsgOnLabelWithFade(labelSetActiveConfigUpdate, configName + " set to new active configuration", Color.GREEN);
-                updateActiveConfig(taskType);
-            }
+            mainController.setActiveConfig(taskType, configName);
+            displayMsgOnLabelWithFade(labelSetActiveConfigUpdate, configName + " set to new active configuration", Color.GREEN);
+            updateActiveConfig(taskType);
+
+//            boolean newActiveSet = Engine.getInstance().setActiveConfig(taskType, configName);
+//            if (newActiveSet) {
+//                displayMsgOnLabelWithFade(labelSetActiveConfigUpdate, configName + " set to new active configuration", Color.GREEN);
+//                updateActiveConfig(taskType);
+//            }
         }
     }
+
+
 
     @FXML
     void buttonDeleteConfigurationActionListener(ActionEvent event) {
@@ -699,7 +772,10 @@ public class TaskSettingsController implements FileLoadedListener {
             return;
         }
 
-        boolean added = Engine.getInstance().addConfiguration(taskType, configuration);
+//        boolean added = Engine.getInstance().addConfiguration(taskType, configuration); // Old code
+
+        boolean added = mainController.addConfiguration(configuration);
+
         if (added) {
 
             String msg = "Configuration added";
@@ -708,6 +784,162 @@ public class TaskSettingsController implements FileLoadedListener {
             updateConfigurationList(taskType);
             isEditingNewConfig.set(false);
         }
+    }
+
+
+
+    @FXML
+    void button_SubmitExecutionActionListener(ActionEvent event) {
+        System.out.println("[TaskSettingsController - button_SubmitExecutionActionListener] Preparing execution data.");
+
+        String executionName = textField_ExecutionName.getText();
+
+        if (executionName == null || executionName == "") {
+            AppMainController.AnimationFadeSingle(null, label_SubmissionResult, "Cannot send empty name", Color.RED);
+            return;
+        }
+
+        Configuration config = getTaskConfigurationWithoutParticipatingTargets();
+        if (config == null) {
+            AppMainController.AnimationFadeSingle(null, label_SubmissionResult, "Configuration not specified", Color.RED);
+            return;
+        }
+
+        DependenciesGraph chosenGraph = getGraphOfChosenTargets();
+        if (chosenGraph == null) {
+            AppMainController.AnimationFadeSingle(null, label_SubmissionResult, "Configuration not specified", Color.RED);
+            return;
+        }
+
+        TaskType taskType = config.getTaskType();
+
+        ConfigurationDTOCompilation configDTOComp = null;
+        ConfigurationDTOSimulation configDTOSim = null;
+
+        switch (config.getTaskType()) {
+            case COMPILATION:
+                configDTOComp = (ConfigurationDTOCompilation) config.toDTO();
+                break;
+            case SIMULATION:
+                configDTOSim = (ConfigurationDTOSimulation) config.toDTO();
+                break;
+        }
+
+        ExecutionDTO executionDTO = new ExecutionDTO(
+                executionName,
+                mainController.getUsername(),
+                // config.toDTO(),
+                chosenGraph.toDTO(),
+                taskType,
+                chosenGraph.getPrice(taskType),
+                0,
+                ExecutionStatus.NEW,
+                configDTOComp,
+                configDTOSim,
+                null);
+
+//        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().serializeNulls().create();
+
+        String executionDTOJson = gson.toJson(executionDTO) + Constants.LINE_SEPARATOR;
+
+//        RequestBody body =
+//                new MultipartBody.Builder()
+//                        .addFormDataPart("executionDTOJson", executionDTOJson)
+//                        .build();
+
+        String bodyStr =
+                Constants.BP_EXECUTION_DTO + "=" + gson.toJson(executionDTO) + Constants.LINE_SEPARATOR;
+
+
+
+        RequestBody body = RequestBody.create(
+                Constants.JSON, executionDTOJson);
+
+//
+//        //noinspection ConstantConditions
+        String finalUrl = HttpUrl
+                .parse(Constants.EXECUTION_UPLOAD)
+                .newBuilder()
+                .build()
+                .toString();
+
+
+//        updateHttpStatusLine("New request is launched for: " + finalUrl); // Aviad Code
+
+
+//        HttpClientUtil.runAsync(finalUrl, body, new Callback() {
+        HttpClientUtil.runAsync(finalUrl, bodyStr, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+//                showFileLoadingErrorMessage("Something went wrong with the file upload!");
+
+//                        Platform.runLater(() ->
+//                                resultMessageProperty.set("Something went wrong: " + e.getMessage()));
+                Platform.runLater(() ->
+                        executionSubmissionFailure());
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String responseBody = response.body().string();
+                if (response.code() != 200) {
+                    Platform.runLater(() ->
+                            executionSubmissionFailure());
+                } else {
+                    Platform.runLater(() -> {
+                        executionSubmissionSuccess();
+                    });
+                }
+            }
+        });
+
+        /*
+        HttpClientUtil.runAsync(finalUrl, body, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+//                showFileLoadingErrorMessage("Something went wrong with the file upload!");
+                        Platform.runLater(() ->
+                                label_SubmissionResult.setText("Something went wrong: " + e.getMessage()));
+//                                resultMessageProperty.set("Something went wrong: " + e.getMessage()));
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String responseBody = response.body().string();
+                if (response.code() != 200) {
+                    Platform.runLater(() ->
+//                                    resultMessageProperty.set("Something went wrong: " + responseBody));
+                            showFileLoadingErrorMessage("Something went wrong with the file upload!"));
+                } else {
+                    Platform.runLater(() -> {
+                        fileLoadedListeners.forEach(FileLoadedListener::fileLoaded);
+
+//                            showFileLoadingErrorMessage("Yay, file loaded! :)");
+
+//                                appMainController.loginSuccessful(userName);
+//                        chatAppMainController.updateUserName(userName);   // Aviad code
+//                        chatAppMainController.switchToChatRoom();         // Aviad code
+                    });
+                }
+            }
+        });
+
+
+         */
+    }
+
+    private void executionSubmissionSuccess() {
+        String msg = "Execution submitted successfully! You should see it updated soon in the table";
+        mainController.AnimationFadeSingle(15000, label_SubmissionResult, msg, Color.GREEN);
+    }
+
+    private void executionSubmissionFailure() {
+        String msg = "Execution denied! Are you sure the name is unique, and that all the parameters are correct?";
+
+        mainController.AnimationFadeSingle(15000, label_SubmissionResult, msg, Color.RED);
     }
 }
 

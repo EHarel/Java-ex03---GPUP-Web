@@ -5,16 +5,17 @@ import components.css.Themes;
 import events.ExecutionEndListener;
 import events.ExecutionStartListener;
 import events.FileLoadedListener;
+import events.GraphChosenListener;
 import javafx.animation.RotateTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import task.ExecutionData;
+import task.Execution;
 import task.configuration.Configuration;
 
-public class MenuController implements ExecutionStartListener, ExecutionEndListener, FileLoadedListener {
+public class MenuController implements ExecutionStartListener, ExecutionEndListener, FileLoadedListener, GraphChosenListener {
     private AppMainController mainController;
 
     @FXML private Button dashboardButton;
@@ -53,6 +54,7 @@ public class MenuController implements ExecutionStartListener, ExecutionEndListe
         mainController.addEventListener_ExecutionStarted(this);
         mainController.addEventListener_ExecutionEnded(this);
         mainController.addEventListener_FileLoaded(this);
+        mainController.addEventListener_GraphChosen(this);
     }
 
     @FXML
@@ -78,8 +80,6 @@ public class MenuController implements ExecutionStartListener, ExecutionEndListe
             rotateButton(taskButton);
         }
     }
-
-
 
     @FXML
     void graphDetailsButtonActionListener(ActionEvent event) {
@@ -116,7 +116,7 @@ public class MenuController implements ExecutionStartListener, ExecutionEndListe
     }
 
     @Override
-    public void executedEnded(ExecutionData executionData) {
+    public void executedEnded(Execution execution) {
         loadFileButton.disableProperty().set(false);
     }
 
@@ -126,6 +126,14 @@ public class MenuController implements ExecutionStartListener, ExecutionEndListe
 
     public void enableTaskSettingsButton() {
         taskButton.disableProperty().set(false);
+    }
+
+    @Override
+    public void graphChosen() {
+        String msg = "Graph chosen!";
+        Color color = Color.GREEN;
+        AppMainController.AnimationFadeSingle(null, labelFileLoadMsg, msg, color);
+        enableTaskSettingsButton();
     }
 
     @Override

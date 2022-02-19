@@ -11,7 +11,7 @@ import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import logic.Engine;
 import task.TaskType;
-import task.configuration.ConfigurationDataSimulation;
+import task.configuration.ConfigurationDTOSimulation;
 import task.configuration.ConfigurationSimulation;
 
 import javax.naming.NameNotFoundException;
@@ -181,7 +181,7 @@ public class SimulationConfigurationController {
     }
 
     public void loadConfig(String configName) {
-        ConfigurationDataSimulation configData = (ConfigurationDataSimulation) Engine.getInstance().getConfigSpecific(TaskType.SIMULATION, configName);
+        ConfigurationDTOSimulation configData = (ConfigurationDTOSimulation) Engine.getInstance().getConfigSpecific(TaskType.SIMULATION, configName);
 
         if (configData == null)
             return;

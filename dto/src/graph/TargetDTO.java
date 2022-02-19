@@ -1,13 +1,12 @@
 package graph;
 
-import task.configuration.ConfigurationData;
+import task.configuration.ConfigurationDTO;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 public class TargetDTO implements Serializable, Cloneable {
 //    private static final long serialVersionUID = 4; // 08-Dec-2021 - Added serial sets
@@ -149,7 +148,7 @@ public class TargetDTO implements Serializable, Cloneable {
         private final boolean participatesInExecution;
         private final Instant startInstant;
         private final Instant endInstant;
-        private final ConfigurationData configData;
+        private final ConfigurationDTO configData;
         private final TaskResult taskResult;
         private final TargetState targetState;
         private final Collection<String> targetsOpenedAsResult;
@@ -162,7 +161,7 @@ public class TargetDTO implements Serializable, Cloneable {
                              boolean participatesInExecution,
                              Instant startInstant,
                              Instant endInstant,
-                             ConfigurationData configData,
+                             ConfigurationDTO configData,
                              TaskResult taskResult,
                              TargetState taskState,
                              Collection<String> targetsThatAreWaitingAsResult,
@@ -214,7 +213,7 @@ public class TargetDTO implements Serializable, Cloneable {
             return targetsSkippedAsResult_AllPaths;
         }
 
-        public ConfigurationData getConfigData() {
+        public ConfigurationDTO getConfigData() {
             return configData;
         }
 
@@ -226,12 +225,17 @@ public class TargetDTO implements Serializable, Cloneable {
             Collection<String> skippedClone = cloneCollection(targetsSkippedAsResult);
             Collection<List<String>> skippedAllPaths = clonePaths(targetsSkippedAsResult_AllPaths);
 
+            ConfigurationDTO configData = null;
+            if (this.configData != null) {
+                configData = this.configData.clone();
+            }
+
             return new TaskStatusDTO(
                     this.executionNum,
                     this.participatesInExecution,
                     this.startInstant,
                     this.endInstant,
-                    this.configData.clone(),
+                    configData,
                     this.taskResult,
                     this.targetState,
                     openedClone,

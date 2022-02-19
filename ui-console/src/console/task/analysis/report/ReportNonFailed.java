@@ -2,11 +2,11 @@ package console.task.analysis.report;
 
 import console.task.TaskGeneral;
 import console.menu.loader.PathMenu;
-import task.ExecutionData;
+import task.Execution;
 
 public class ReportNonFailed extends Report {
-    public ReportNonFailed(ExecutionData executionDataDataSim, PathMenu.ReportType reportType) {
-        super(executionDataDataSim, reportType);
+    public ReportNonFailed(Execution executionDataSim, PathMenu.ReportType reportType) {
+        super(executionDataSim, reportType);
     }
 
     @Override
@@ -15,7 +15,7 @@ public class ReportNonFailed extends Report {
     }
 
     private void reportNonFailed() {
-        TaskGeneral.printReports("Non-failed Processed Targets", executionData.getProcessedData().getProcessedTargetsNoFailure(), reportType);
+        TaskGeneral.printReports("Non-failed Processed Targets", execution.getProcessedData().getProcessedTargetsNoFailure(), reportType);
         System.out.println(System.lineSeparator());
     }
 }

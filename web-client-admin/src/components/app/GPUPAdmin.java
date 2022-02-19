@@ -40,6 +40,7 @@ public class GPUPAdmin extends javafx.application.Application {
         BorderPane root = fxmlLoader.load(url.openStream());
         AppMainController mainController = fxmlLoader.getController();
         mainController.setRoot(root);
+        mainController.setMainStage(primaryStage);
 
         loadSubComponents(mainController);
 

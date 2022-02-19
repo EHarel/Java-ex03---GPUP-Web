@@ -13,8 +13,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
-import utilshared.Constants;
-import utilshared.UserType;
+import utilsharedall.Constants;
+import utilsharedall.UserType;
 
 import java.io.IOException;
 

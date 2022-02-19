@@ -38,6 +38,15 @@ public class HttpClientUtil {
         call(request, callback);
     }
 
+    public static void runAsync(String finalUrl, String bodyStr, Callback callback) {
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .post(RequestBody.create(bodyStr.getBytes()))
+                .build();
+
+        call(request, callback);
+    }
+
     private static void call(Request request, Callback callback) {
         Call call = HttpClientUtil.HTTP_CLIENT.newCall(request);
 

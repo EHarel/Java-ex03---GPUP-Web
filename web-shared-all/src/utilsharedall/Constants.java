@@ -1,11 +1,18 @@
-package utilshared;
+package utilsharedall;
 
 import com.google.gson.Gson;
+import okhttp3.MediaType;
 
 public class Constants {
+    public final static MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    public final static String LINE_SEPARATOR = System.getProperty("line.separator");
+
     // Query Parameter Constants
     public final static String QP_USERTYPE = "usertype";
     public final static String QP_USERNAME = "username";
+    public final static String QP_EXECUTIONNAME = "executionName";
+
+    public final static String BP_EXECUTION_DTO = "executionDTO";
 
 
     // Server resources locations
@@ -17,7 +24,16 @@ public class Constants {
     public final static String LOGIN_PAGE = FULL_SERVER_PATH + "/login";
     public final static String USERS_LIST = FULL_SERVER_PATH + "/userlist";
     public final static String GRAPH_LIST = FULL_SERVER_PATH + "/graphlist";
+    public final static String EXECUTION_LIST = FULL_SERVER_PATH + "/executionlist";
+
     public final static String FILE_UPLOAD = FULL_SERVER_PATH + "/file-upload";
+
+    public final static String EXECUTION_UPLOAD = FULL_SERVER_PATH + "/execution/upload";
+    public final static String EXECUTION_SUBSCRIBE = FULL_SERVER_PATH + "/execution/subscribe";
+
+
+
+
 
 
     // GSON instance

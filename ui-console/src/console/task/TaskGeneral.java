@@ -12,7 +12,7 @@ import console.task.consumer.ConsumerStartProcessingUI;
 import exception.NoConfigurationException;
 import exception.UninitializedTaskException;
 import graph.TargetDTO;
-import task.ExecutionData;
+import task.Execution;
 import logic.Engine;
 import task.TaskProcess;
 import task.configuration.ChosenTarget;
@@ -65,8 +65,8 @@ public class TaskGeneral implements DoesAction {
             managePause();
             System.out.println("\n ---------- After waking up! ---------- \n");
 
-            ExecutionData executionData = engine.getExecutionLast(TaskSubMenu.getTaskType());
-            new ExecutionAnalysisMenu(executionData).run();
+            Execution execution = engine.getExecutionLast(TaskSubMenu.getTaskType());
+            new ExecutionAnalysisMenu(execution).run();
         } catch (UninitializedTaskException uninitializedTaskException) { // TODO: delete this?
             System.out.println("Whoa, hold on! No configuration has been set yet.\n" + uninitializedTaskException.getMessage());
         } catch (IOException e) {
@@ -163,9 +163,9 @@ public class TaskGeneral implements DoesAction {
         return consumerManager;
     }
 
-    public static void printExecutionReport(ExecutionData executionData) {
+    public static void printExecutionReport(Execution execution) {
         System.out.println();
-        System.out.println(Engine.getInstance().getFormalizedExecutionReportString(executionData));
+        System.out.println(Engine.getInstance().getFormalizedExecutionReportString(execution));
         System.out.println();
         System.out.println();
     }

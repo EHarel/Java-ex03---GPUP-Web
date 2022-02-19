@@ -1,9 +1,7 @@
 package gpupweb.servlets;
 
 
-import gpupweb.constants.Constants;
 import gpupweb.utils.ServletUtils;
-import gpupweb.utils.SessionUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,14 +9,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import users.User;
 import users.UserDTO;
 import users.UserManager;
-import utilshared.UserType;
 
 import java.io.IOException;
 import com.google.gson.Gson;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;

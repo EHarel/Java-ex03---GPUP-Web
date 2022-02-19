@@ -5,7 +5,6 @@ import components.app.AppMainController;
 import components.app.AppUtils;
 import components.graph.alldata.GraphAllDataController;
 import graph.DependenciesGraph;
-import graph.Graph;
 import graph.TargetDTO;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -194,8 +193,9 @@ public class TargetTableController {
 
     /**
      * Clears the table and adds all targets from given graph to the table.
+     * @param graph
      */
-    public void PopulateData_AllTargets(Graph graph) {
+    public void PopulateData_AllTargets(DependenciesGraph graph) {
         workingGraph = (DependenciesGraph) graph;
         Collection<TargetDTO> targetDTOCollection = graph.getAllTargetData();
 
@@ -236,6 +236,8 @@ public class TargetTableController {
             });
         }
     }
+
+
 
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */

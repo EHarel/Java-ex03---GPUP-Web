@@ -2,11 +2,11 @@ package console.task.analysis.report;
 
 import console.task.TaskGeneral;
 import console.menu.loader.PathMenu;
-import task.ExecutionData;
+import task.Execution;
 
 public class ReportSuccessWarnings extends Report {
-    public ReportSuccessWarnings(ExecutionData executionData, PathMenu.ReportType reportType) {
-        super(executionData, reportType);
+    public ReportSuccessWarnings(Execution execution, PathMenu.ReportType reportType) {
+        super(execution, reportType);
     }
 
     @Override
@@ -16,7 +16,7 @@ public class ReportSuccessWarnings extends Report {
 
     private void reportWarnings() {
         TaskGeneral.printReports("Successful targets (with warnings)" +
-                "", executionData.getProcessedData().getWarningTargets(), reportType);
+                "", execution.getProcessedData().getWarningTargets(), reportType);
         System.out.println(System.lineSeparator());
     }
 }

@@ -1,7 +1,7 @@
 package events;
 
-import task.ExecutionData;
+import task.Execution;
 
 public interface ExecutionEndListener {
-    void executedEnded(ExecutionData executionData);
+    void executedEnded(Execution execution);
 }

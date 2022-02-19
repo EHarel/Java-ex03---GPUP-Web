@@ -3,7 +3,7 @@ package task;
 import exception.*;
 import graph.DependenciesGraph;
 import task.configuration.Configuration;
-import task.configuration.ConfigurationData;
+import task.configuration.ConfigurationDTO;
 import task.consumer.ConsumerManager;
 
 import java.io.Serializable;
@@ -81,7 +81,7 @@ public class TaskManager implements Serializable {
         tasks.get(taskType).removeConfigurationAll();
     }
 
-    public ConfigurationData getConfigActive(TaskType taskType) {
+    public ConfigurationDTO getConfigActive(TaskType taskType) {
         return tasks.get(taskType).getConfigurationDataActiveOnly();
     }
 
@@ -89,11 +89,11 @@ public class TaskManager implements Serializable {
         return tasks.get(taskType).getConfigurationActive();
     }
 
-    public Collection<ConfigurationData> getAllConfigurations(TaskType taskType) {
+    public Collection<ConfigurationDTO> getAllConfigurations(TaskType taskType) {
         return tasks.get(taskType).getConfigurationDataAll();
     }
 
-    public ConfigurationData getSpecificConfig(TaskType taskType, String configName) {
+    public ConfigurationDTO getSpecificConfig(TaskType taskType, String configName) {
         return tasks.get(taskType).getSpecificConfig(configName);
     }
 
@@ -105,15 +105,15 @@ public class TaskManager implements Serializable {
         return tasks.get(taskType).getConfigCount();
     }
 
-    public ExecutionData getExecutionReportLast(TaskType taskType) {
+    public Execution getExecutionReportLast(TaskType taskType) {
         return tasks.get(taskType).getLastExecution();
     }
 
-    public ExecutionData getExecutionReportIndex(TaskType taskType, int i) throws IndexOutOfBoundsException {
+    public Execution getExecutionReportIndex(TaskType taskType, int i) throws IndexOutOfBoundsException {
         return tasks.get(taskType).getReportAtIndex(i);
     }
 
-    public ExecutionData getExecutionByExeNumber(TaskType taskType, int executionNumber) {
+    public Execution getExecutionByExeNumber(TaskType taskType, int executionNumber) {
         return tasks.get(taskType).getReportByNumber(executionNumber);
     }
 

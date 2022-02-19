@@ -46,7 +46,7 @@ public class GraphGeneralDetailsController {
 
     public void populateData(DependenciesGraph graph) {
         if (graph != null) {
-            GraphDTO graphDTO = graph.getGeneralDataAllTargets();
+            GraphDTO graphDTO = graph.toDTO();
             this.getGraphNameLabel().setText(graph.getName());
             this.getNumberOfIndependentsLabel().setText(String.valueOf(graphDTO.getCountIndependents()));
             this.getNumberOfLeavesLabel().setText(String.valueOf(graphDTO.getCountLeaves()));

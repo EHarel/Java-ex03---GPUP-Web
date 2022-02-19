@@ -1,18 +1,18 @@
 package console.task.consumer;
 
 import console.task.TaskGeneral;
-import task.ExecutionData;
+import task.Execution;
 
 import java.io.Serializable;
 import java.util.function.Consumer;
 
-public class ConsumerPrintExecution implements Consumer<ExecutionData>, Serializable {
+public class ConsumerPrintExecution implements Consumer<Execution>, Serializable {
     private static final long serialVersionUID = 1; // 08-Dec-2021, creation
 
     @Override
-    public void accept(ExecutionData executionData) {
+    public void accept(Execution execution) {
         System.out.println("\n ---------- Execution completed (consumer print) ---------- \n");
-        TaskGeneral.printExecutionReport(executionData);
+        TaskGeneral.printExecutionReport(execution);
 
         // Old code before JavaFX
 //        TaskGeneral.TaskState taskState = TaskGeneral.getTaskState();

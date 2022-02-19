@@ -28,15 +28,18 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.Engine;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
-import task.ExecutionData;
+import task.Execution;
 import task.TaskType;
+import task.configuration.Configuration;
 import task.configuration.ConfigurationCompilation;
+import task.configuration.ConfigurationDTO;
 import task.configuration.ConfigurationSimulation;
-import utilshared.Constants;
+import utilsharedall.Constants;
 
 import javax.naming.NameNotFoundException;
 import java.io.File;
@@ -83,15 +86,17 @@ public class AppMainController {
 
     private Parent dashboard;
     private DashboardController dashboardController;
+    private Stage primaryStage;
 
 
     public boolean getAllowAnimations() { return allowAnimations.get(); }
 
-
     /* ------------------------------------------ CUSTOM FIELDS ------------------------------------------- */
+    private String username;
     private String chosenGraphName;
-    DependenciesGraph chosenGraph;
-    GraphManager graphManager;
+    private DependenciesGraph chosenGraph;
+    private GraphManager graphManager;
+    private ConfigurationManager configManager;
 
 
     // Events
@@ -110,6 +115,7 @@ public class AppMainController {
         executionEndListeners = new LinkedList<>();
         graphChosenListeners = new LinkedList<>();
         graphManager = new GraphManager();
+        configManager = new ConfigurationManager();
     }
 
 
@@ -121,6 +127,14 @@ public class AppMainController {
     /* --------------------------------------- GETTERS AND SETTERS ---------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public void setMainScene(Scene scene) {
         this.mainScene = scene;
     }
@@ -204,10 +218,6 @@ public class AppMainController {
         if (targetTableController != null) {
             targetTableController.setMainController(this);
         }
-    }
-
-    public boolean isHasPerformedInitialGraphLoad() {
-        return hasPerformedInitialGraphLoad;
     }
 
     public TaskSettingsController getTaskSettingsController() {
@@ -402,6 +412,11 @@ public class AppMainController {
     }
 
     public void taskButtonPressed() {
+        displayTaskSettings();
+    }
+
+    private void displayTaskSettings() {
+        dashboardController.setActive(false);
         root.setCenter(taskSettings);
     }
 
@@ -419,6 +434,177 @@ public class AppMainController {
 
         controller.setMainController(this);
     }
+
+    public void pauseButtonPressed() {
+        Engine.getInstance().pauseExecution(true);
+        System.out.println("[pauseButtonPressed - AppMainController] Sent pause to engine.");
+    }
+
+    public void continueButtonPressed() {
+        System.out.println("[continueButtonPressed - AppMainController] About to continue execution..");
+        Engine.getInstance().pauseExecution(false);
+    }
+
+    public void threadChangedDuringExecution(int newValue) {
+        Engine.getInstance().setThreadCount_activeThreads(newValue);
+    }
+
+    public void finishedExecutionProcess(Execution execution) {
+        executionEndListeners.forEach(executionEndListener -> executionEndListener.executedEnded(execution));
+    }
+
+    private void loadDefaultConfigurationsToEngine() {
+        loadDefaultSimulationConfiguration();
+        loadDefaultCompilationConfiguration();
+    }
+
+    private void loadDefaultCompilationConfiguration() {
+        try {
+            ConfigurationCompilation compConfig = new ConfigurationCompilation(
+                    "Default Comp Config",
+                    1,
+                    "C:/Temp/",
+                    "C:/temp/"
+            );
+
+            Engine.getInstance().addConfigAndSetActive(TaskType.COMPILATION, compConfig);
+        } catch (Exception ignore) {
+        }
+    }
+
+    private void loadDefaultSimulationConfiguration() {
+        try {
+            ConfigurationSimulation simConfig = new ConfigurationSimulation(
+                    "Default Sim Config",
+                    1,
+                    0.5,
+                    5000,
+                    true,
+                    0.5);
+
+            Engine.getInstance().addConfigAndSetActive(TaskType.SIMULATION, simConfig);
+        } catch (InvalidInputRangeException | NameNotFoundException ignore) {
+        }
+    }
+
+    public void TaskSettingsEvent_updateChosenButtonAction() {
+        taskExecutionController.TaskSettingsEvent_UpdateChosenTargetsAction();
+    }
+
+    public void resetForNewExecutionButton_FromDynamicPanel() {
+        clearAll();
+    }
+
+    private void clearAll() {
+        taskSettingsController.reset();
+        taskExecutionController.reset();
+    }
+
+    public void displayLogin() {
+        this.root.setTop(null);
+        this.root.setBottom(null);
+        this.root.setLeft(null);
+        this.root.setRight(null);
+        this.root.setCenter(login);
+    }
+
+    public void loginSuccessful(String userName) {
+        this.username = userName;
+        this.primaryStage.setTitle(this.primaryStage.getTitle() + " - Logged in as: " + userName);
+        displayMainApp();
+    }
+
+    private void displayMainApp() {
+        this.root.setTop(menu);
+        this.root.setBottom(null);
+        this.root.setLeft(null);
+        this.root.setRight(null);
+        displayDashboard();
+    }
+
+    private void displayDashboard() {
+        this.root.setCenter(dashboard);
+        dashboardController.setActive(true);
+    }
+
+    public void dashboardButtonPressed() {
+        displayDashboard();
+    }
+
+    /**
+     * This event is responsible for handling all the implications of a new graph being chosen by the admin.
+     * This graph must be read from the dashboard, and then be made relevant to all the other components.
+     */
+    public void newGraphChosen() {
+        String chosenGraphName = dashboardController.getChosenGraphName();
+
+        chosenGraph = null;
+
+        if (chosenGraphName != null) {
+            chosenGraph = graphManager.getGraph(chosenGraphName);
+        }
+
+        graphChosenListeners.forEach(GraphChosenListener::graphChosen);
+    }
+
+    public DependenciesGraph getChosenGraph() { return chosenGraph; }
+
+    public void addGraphs(GraphDTO[] graphDTOs) {
+        graphManager.addGraphs(graphDTOs);
+    }
+
+    public boolean addConfiguration(Configuration configuration) {
+        return configManager.addConfiguration(configuration);
+    }
+
+    public Collection<ConfigurationDTO> getConfigDataAll(TaskType taskType) {
+        return configManager.getConfigDataAll(taskType);
+    }
+
+    public ConfigurationDTO getActiveConfigData(TaskType taskType) {
+        return configManager.getActiveConfigData(taskType);
+    }
+
+    public void setActiveConfig(TaskType taskType, String configName) {
+        configManager.setActiveConfig(taskType, configName);
+    }
+
+    public ConfigurationDTO getConfigDataSpecific(TaskType taskType, String configName) {
+        return configManager.getConfigDataSpecific(taskType, configName);
+    }
+
+    public void setMainStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
+    }
+
+
+
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ------------------------------------------ MISC. METHODS ------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+}
+
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------- */
+/* --------------------------------------------- OLD CODE --------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------- */
+//    public static void setThreadNumberChoiceBox(ChoiceBox<Integer> threadNumCB) {
+//        int maxParallelism = Engine.getInstance().getThreadCount_maxParallelism();
+//        threadNumCB.getItems().clear();
+//        for (int i = 0; i < maxParallelism; i++) {
+//            int value = i + 1;
+//            threadNumCB.getItems().add(value);
+//        }
+//
+//        threadNumCB.getSelectionModel().select(0);
+//    }
+
+
+
 //
 //    public void startExecutionButtonPressed() {
 ////        Configuration configuration = taskSettingsController.getTaskConfigurationWithParticipatingTargets();
@@ -490,139 +676,3 @@ public class AppMainController {
 //
 //        return consumerManager;
 //    }
-
-    public void pauseButtonPressed() {
-        Engine.getInstance().pauseExecution(true);
-        System.out.println("[pauseButtonPressed - AppMainController] Sent pause to engine.");
-    }
-
-    public void continueButtonPressed() {
-        System.out.println("[continueButtonPressed - AppMainController] About to continue execution..");
-        Engine.getInstance().pauseExecution(false);
-    }
-
-    public static void setThreadNumberChoiceBox(ChoiceBox<Integer> threadNumCB) {
-        int maxParallelism = Engine.getInstance().getThreadCount_maxParallelism();
-        threadNumCB.getItems().clear();
-        for (int i = 0; i < maxParallelism; i++) {
-            int value = i + 1;
-            threadNumCB.getItems().add(value);
-        }
-
-        threadNumCB.getSelectionModel().select(0);
-    }
-
-    public void threadChangedDuringExecution(int newValue) {
-        Engine.getInstance().setThreadCount_activeThreads(newValue);
-    }
-
-    public void finishedExecutionProcess(ExecutionData executionData) {
-        executionEndListeners.forEach(executionEndListener -> executionEndListener.executedEnded(executionData));
-    }
-
-    private void loadDefaultConfigurationsToEngine() {
-        loadDefaultSimulationConfiguration();
-        loadDefaultCompilationConfiguration();
-    }
-
-    private void loadDefaultCompilationConfiguration() {
-        try {
-            ConfigurationCompilation compConfig = new ConfigurationCompilation(
-                    "Default Comp Config",
-                    1,
-                    "C:/Temp/",
-                    "C:/temp/"
-            );
-
-            Engine.getInstance().addConfigAndSetActive(TaskType.COMPILATION, compConfig);
-        } catch (Exception ignore) {
-        }
-    }
-
-    private void loadDefaultSimulationConfiguration() {
-        try {
-            ConfigurationSimulation simConfig = new ConfigurationSimulation(
-                    "Default Sim Config",
-                    1,
-                    0.5,
-                    5000,
-                    true,
-                    0.5);
-
-            Engine.getInstance().addConfigAndSetActive(TaskType.SIMULATION, simConfig);
-        } catch (InvalidInputRangeException | NameNotFoundException ignore) {
-        }
-    }
-
-    public void TaskSettingsEvent_updateChosenButtonAction() {
-        taskExecutionController.TaskSettingsEvent_UpdateChosenTargetsAction();
-    }
-
-    public void resetForNewExecutionButton_FromDynamicPanel() {
-        clearAll();
-    }
-
-    private void clearAll() {
-        taskSettingsController.reset();
-        taskExecutionController.reset();
-    }
-
-    public void displayLogin() {
-        this.root.setTop(null);
-        this.root.setBottom(null);
-        this.root.setLeft(null);
-        this.root.setRight(null);
-        this.root.setCenter(login);
-    }
-
-    public void loginSuccessful(String userName) {
-        displayMainApp();
-    }
-
-    private void displayMainApp() {
-        this.root.setTop(menu);
-        this.root.setBottom(null);
-        this.root.setLeft(null);
-        this.root.setRight(null);
-        displayDashboard();
-    }
-
-    private void displayDashboard() {
-        this.root.setCenter(dashboard);
-        dashboardController.setActive(true);
-    }
-
-    public void dashboardButtonPressed() {
-        displayDashboard();
-    }
-
-    /**
-     * This event is responsible for handling all the implications of a new graph being chosen by the admin.
-     * This graph must be read from the dashboard, and then be made relevant to all the other components.
-     */
-    public void newGraphChosen() {
-        String chosenGraphName = dashboardController.getChosenGraphName();
-
-        chosenGraph = null;
-
-        if (chosenGraphName != null) {
-            chosenGraph = graphManager.getGraph(chosenGraphName);
-        }
-
-        graphChosenListeners.forEach(GraphChosenListener::graphChosen);
-    }
-
-    public DependenciesGraph getChosenGraph() { return chosenGraph; }
-
-    public void addGraphs(GraphDTO[] graphDTOs) {
-        graphManager.addGraphs(graphDTOs);
-    }
-
-
-
-    /* ---------------------------------------------------------------------------------------------------- */
-    /* ---------------------------------------------------------------------------------------------------- */
-    /* ------------------------------------------ MISC. METHODS ------------------------------------------- */
-    /* ---------------------------------------------------------------------------------------------------- */
-    /* ---------------------------------------------------------------------------------------------------- */
-}

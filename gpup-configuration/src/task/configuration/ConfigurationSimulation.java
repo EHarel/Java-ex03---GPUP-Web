@@ -20,7 +20,7 @@ public class ConfigurationSimulation extends Configuration implements Serializab
         update(successProbability, processingTime, randomProcessingTime, warningsProbability);
     }
 
-    public ConfigurationSimulation(ConfigurationDataSimulation configData) throws NameNotFoundException, InvalidInputRangeException {
+    public ConfigurationSimulation(ConfigurationDTOSimulation configData) throws NameNotFoundException, InvalidInputRangeException {
         super(TaskType.SIMULATION, configData.getName(), configData.threadCount);
         update(configData);
     }
@@ -31,7 +31,7 @@ public class ConfigurationSimulation extends Configuration implements Serializab
     /* --------------------------------------- SETTERS AND GETTERS ---------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
-    private void update(ConfigurationDataSimulation configData) {
+    private void update(ConfigurationDTOSimulation configData) {
         try {
             setProcessingTime(configData.getProcessingTime());
             setRandomProcessingTime(configData.isRandomProcessingTime());
@@ -56,8 +56,8 @@ public class ConfigurationSimulation extends Configuration implements Serializab
         setWarningsProbability(config.getWarningsProbability());
     }
 
-    public ConfigurationDataSimulation getData() {
-        return new ConfigurationDataSimulation(name, numberOfThreads, successProbability, processingTime, randomProcessingTime, warningsProbability);
+    public ConfigurationDTOSimulation toDTO() {
+        return new ConfigurationDTOSimulation(name, numberOfThreads, successProbability, processingTime, randomProcessingTime, warningsProbability);
     }
 
     public int getProcessingTime() {

@@ -7,7 +7,7 @@ import okhttp3.Callback;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import users.UserDTO;
-import utilshared.Constants;
+import utilsharedall.Constants;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,7 +16,7 @@ import java.util.TimerTask;
 import java.util.function.Consumer;
 
 
-import static utilshared.Constants.GSON_INSTANCE;
+import static utilsharedall.Constants.GSON_INSTANCE;
 
 public class UserListRefresher extends TimerTask {
 

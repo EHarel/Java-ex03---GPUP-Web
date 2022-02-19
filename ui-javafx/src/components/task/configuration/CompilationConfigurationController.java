@@ -117,7 +117,7 @@ public class CompilationConfigurationController {
     }
 
     public void loadConfig(String configName) {
-        ConfigurationDataCompilation configData = (ConfigurationDataCompilation) Engine.getInstance().getConfigSpecific(TaskType.COMPILATION, configName);
+        ConfigurationDTOCompilation configData = (ConfigurationDTOCompilation) Engine.getInstance().getConfigSpecific(TaskType.COMPILATION, configName);
 
         if (configData == null)
             return;

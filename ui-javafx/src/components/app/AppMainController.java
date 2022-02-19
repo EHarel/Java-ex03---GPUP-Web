@@ -26,12 +26,12 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import logic.Engine;
-import task.ExecutionData;
+import task.Execution;
 import task.TaskProcess;
 import task.TaskType;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationCompilation;
-import task.configuration.ConfigurationData;
+import task.configuration.ConfigurationDTO;
 import task.configuration.ConfigurationSimulation;
 import task.consumer.ConsumerManager;
 
@@ -336,7 +336,7 @@ public class AppMainController {
             return;
         }
 
-        ConfigurationData configData = Engine.getInstance().getConfigActive(taskType);
+        ConfigurationDTO configData = Engine.getInstance().getConfigActive(taskType);
         if (configData == null) {
             AlertErrorMessage(errorTitle, "No active configuration set. Go to the settings and define an active config.");
             return;
@@ -413,8 +413,8 @@ public class AppMainController {
         Engine.getInstance().setThreadCount_activeThreads(newValue);
     }
 
-    public void finishedExecutionProcess(ExecutionData executionData) {
-        executionEndListeners.forEach(executionEndListener -> executionEndListener.executedEnded(executionData));
+    public void finishedExecutionProcess(Execution execution) {
+        executionEndListeners.forEach(executionEndListener -> executionEndListener.executedEnded(execution));
     }
 
     private void loadDefaultConfigurationsToEngine() {

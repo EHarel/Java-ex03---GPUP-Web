@@ -30,7 +30,7 @@ public abstract class Configuration implements Serializable {
         this.participatingTargetNames = new LinkedList<>();
     }
 
-    public Configuration(ConfigurationData configData) {
+    public Configuration(ConfigurationDTO configData) {
         this.taskType = configData.getTaskType();
         this.name = configData.getName();
         this.numberOfThreads = configData.getThreadCount();
@@ -79,7 +79,7 @@ public abstract class Configuration implements Serializable {
         return (participatingTargetNames == null || participatingTargetNames.size() == 0);
     }
 
-    public abstract ConfigurationData getData();
+    public abstract ConfigurationDTO toDTO();
 
     @Override
     public abstract Configuration clone();

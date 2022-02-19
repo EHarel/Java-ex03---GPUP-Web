@@ -1,12 +1,11 @@
 package components.task.consumer;
 
 import components.app.AppMainController;
-import console.task.TaskGeneral;
 import javafx.application.Platform;
-import task.ExecutionData;
+import task.Execution;
 import java.util.function.Consumer;
 
-public class ConsumerFinishedTaskProcessJavaFX implements Consumer<ExecutionData>{
+public class ConsumerFinishedTaskProcessJavaFX implements Consumer<Execution>{
     AppMainController appMainController;
 
     public ConsumerFinishedTaskProcessJavaFX(AppMainController appMainController) {
@@ -14,7 +13,7 @@ public class ConsumerFinishedTaskProcessJavaFX implements Consumer<ExecutionData
     }
 
     @Override
-    public void accept(ExecutionData executionData) {
+    public void accept(Execution execution) {
 // Old code from console version
         // TaskGeneral.printExecutionReport(executionData);
 //        TaskGeneral.TaskState taskState = TaskGeneral.getTaskState();
@@ -24,7 +23,7 @@ public class ConsumerFinishedTaskProcessJavaFX implements Consumer<ExecutionData
 //        }
 
         Platform.runLater(
-                () -> appMainController.finishedExecutionProcess(executionData)
+                () -> appMainController.finishedExecutionProcess(execution)
         );
     }
 }

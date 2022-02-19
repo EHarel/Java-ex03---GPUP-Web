@@ -41,15 +41,15 @@ public class TaskFactory {
                                      Target target,
                                      Configuration configuration,
                                      DependenciesGraph workingGraph,
-                                     ExecutionData executionData) {
+                                     Execution execution) {
         Task task = null;
 
         switch (taskType) {
             case SIMULATION:
-                task = new TaskSimulation(target, configuration, workingGraph, executionData);
+                task = new TaskSimulation(target, configuration, workingGraph, execution);
                 break;
             case COMPILATION:
-                task = new TaskCompilation(target, configuration, workingGraph, executionData);
+                task = new TaskCompilation(target, configuration, workingGraph, execution);
                 break;
         }
 

@@ -9,9 +9,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
-import utilshared.Constants;
+import utilsharedall.Constants;
 import httpclient.HttpClientUtil;
-import utilshared.UserType;
+import utilsharedall.UserType;
 
 import java.io.IOException;
 

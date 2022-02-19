@@ -14,9 +14,9 @@ public class TaskSimulation extends Task {
     public TaskSimulation(@NotNull Target target,
                           @NotNull Configuration configuration,
                           DependenciesGraph workingGraph,
-                          ExecutionData executionData)
+                          Execution execution)
             throws IllegalArgumentException {
-        super(TaskType.SIMULATION, target, configuration, workingGraph, executionData);
+        super(TaskType.SIMULATION, target, configuration, workingGraph, execution);
     }
 
     @Override

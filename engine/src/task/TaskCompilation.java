@@ -21,8 +21,8 @@ public class TaskCompilation extends Task {
     public TaskCompilation(@NotNull Target target,
                            @NotNull Configuration configuration,
                            DependenciesGraph workingGraph,
-                           ExecutionData executionData) throws IllegalArgumentException {
-        super(TaskType.COMPILATION, target, configuration, workingGraph, executionData);
+                           Execution execution) throws IllegalArgumentException {
+        super(TaskType.COMPILATION, target, configuration, workingGraph, execution);
     }
 
     @Override

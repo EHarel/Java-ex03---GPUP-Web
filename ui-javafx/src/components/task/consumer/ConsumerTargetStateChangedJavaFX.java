@@ -4,7 +4,6 @@ import components.task.execution.main.TaskExecutionMainController;
 import graph.TargetDTO;
 import javafx.application.Platform;
 import logic.Engine;
-import task.ExecutionData;
 
 import java.util.function.Consumer;
 

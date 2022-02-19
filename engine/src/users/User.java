@@ -1,6 +1,6 @@
 package users;
 
-import utilshared.UserType;
+import utilsharedall.UserType;
 
 public class User {
     private String name;

@@ -3,11 +3,11 @@ package logic;
 import graph.SerialSetDTO;
 import graph.Target;
 import graph.TargetDTO;
-import task.ExecutionData;
+import task.Execution;
 import task.TaskType;
-import task.configuration.ConfigurationData;
-import task.configuration.ConfigurationDataCompilation;
-import task.configuration.ConfigurationDataSimulation;
+import task.configuration.ConfigurationDTO;
+import task.configuration.ConfigurationDTOCompilation;
+import task.configuration.ConfigurationDTOSimulation;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -137,28 +137,28 @@ public abstract class EngineUtils {
 //        return res;
 //    }
 
-    public static String getFormalizedExecutionReportString(ExecutionData executionData) {
-        String res = "Execution Report (" + executionData.getTaskType() + ")";
-        if (executionData.getTaskComplete()) {
+    public static String getFormalizedExecutionReportString(Execution execution) {
+        String res = "Execution Report (" + execution.getTaskType() + ")";
+        if (execution.getTaskComplete()) {
             res = res + " -- TASK COMPLETE";
         }
 
         // Local variables just for ease of formatting
-        Collection<String> allTargets = getNamesOfTargetsData(executionData.getProcessedData().getAllTargetData());
-        Collection<String> allParticipatingTargets = getNamesOfParticipatingTargets(executionData.getProcessedData().getAllTargetData());
-        Collection<String> allProcessed = getNamesOfTargetsData(executionData.getProcessedData().getAllProcessedTargetsOfAllResults());
-        Collection<String> nonFailed = getNamesOfTargetsData(executionData.getProcessedData().getProcessedTargetsNoFailure());
-        Collection<String> success = getNamesOfTargetsData(executionData.getProcessedData().getSuccessfulTargets());
-        Collection<String> warnings = getNamesOfTargetsData(executionData.getProcessedData().getWarningTargets());
-        Collection<String> failed = getNamesOfTargetsData(executionData.getProcessedData().getFailedTargets());
-        Collection<String> unprocessed = getNamesOfTargetsData(executionData.getProcessedData().getUnprocessedTargets());
-        Collection<String> leftToCompletion = getNamesOfTargetsData(executionData.getProcessedData().getTargetsLeftToCompletion());
+        Collection<String> allTargets = getNamesOfTargetsData(execution.getProcessedData().getAllTargetData());
+        Collection<String> allParticipatingTargets = getNamesOfParticipatingTargets(execution.getProcessedData().getAllTargetData());
+        Collection<String> allProcessed = getNamesOfTargetsData(execution.getProcessedData().getAllProcessedTargetsOfAllResults());
+        Collection<String> nonFailed = getNamesOfTargetsData(execution.getProcessedData().getProcessedTargetsNoFailure());
+        Collection<String> success = getNamesOfTargetsData(execution.getProcessedData().getSuccessfulTargets());
+        Collection<String> warnings = getNamesOfTargetsData(execution.getProcessedData().getWarningTargets());
+        Collection<String> failed = getNamesOfTargetsData(execution.getProcessedData().getFailedTargets());
+        Collection<String> unprocessed = getNamesOfTargetsData(execution.getProcessedData().getUnprocessedTargets());
+        Collection<String> leftToCompletion = getNamesOfTargetsData(execution.getProcessedData().getTargetsLeftToCompletion());
 
         res = res +
-                "\n\tExecution number: " + executionData.getExecutionNumber() +
-                "\n\tOverall time:   " + formatTimeDuration(executionData.getStartInstant(), executionData.getEndInstant()) +
-                "\n\t\tStart time:   " + getDateTimeFromInstant(executionData.getStartInstant()) +
-                "\n\t\tEnd time:     " + getDateTimeFromInstant(executionData.getEndInstant()) +
+                "\n\tExecution number: " + execution.getExecutionNumber() +
+                "\n\tOverall time:   " + formatTimeDuration(execution.getStartInstant(), execution.getEndInstant()) +
+                "\n\t\tStart time:   " + getDateTimeFromInstant(execution.getStartInstant()) +
+                "\n\t\tEnd time:     " + getDateTimeFromInstant(execution.getEndInstant()) +
                 "\n\tTargets in graph: " + allTargets + " (" + allTargets.size() + ")" +
                 "\n\tProcessed (success\\warnings\\failed): " + allProcessed + " (" + allProcessed.size() + ")" +
                 "\n\t\tNon-failed targets: " + nonFailed + " (" + nonFailed.size() + ")" +
@@ -167,7 +167,7 @@ public abstract class EngineUtils {
                 "\n\t\tFailed: " + failed + " (" + failed.size() + ")" +
                 "\n\tUnprocessed: " + unprocessed + " (" + unprocessed.size() + ")" +
                 "\n\tTargets left for completion: " + leftToCompletion + " (" + leftToCompletion.size() + ")" +
-                "\n\n" + getFormalizedConfigurationString(executionData.getConfiguration().getData());
+                "\n\n" + getFormalizedConfigurationString(execution.getConfiguration().toDTO());
 
         return res;
     }
@@ -192,7 +192,7 @@ public abstract class EngineUtils {
         return timeStr;
     }
 
-    public static String getFormalizedConfigurationString(ConfigurationData config) {
+    public static String getFormalizedConfigurationString(ConfigurationDTO config) {
         String configStr = null;
 
         switch (config.getTaskType()) {
@@ -207,12 +207,12 @@ public abstract class EngineUtils {
         return configStr;
     }
 
-    private static String getSimulationConfig(ConfigurationData config) {
+    private static String getSimulationConfig(ConfigurationDTO config) {
         if (config.getTaskType() != TaskType.SIMULATION) {
             return null;
         }
 
-        ConfigurationDataSimulation simConfig = (ConfigurationDataSimulation) config;
+        ConfigurationDTOSimulation simConfig = (ConfigurationDTOSimulation) config;
 
         return "Simulation Configuration" +
                 "\n\tName: " + simConfig.getName() +
@@ -223,12 +223,12 @@ public abstract class EngineUtils {
                 "\n\tWarnings probability: " + simConfig.getWarningsProbability();
     }
 
-    private static String getCompilationConfig(ConfigurationData config) {
+    private static String getCompilationConfig(ConfigurationDTO config) {
         if (config.getTaskType() != TaskType.COMPILATION) {
             return null;
         }
 
-        ConfigurationDataCompilation compConfig = (ConfigurationDataCompilation) config;
+        ConfigurationDTOCompilation compConfig = (ConfigurationDTOCompilation) config;
 
         return "Compilation Configuration" +
                 "\n\tName: " + compConfig.getName() +

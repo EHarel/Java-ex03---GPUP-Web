@@ -2,11 +2,11 @@ package console.task.analysis.report;
 
 import console.task.TaskGeneral;
 import console.menu.loader.PathMenu;
-import task.ExecutionData;
+import task.Execution;
 
 public class ReportOverview extends Report {
-    public ReportOverview(ExecutionData executionData, PathMenu.ReportType reportType) throws NullPointerException {
-        super(executionData, reportType);
+    public ReportOverview(Execution execution, PathMenu.ReportType reportType) throws NullPointerException {
+        super(execution, reportType);
     }
 
     @Override
@@ -17,10 +17,10 @@ public class ReportOverview extends Report {
     private void reportOverview() {
         switch (reportType) {
             case GENERAL:
-                TaskGeneral.printExecutionReport(executionData);
+                TaskGeneral.printExecutionReport(execution);
                 break;
             case DETAIL:
-                TaskGeneral.printReports("All reports", executionData.getProcessedData().getAllTargetData(), PathMenu.ReportType.DETAIL);
+                TaskGeneral.printReports("All reports", execution.getProcessedData().getAllTargetData(), PathMenu.ReportType.DETAIL);
                 break;
         }
     }

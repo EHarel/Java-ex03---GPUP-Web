@@ -33,7 +33,7 @@ public class ConfigurationCompilation extends Configuration implements Serializa
         outDirectoryCreated = false;
     }
 
-    public ConfigurationCompilation(ConfigurationDataCompilation compData) throws NameNotFoundException, InvalidInputRangeException, NonexistentElementException {
+    public ConfigurationCompilation(ConfigurationDTOCompilation compData) throws NameNotFoundException, InvalidInputRangeException, NonexistentElementException {
         super(TaskType.COMPILATION, compData.getName(), compData.getThreadCount());
         setSourceCodePath(compData.getSourceCodePath());
         setOutPath(compData.getOutPath());
@@ -111,8 +111,8 @@ public class ConfigurationCompilation extends Configuration implements Serializa
     }
 
     @Override
-    public ConfigurationData getData() {
-        return new ConfigurationDataCompilation(this.name, this.numberOfThreads, this.sourceCodePath, this.outPath, this.outDirectoryCreated);
+    public ConfigurationDTO toDTO() {
+        return new ConfigurationDTOCompilation(this.name, this.numberOfThreads, this.sourceCodePath, this.outPath, this.outDirectoryCreated);
     }
 
     @Override

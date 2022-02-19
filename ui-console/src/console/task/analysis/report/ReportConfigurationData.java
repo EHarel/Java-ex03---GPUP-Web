@@ -2,15 +2,15 @@ package console.task.analysis.report;
 
 import console.menu.system.DoesAction;
 import logic.Engine;
-import task.ExecutionData;
-import task.configuration.ConfigurationData;
+import task.Execution;
+import task.configuration.ConfigurationDTO;
 
 public class ReportConfigurationData implements DoesAction {
     Engine engine = Engine.getInstance();
-    ExecutionData executionData;
+    Execution execution;
 
-    public ReportConfigurationData(ExecutionData executionData) {
-        this.executionData = executionData;
+    public ReportConfigurationData(Execution execution) {
+        this.execution = execution;
     }
 
     @Override
@@ -19,7 +19,7 @@ public class ReportConfigurationData implements DoesAction {
     }
 
     private void printConfigData() {
-        ConfigurationData configData = executionData.getConfiguration().getData();
+        ConfigurationDTO configData = execution.getConfiguration().toDTO();
         System.out.println(engine.getFormalizedConfigurationString(configData));
         System.out.println();
     }

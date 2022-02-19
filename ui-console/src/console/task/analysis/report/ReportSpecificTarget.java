@@ -4,14 +4,14 @@ import console.Utils;
 import console.menu.system.DoesAction;
 import graph.TargetDTO;
 import logic.Engine;
-import task.ExecutionData;
+import task.Execution;
 
 import java.util.Optional;
 
 public class ReportSpecificTarget implements DoesAction {
-    private ExecutionData executionData;
+    private Execution execution;
 
-    public ReportSpecificTarget(ExecutionData executionData) { this.executionData = executionData;}
+    public ReportSpecificTarget(Execution execution) { this.execution = execution;}
 
     @Override
     public void DoAction() {
@@ -19,10 +19,10 @@ public class ReportSpecificTarget implements DoesAction {
     }
 
     private void reportSpecificTarget() {
-        Optional<String> targetName = Utils.getTargetName(executionData.getStartingGraph());
+        Optional<String> targetName = Utils.getTargetName(execution.getStartingGraph());
 
         targetName.ifPresent(name ->{
-            TargetDTO targetDTO = executionData.getSpecificTargetData(name);
+            TargetDTO targetDTO = execution.getSpecificTargetData(name);
 
             if (targetDTO == null) {
                 System.out.println("Whoops, couldn't find the target!");

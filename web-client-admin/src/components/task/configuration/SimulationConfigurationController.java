@@ -1,5 +1,6 @@
 package components.task.configuration;
 
+import components.app.AppMainController;
 import components.task.settings.TaskSettingsController;
 import exception.InvalidInputRangeException;
 import javafx.fxml.FXML;
@@ -9,9 +10,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
-import logic.Engine;
 import task.TaskType;
-import task.configuration.ConfigurationDataSimulation;
+import task.configuration.ConfigurationDTOSimulation;
 import task.configuration.ConfigurationSimulation;
 
 import javax.naming.NameNotFoundException;
@@ -116,25 +116,23 @@ public class SimulationConfigurationController {
         return isValid;
     }
 
-    public ConfigurationSimulation getConfig(Integer threadNum) {
+    public ConfigurationSimulation getConfig() {
         ConfigurationSimulation simConfig = null;
 
-        if (threadNum != null) {
-            try {
-                String name = getName();
-                int numberOfThreads = threadNum;
-                double successProbability = getSuccessProbability();
-                int processingTime = getProcessingTime();
-                boolean randomProcessingTime = getIsRandomProcessingTime();
-                double warningsProbability = getWarningsProbability();
+        try {
+            String name = getName();
+            int numberOfThreads = 1;
+            double successProbability = getSuccessProbability();
+            int processingTime = getProcessingTime();
+            boolean randomProcessingTime = getIsRandomProcessingTime();
+            double warningsProbability = getWarningsProbability();
 
-                simConfig = new ConfigurationSimulation(name, numberOfThreads, successProbability, processingTime, randomProcessingTime, warningsProbability);
-            } catch (InvalidInputRangeException ignore) {
-            } catch (NumberFormatException exception) {
-                showNumberError();
-            } catch (NameNotFoundException e) {
-                showNoNameError();
-            }
+            simConfig = new ConfigurationSimulation(name, numberOfThreads, successProbability, processingTime, randomProcessingTime, warningsProbability);
+        } catch (InvalidInputRangeException ignore) {
+        } catch (NumberFormatException exception) {
+            showNumberError();
+        } catch (NameNotFoundException e) {
+            showNoNameError();
         }
 
         return simConfig;
@@ -180,8 +178,9 @@ public class SimulationConfigurationController {
         return randomRadioButton.isSelected();
     }
 
-    public void loadConfig(String configName) {
-        ConfigurationDataSimulation configData = (ConfigurationDataSimulation) Engine.getInstance().getConfigSpecific(TaskType.SIMULATION, configName);
+    public void loadConfig(String configName, AppMainController mainController) {
+//        ConfigurationDataSimulation configData = (ConfigurationDataSimulation) Engine.getInstance().getConfigSpecific(TaskType.SIMULATION, configName);
+        ConfigurationDTOSimulation configData = (ConfigurationDTOSimulation) mainController.getConfigDataSpecific(TaskType.SIMULATION, configName);
 
         if (configData == null)
             return;

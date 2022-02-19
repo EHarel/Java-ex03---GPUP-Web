@@ -5,7 +5,7 @@ import console.menu.system.SubMenu;
 import console.task.configuration.*;
 import logic.Engine;
 import task.TaskType;
-import task.configuration.ConfigurationData;
+import task.configuration.ConfigurationDTO;
 
 public class ConfigSubMenu extends SubMenu {
     private static String subMenuName = "Configuration - ";
@@ -65,7 +65,7 @@ public class ConfigSubMenu extends SubMenu {
     }
 
     private void updateActiveConfigText() {
-        ConfigurationData configData = Engine.getInstance().getConfigActive(TaskSubMenu.getTaskType());
+        ConfigurationDTO configData = Engine.getInstance().getConfigActive(TaskSubMenu.getTaskType());
         String textToAdd;
 
         if(configData != null) {

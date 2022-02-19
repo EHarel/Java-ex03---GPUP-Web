@@ -3,8 +3,7 @@ package console.task.configuration;
 import console.menu.loader.TaskSubMenu;
 import console.menu.system.DoesAction;
 import logic.Engine;
-import task.configuration.ConfigurationData;
-import task.configuration.ConfigurationDataSimulation;
+import task.configuration.ConfigurationDTO;
 
 import java.util.Collection;
 
@@ -37,7 +36,7 @@ public class TaskGetConfiguration implements DoesAction {
     }
 
     private void getActiveOnly() {
-        ConfigurationData configData = engine.getConfigActive(TaskSubMenu.getTaskType());
+        ConfigurationDTO configData = engine.getConfigActive(TaskSubMenu.getTaskType());
 
         if (configData != null) {
             ConfigUtils.printConfig(configData);
@@ -47,13 +46,13 @@ public class TaskGetConfiguration implements DoesAction {
     }
 
     private void getAllConfig() {
-        Collection<ConfigurationData> configDataColl = engine.getConfigAll(TaskSubMenu.getTaskType());
+        Collection<ConfigurationDTO> configDataColl = engine.getConfigAll(TaskSubMenu.getTaskType());
 
         if (configDataColl == null || configDataColl.isEmpty()) {
             System.out.println("No configuration has been loaded yet. Not a single one. Pfft.");
         } else {
             int i = 1;
-            for (ConfigurationData configData : configDataColl) {
+            for (ConfigurationDTO configData : configDataColl) {
                 System.out.print(i + ") ");
                 i++;
                 ConfigUtils.printConfig(configData);

@@ -14,7 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import task.ExecutionData;
+import task.Execution;
 import task.configuration.Configuration;
 
 public class TaskExecutionMainController implements FileLoadedListener, ExecutionStartListener, ExecutionEndListener {
@@ -123,7 +123,7 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
     public void TaskSettingsEvent_UpdateChosenTargetsAction() {
         TaskSettingsController settingsController = mainController.getTaskSettingsController();
 
-        workingGraph = settingsController.getChosenGraph();
+        workingGraph = settingsController.getGraphOfChosenTargets();
 
         setWorkingGraph(workingGraph);
         statusTablesComponentController.updateUnprocessed(workingGraph);
@@ -173,8 +173,8 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
     }
 
     @Override
-    public void executedEnded(ExecutionData executionData) {
-        dynamicPanelComponentController.endExecution(executionData);
+    public void executedEnded(Execution execution) {
+        dynamicPanelComponentController.endExecution(execution);
     }
 
 
