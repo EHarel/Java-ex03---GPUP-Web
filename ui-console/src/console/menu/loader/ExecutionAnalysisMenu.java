@@ -5,19 +5,19 @@ import console.task.analysis.report.*;
 import console.menu.system.MenuAction;
 import console.menu.system.MenuManager;
 import console.menu.system.SubMenu;
-import task.ExecutionData;
+import task.Execution;
 
 public class ExecutionAnalysisMenu {
     private MenuManager analysisReportManager;
     private SubMenu mainMenu = new SubMenu("Execution Analysis", null);
-    private ExecutionData executionData;
+    private Execution execution;
 
-    public ExecutionAnalysisMenu(ExecutionData executionData) throws NullPointerException {
-        if (executionData == null) {
+    public ExecutionAnalysisMenu(Execution execution) throws NullPointerException {
+        if (execution == null) {
             throw new NullPointerException();
         }
 
-        this.executionData = executionData;
+        this.execution = execution;
         initMenu();
     }
 
@@ -26,12 +26,12 @@ public class ExecutionAnalysisMenu {
     }
 
     private void initMenu() {
-        new ProcessedTargetSubMenu(mainMenu, PathMenu.ReportType.GENERAL, executionData);
-        new ProcessedTargetSubMenu(mainMenu, PathMenu.ReportType.DETAIL, executionData);
-        new MenuAction("See specific target results", mainMenu, new ReportSpecificTarget(executionData));
-        new MenuAction("Execution configuration data", mainMenu, new ReportConfigurationData(executionData));
-        new MenuAction("Analyze graph at beginning of task", mainMenu, new TaskGraphAnalysis(executionData.getStartingGraph(), "Graph At Start"));
-        new MenuAction("Analyze graph at end of task", mainMenu, new TaskGraphAnalysis(executionData.getEndGraph(), "Graph At End"));
+        new ProcessedTargetSubMenu(mainMenu, PathMenu.ReportType.GENERAL, execution);
+        new ProcessedTargetSubMenu(mainMenu, PathMenu.ReportType.DETAIL, execution);
+        new MenuAction("See specific target results", mainMenu, new ReportSpecificTarget(execution));
+        new MenuAction("Execution configuration data", mainMenu, new ReportConfigurationData(execution));
+        new MenuAction("Analyze graph at beginning of task", mainMenu, new TaskGraphAnalysis(execution.getStartingGraph(), "Graph At Start"));
+        new MenuAction("Analyze graph at end of task", mainMenu, new TaskGraphAnalysis(execution.getEndGraph(), "Graph At End"));
 
         analysisReportManager = new MenuManager(mainMenu, true);
     }

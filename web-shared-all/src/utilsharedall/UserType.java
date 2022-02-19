@@ -1,4 +1,4 @@
-package utilshared;
+package utilsharedall;
 
 public enum UserType {
     Admin,

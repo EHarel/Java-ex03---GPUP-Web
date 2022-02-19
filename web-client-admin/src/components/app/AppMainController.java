@@ -28,17 +28,18 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import logic.Engine;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
-import task.ExecutionData;
+import task.Execution;
 import task.TaskType;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationCompilation;
-import task.configuration.ConfigurationData;
+import task.configuration.ConfigurationDTO;
 import task.configuration.ConfigurationSimulation;
-import utilshared.Constants;
+import utilsharedall.Constants;
 
 import javax.naming.NameNotFoundException;
 import java.io.File;
@@ -85,16 +86,17 @@ public class AppMainController {
 
     private Parent dashboard;
     private DashboardController dashboardController;
+    private Stage primaryStage;
 
 
     public boolean getAllowAnimations() { return allowAnimations.get(); }
 
-
     /* ------------------------------------------ CUSTOM FIELDS ------------------------------------------- */
+    private String username;
     private String chosenGraphName;
-    DependenciesGraph chosenGraph;
-    GraphManager graphManager;
-    ConfigurationManager configManager;
+    private DependenciesGraph chosenGraph;
+    private GraphManager graphManager;
+    private ConfigurationManager configManager;
 
 
     // Events
@@ -125,6 +127,14 @@ public class AppMainController {
     /* --------------------------------------- GETTERS AND SETTERS ---------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public void setMainScene(Scene scene) {
         this.mainScene = scene;
     }
@@ -439,8 +449,8 @@ public class AppMainController {
         Engine.getInstance().setThreadCount_activeThreads(newValue);
     }
 
-    public void finishedExecutionProcess(ExecutionData executionData) {
-        executionEndListeners.forEach(executionEndListener -> executionEndListener.executedEnded(executionData));
+    public void finishedExecutionProcess(Execution execution) {
+        executionEndListeners.forEach(executionEndListener -> executionEndListener.executedEnded(execution));
     }
 
     private void loadDefaultConfigurationsToEngine() {
@@ -499,6 +509,8 @@ public class AppMainController {
     }
 
     public void loginSuccessful(String userName) {
+        this.username = userName;
+        this.primaryStage.setTitle(this.primaryStage.getTitle() + " - Logged in as: " + userName);
         displayMainApp();
     }
 
@@ -545,11 +557,11 @@ public class AppMainController {
         return configManager.addConfiguration(configuration);
     }
 
-    public Collection<ConfigurationData> getConfigDataAll(TaskType taskType) {
+    public Collection<ConfigurationDTO> getConfigDataAll(TaskType taskType) {
         return configManager.getConfigDataAll(taskType);
     }
 
-    public ConfigurationData getActiveConfigData(TaskType taskType) {
+    public ConfigurationDTO getActiveConfigData(TaskType taskType) {
         return configManager.getActiveConfigData(taskType);
     }
 
@@ -557,8 +569,12 @@ public class AppMainController {
         configManager.setActiveConfig(taskType, configName);
     }
 
-    public ConfigurationData getConfigDataSpecific(TaskType taskType, String configName) {
+    public ConfigurationDTO getConfigDataSpecific(TaskType taskType, String configName) {
         return configManager.getConfigDataSpecific(taskType, configName);
+    }
+
+    public void setMainStage(Stage primaryStage) {
+        this.primaryStage = primaryStage;
     }
 
 

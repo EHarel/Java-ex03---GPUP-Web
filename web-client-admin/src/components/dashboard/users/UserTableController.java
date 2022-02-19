@@ -7,7 +7,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import users.UserDTO;
-import utilshared.UserType;
+import utilsharedall.UserType;
 
 import java.util.Collection;
 
@@ -26,10 +26,10 @@ public class UserTableController {
     private TableColumn<UserDTO, UserType> tableColumn_UserType;
 
 
-    private UserTableControllerShared sharedController;
 
 
     /* ------------------------------------------ CUSTOM FIELDS ------------------------------------------- */
+    private UserTableControllerShared sharedController;
 
 
     /* ---------------------------------------------------------------------------------------------------- */

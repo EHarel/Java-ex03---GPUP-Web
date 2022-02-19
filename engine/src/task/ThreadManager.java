@@ -3,7 +3,6 @@ package task;
 import logic.Engine;
 
 import java.io.Serializable;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -19,7 +18,7 @@ public class ThreadManager implements Serializable {
     private transient ThreadPoolExecutor executor;
     private Integer remainingTasks;
     private Integer activeThreads;
-    private ExecutionData executionData;
+    private Execution execution;
 
 
 
@@ -51,12 +50,12 @@ public class ThreadManager implements Serializable {
     }
 
     // TODO: should I add some validity checks and exceptions here?
-    public void prepareForNewExecution(int threadCount, ExecutionData executionData) {
+    public void prepareForNewExecution(int threadCount, Execution execution) {
         setCurrentParallelism(threadCount);
 
         this.remainingTasks = 0;
         this.activeThreads = 0;
-        this.executionData = executionData;
+        this.execution = execution;
         this.pause = false;
     }
 
@@ -108,7 +107,7 @@ public class ThreadManager implements Serializable {
                 if (activeThreads == 0 && remainingTasks == 0 && executor.getQueue().isEmpty()) {
                     System.out.println(" ------------- DONE WORKING (thread manager print) ------------- ");
                     System.out.println();
-                    Engine.getInstance().getTaskManager().getConsumerManager().getEndProcessConsumers().forEach(consumer -> consumer.accept(executionData));
+                    Engine.getInstance().getTaskManager().getConsumerManager().getEndProcessConsumers().forEach(consumer -> consumer.accept(execution));
 
                 }
             }
@@ -131,8 +130,8 @@ public class ThreadManager implements Serializable {
 //        }
     }
 
-    public void setExecutionData(ExecutionData executionData) {
-        this.executionData = executionData;
+    public void setExecutionData(Execution execution) {
+        this.execution = execution;
     }
 
     public void pause(boolean isPause) {

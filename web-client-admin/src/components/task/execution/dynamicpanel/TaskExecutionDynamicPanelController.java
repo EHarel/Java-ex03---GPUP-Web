@@ -18,7 +18,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import logic.Engine;
-import task.ExecutionData;
+import task.Execution;
 import task.configuration.Configuration;
 
 public class TaskExecutionDynamicPanelController {
@@ -209,11 +209,11 @@ public class TaskExecutionDynamicPanelController {
         isExecuting.set(false);
     }
 
-    public void endExecution(ExecutionData executionData) {
+    public void endExecution(Execution execution) {
         isExecuting.set(false);
         isPaused.set(true);
 
-        String executionStr = Engine.getInstance().getFormalizedExecutionReportString(executionData);
+        String executionStr = Engine.getInstance().getFormalizedExecutionReportString(execution);
 
         taskExecutionUpdatesTA.appendText("\n\n -------------- Execution Ended -------------- \n\n");
         taskExecutionUpdatesTA.appendText(executionStr);

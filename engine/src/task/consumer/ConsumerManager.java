@@ -3,7 +3,7 @@ package task.consumer;
 import graph.DependenciesGraph;
 import graph.Target;
 import graph.TargetDTO;
-import task.ExecutionData;
+import task.Execution;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class ConsumerManager implements Serializable {
     Collection<Consumer<Target>> startProcessConsumers; // TODO: change to null? String? Something else? Target makes no sense
     Collection<Consumer<TargetDTO>> startTargetConsumers;
     Collection<Consumer<TargetDTO>> endTargetConsumers;
-    Collection<Consumer<ExecutionData>> endProcessConsumers;
+    Collection<Consumer<Execution>> endProcessConsumers;
     Collection<Consumer<TargetDTO>> targetStateChangedConsumers;
 
     Collection<Consumer<DependenciesGraph>> startTargetProcessingConsumers;
@@ -64,11 +64,11 @@ public class ConsumerManager implements Serializable {
         this.endTargetConsumers = endTargetConsumers;
     }
 
-    public Collection<Consumer<ExecutionData>> getEndProcessConsumers() {
+    public Collection<Consumer<Execution>> getEndProcessConsumers() {
         return endProcessConsumers;
     }
 
-    public void setEndProcessConsumers(Collection<Consumer<ExecutionData>> endProcessConsumers) {
+    public void setEndProcessConsumers(Collection<Consumer<Execution>> endProcessConsumers) {
         this.endProcessConsumers = endProcessConsumers;
     }
 

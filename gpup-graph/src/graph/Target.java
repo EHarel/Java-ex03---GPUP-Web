@@ -498,11 +498,11 @@ public class Target implements Serializable {
 
                 switch (taskStatusDTO.getConfigData().getTaskType()) {
                     case COMPILATION:
-                        ConfigurationDataCompilation configDataComp = (ConfigurationDataCompilation) taskStatusDTO.getConfigData();
+                        ConfigurationDTOCompilation configDataComp = (ConfigurationDTOCompilation) taskStatusDTO.getConfigData();
                         this.config = new ConfigurationCompilation(configDataComp);
                         break;
                     case SIMULATION:
-                        ConfigurationDataSimulation configDataSim = (ConfigurationDataSimulation) taskStatusDTO.getConfigData();
+                        ConfigurationDTOSimulation configDataSim = (ConfigurationDTOSimulation) taskStatusDTO.getConfigData();
                         this.config = new ConfigurationSimulation(configDataSim);
                         break;
                 }
@@ -662,7 +662,7 @@ public class Target implements Serializable {
                     this.participatesInExecution,
                     this.startInstant,
                     this.endInstant,
-                    (config != null ? this.config.getData() : null),
+                    (config != null ? this.config.toDTO() : null),
                     this.taskResult,
                     this.targetState,
                     getTargetsOpenedAsResultString(),

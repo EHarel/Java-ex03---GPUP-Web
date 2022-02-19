@@ -38,7 +38,7 @@ public class TaskSetConfiguration implements DoesAction {
                     continueLoop = MenuManager.tryAgain();
                 } else {
                     System.out.println("\nConfiguration set.\n");
-                    ConfigUtils.printConfig(configuration.getData());
+                    ConfigUtils.printConfig(configuration.toDTO());
                     continueLoop = false;
                 }
             }

@@ -2,11 +2,11 @@ package console.task.analysis.report;
 
 import console.task.TaskGeneral;
 import console.menu.loader.PathMenu;
-import task.ExecutionData;
+import task.Execution;
 
 public class ReportLeftToCompletion extends Report {
-    public ReportLeftToCompletion(ExecutionData executionData, PathMenu.ReportType reportType) throws NullPointerException {
-        super(executionData, reportType);
+    public ReportLeftToCompletion(Execution execution, PathMenu.ReportType reportType) throws NullPointerException {
+        super(execution, reportType);
     }
 
     @Override
@@ -15,7 +15,7 @@ public class ReportLeftToCompletion extends Report {
     }
 
     private void reportLeftToCompletion() {
-        TaskGeneral.printReports("Targets left to completion (failed and unprocessed)", executionData.getProcessedData().getTargetsLeftToCompletion(), reportType);
+        TaskGeneral.printReports("Targets left to completion (failed and unprocessed)", execution.getProcessedData().getTargetsLeftToCompletion(), reportType);
         System.out.println(System.lineSeparator());
     }
 }

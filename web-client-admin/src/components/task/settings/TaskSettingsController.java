@@ -1,6 +1,8 @@
 package components.task.settings;
 
 import algorithm.DFS;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import components.app.AppMainController;
 import components.app.AppUtils;
 import components.graph.general.GraphGeneralDetailsController;
@@ -24,12 +26,16 @@ import javafx.scene.paint.Color;
 import logic.Engine;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
-import task.ExecutionData;
+import task.Execution;
 import task.TaskProcess;
 import task.TaskType;
 import task.configuration.Configuration;
-import task.configuration.ConfigurationData;
-import utilshared.Constants;
+import task.configuration.ConfigurationDTO;
+import task.configuration.ConfigurationDTOCompilation;
+import task.configuration.ConfigurationDTOSimulation;
+import task.execution.ExecutionDTO;
+import task.execution.ExecutionStatus;
+import utilsharedall.Constants;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -310,7 +316,7 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
 
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------- GETTERS AND SETTERS (PRIVATE) ----------------------------------- */
-    private DependenciesGraph getLastGraphReset(ExecutionData lastExecution) {
+    private DependenciesGraph getLastGraphReset(Execution lastExecution) {
         DependenciesGraph graph = null;
 
         if (lastExecution != null) {
@@ -498,7 +504,7 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
         }
 
 //        Collection<ConfigurationData> configData = Engine.getInstance().getConfigAll(taskType);
-        Collection<ConfigurationData> configData = mainController.getConfigDataAll(taskType);
+        Collection<ConfigurationDTO> configData = mainController.getConfigDataAll(taskType);
 
 
         existingConfigurationsListView.getItems().clear();
@@ -610,7 +616,7 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
     private void updateActiveConfig(TaskType taskType) {
         try {
 //            ConfigurationData configData = Engine.getInstance().getConfigActive(taskType);
-            ConfigurationData configData = mainController.getActiveConfigData(taskType);
+            ConfigurationDTO configData = mainController.getActiveConfigData(taskType);
 
             if (configData != null) {
                 labelActiveConfiguration.setText(configData.getName());
@@ -805,23 +811,89 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
             return;
         }
 
+        TaskType taskType = config.getTaskType();
 
+        ConfigurationDTOCompilation configDTOComp = null;
+        ConfigurationDTOSimulation configDTOSim = null;
+
+        switch (config.getTaskType()) {
+            case COMPILATION:
+                configDTOComp = (ConfigurationDTOCompilation) config.toDTO();
+                break;
+            case SIMULATION:
+                configDTOSim = (ConfigurationDTOSimulation) config.toDTO();
+                break;
+        }
+
+        ExecutionDTO executionDTO = new ExecutionDTO(
+                executionName,
+                mainController.getUsername(),
+                // config.toDTO(),
+                chosenGraph.toDTO(),
+                taskType,
+                chosenGraph.getPrice(taskType),
+                0,
+                ExecutionStatus.NEW,
+                configDTOComp,
+                configDTOSim,
+                null);
+
+//        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().serializeNulls().create();
+
+        String executionDTOJson = gson.toJson(executionDTO) + Constants.LINE_SEPARATOR;
 
 //        RequestBody body =
 //                new MultipartBody.Builder()
-//                        .addFormDataPart("file1", selectedFile.getName(), RequestBody.create(selectedFile, MediaType.parse("text/plain")))
+//                        .addFormDataPart("executionDTOJson", executionDTOJson)
 //                        .build();
+
+        String bodyStr =
+                Constants.BP_EXECUTION_DTO + "=" + gson.toJson(executionDTO) + Constants.LINE_SEPARATOR;
+
+
+
+        RequestBody body = RequestBody.create(
+                Constants.JSON, executionDTOJson);
+
 //
 //        //noinspection ConstantConditions
-//        String finalUrl = HttpUrl
-//                .parse(Constants.FILE_UPLOAD)
-//                .newBuilder()
-//                .build()
-//                .toString();
+        String finalUrl = HttpUrl
+                .parse(Constants.EXECUTION_UPLOAD)
+                .newBuilder()
+                .build()
+                .toString();
 
 
 //        updateHttpStatusLine("New request is launched for: " + finalUrl); // Aviad Code
 
+
+//        HttpClientUtil.runAsync(finalUrl, body, new Callback() {
+        HttpClientUtil.runAsync(finalUrl, bodyStr, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+//                showFileLoadingErrorMessage("Something went wrong with the file upload!");
+
+//                        Platform.runLater(() ->
+//                                resultMessageProperty.set("Something went wrong: " + e.getMessage()));
+                Platform.runLater(() ->
+                        executionSubmissionFailure());
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String responseBody = response.body().string();
+                if (response.code() != 200) {
+                    Platform.runLater(() ->
+                            executionSubmissionFailure());
+                } else {
+                    Platform.runLater(() -> {
+                        executionSubmissionSuccess();
+                    });
+                }
+            }
+        });
 
         /*
         HttpClientUtil.runAsync(finalUrl, body, new Callback() {
@@ -857,6 +929,17 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
 
 
          */
+    }
+
+    private void executionSubmissionSuccess() {
+        String msg = "Execution submitted successfully! You should see it updated soon in the table";
+        mainController.AnimationFadeSingle(15000, label_SubmissionResult, msg, Color.GREEN);
+    }
+
+    private void executionSubmissionFailure() {
+        String msg = "Execution denied! Are you sure the name is unique, and that all the parameters are correct?";
+
+        mainController.AnimationFadeSingle(15000, label_SubmissionResult, msg, Color.RED);
     }
 }
 

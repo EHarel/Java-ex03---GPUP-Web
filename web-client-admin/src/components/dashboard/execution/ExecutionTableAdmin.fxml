@@ -7,7 +7,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-
 <ScrollPane fx:id="mainPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" pannable="true" prefHeight="400.0" prefWidth="950.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.dashboard.execution.ExecutionTableAdminController">
    <content>
       <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
@@ -19,11 +18,11 @@
                   <TableColumn fx:id="tableColumn_GraphName" minWidth="5.0" text="Graph Name" />
                   <TableColumn prefWidth="75.0" text="Target Count">
                      <columns>
-                        <TableColumn fx:id="tableColumn_Count_Total" prefWidth="75.0" text="Total" />
-                        <TableColumn fx:id="tableColumn_Count_Independent" prefWidth="75.0" text="Independent" />
-                        <TableColumn fx:id="tableColumn_Count_Leaf" prefWidth="75.0" text="Leaf" />
-                        <TableColumn fx:id="tableColumn_Count_Middle" prefWidth="75.0" text="Middle" />
-                        <TableColumn fx:id="tableColumn_Count_Root" prefWidth="75.0" text="Root" />
+                        <TableColumn fx:id="tableColumn_TargetCount_Total" prefWidth="75.0" text="Total" />
+                        <TableColumn fx:id="tableColumn_TargetCount_Independent" prefWidth="75.0" text="Independent" />
+                        <TableColumn fx:id="tableColumn_TargetCount_Leaf" prefWidth="75.0" text="Leaf" />
+                        <TableColumn fx:id="tableColumn_TargetCount_Middle" prefWidth="75.0" text="Middle" />
+                        <TableColumn fx:id="tableColumn_TargetCount_Root" prefWidth="75.0" text="Root" />
                      </columns>
                   </TableColumn>
                   <TableColumn fx:id="tableColumn_TotalPrice" prefWidth="75.0" text="Total Price" />

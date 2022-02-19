@@ -5,7 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
-import task.ExecutionData;
+import task.Execution;
 import task.TaskType;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -28,12 +28,12 @@ public class GraphChooserMenuController {
 
     public Button getButtonOriginalGraph() { return buttonOriginalGraph; }
 
-    public Button addNewExecutionStartGraph(ExecutionData executionData) {
+    public Button addNewExecutionStartGraph(Execution execution) {
         Button newButton = null;
 
-        if (executionData != null) {
-            VBox relevantVbox = getVBox(executionData.getTaskType());
-            String nameToSet = executionData.getStartingGraph().getName();
+        if (execution != null) {
+            VBox relevantVbox = getVBox(execution.getTaskType());
+            String nameToSet = execution.getStartingGraph().getName();
 
             if (! doesButtonAlreadyExist(relevantVbox, nameToSet)) {
                 newButton = new Button();
@@ -46,12 +46,12 @@ public class GraphChooserMenuController {
         return newButton;
     }
 
-    public Button addNewExecutionEndGraph(ExecutionData executionData) {
+    public Button addNewExecutionEndGraph(Execution execution) {
         Button newButton = null;
 
-        if (executionData != null) {
-            VBox relevantVbox = getVBox(executionData.getTaskType());
-            String nameToSet = executionData.getEndGraph().getName();
+        if (execution != null) {
+            VBox relevantVbox = getVBox(execution.getTaskType());
+            String nameToSet = execution.getEndGraph().getName();
 
             if (! doesButtonAlreadyExist(relevantVbox, nameToSet)) {
                 newButton = new Button();

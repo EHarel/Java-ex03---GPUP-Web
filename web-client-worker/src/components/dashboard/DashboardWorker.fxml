@@ -1,15 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 
-
-<ScrollPane fx:id="MainPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" pannable="true" prefHeight="580.0" prefWidth="1028.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.dashboard.DashboardWorkerController">
+<ScrollPane fx:id="MainPane" fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" pannable="true" prefHeight="580.0" prefWidth="1160.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.dashboard.DashboardWorkerController">
    <content>
       <BorderPane fx:id="BorderPane" prefHeight="200.0" prefWidth="200.0">
          <left>
             <fx:include source="users/UserTable.fxml" />
          </left>
+         <center>
+            <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <bottom>
+                  <AnchorPane prefHeight="134.0" prefWidth="899.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <Label layoutX="14.0" layoutY="45.0" text="Selected Execution:" underline="true" />
+                        <Label fx:id="label_SelectedExecutionName" layoutX="129.0" layoutY="45.0" prefHeight="17.0" prefWidth="674.0" />
+                        <Label layoutX="14.0" layoutY="14.0" text="Instructions:" underline="true" />
+                        <Label layoutX="129.0" layoutY="14.0" prefHeight="17.0" prefWidth="736.0" text="To subscribe to an execution, double-click it to choose, then press the &quot;Subscribe&quot; button here." />
+                        <Button fx:id="button_Subscribe" alignment="CENTER" contentDisplay="TOP" layoutX="12.0" layoutY="81.0" mnemonicParsing="false" onAction="#button_SubscribeActionListener" prefHeight="25.0" prefWidth="69.0" text="Subscribe" />
+                        <Label fx:id="label_SubscribeResult" layoutX="129.0" layoutY="85.0" prefHeight="17.0" prefWidth="713.0" />
+                     </children>
+                  </AnchorPane>
+               </bottom>
+               <center>
+                  <fx:include fx:id="component_ExecutionTableWorker" source="execution/ExecutionTableWorker.fxml" />
+               </center>
+            </BorderPane>
+         </center>
       </BorderPane>
    </content>
 </ScrollPane>

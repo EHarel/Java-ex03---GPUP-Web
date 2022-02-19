@@ -31,7 +31,7 @@ public class GraphListServlet extends HttpServlet {
 
             Set<GraphDTO> graphDataSet = new HashSet<>();
             graphList.forEach(graph -> {
-                graphDataSet.add(graph.getGeneralDataAllTargets());
+                graphDataSet.add(graph.toDTO());
             });
 
             String json = gson.toJson(graphDataSet);

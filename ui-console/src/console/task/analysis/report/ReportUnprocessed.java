@@ -2,11 +2,11 @@ package console.task.analysis.report;
 
 import console.task.TaskGeneral;
 import console.menu.loader.PathMenu;
-import task.ExecutionData;
+import task.Execution;
 
 public class ReportUnprocessed extends Report {
-    public ReportUnprocessed(ExecutionData executionData, PathMenu.ReportType reportType) {
-        super(executionData, reportType);
+    public ReportUnprocessed(Execution execution, PathMenu.ReportType reportType) {
+        super(execution, reportType);
     }
 
     @Override
@@ -15,7 +15,7 @@ public class ReportUnprocessed extends Report {
     }
 
     private void reportUnprocessed() {
-        TaskGeneral.printReports("Unprocessed Targets", executionData.getProcessedData().getUnprocessedTargets(), reportType);
+        TaskGeneral.printReports("Unprocessed Targets", execution.getProcessedData().getUnprocessedTargets(), reportType);
         System.out.println(System.lineSeparator());
     }
 }

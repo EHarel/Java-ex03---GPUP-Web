@@ -6,7 +6,7 @@ import exception.*;
 import graph.*;
 import task.*;
 import task.configuration.Configuration;
-import task.configuration.ConfigurationData;
+import task.configuration.ConfigurationDTO;
 import task.consumer.ConsumerExecutionSummary;
 import task.consumer.ConsumerManager;
 import task.consumer.ConsumerWriteTargetToFile;
@@ -26,6 +26,7 @@ public class Engine implements Serializable {
     private DependenciesGraph dependenciesGraph;
     private TaskManager taskManager;
     private GraphManager graphManager;
+    private ExecutionManager executionManager;
 
 
     private Engine() {
@@ -33,6 +34,7 @@ public class Engine implements Serializable {
         // taskManager = new TaskManager(dependenciesGraph);
 
         graphManager = new GraphManager();
+        executionManager = new ExecutionManager();
     }
 
     public static synchronized Engine getInstance() {
@@ -43,7 +45,7 @@ public class Engine implements Serializable {
         return singleInstance;
     }
 
-    public Graph getGraph() {
+    public DependenciesGraph getGraph() {
         return dependenciesGraph;
     }
 
@@ -94,7 +96,7 @@ public class Engine implements Serializable {
         taskManager.removeConfigurationAll(taskType);
     }
 
-    public ConfigurationData getConfigActive(TaskType taskType) {
+    public ConfigurationDTO getConfigActive(TaskType taskType) {
         return taskManager.getConfigActive(taskType);
     }
 
@@ -103,11 +105,11 @@ public class Engine implements Serializable {
         return taskManager.getActiveConfigNotData(taskType);
     }
 
-    public Collection<ConfigurationData> getConfigAll(TaskType taskType) {
+    public Collection<ConfigurationDTO> getConfigAll(TaskType taskType) {
         return taskManager.getAllConfigurations(taskType);
     }
 
-    public ConfigurationData getConfigSpecific(TaskType taskType, String configName) {
+    public ConfigurationDTO getConfigSpecific(TaskType taskType, String configName) {
         return taskManager.getSpecificConfig(taskType, configName);
     }
 
@@ -152,32 +154,32 @@ public class Engine implements Serializable {
         return taskManager.getExecutionCount(TaskType.SIMULATION);
     }
 
-    public ExecutionData getExecutionLast(TaskType taskType) {
+    public Execution getExecutionLast(TaskType taskType) {
         return taskManager.getExecutionReportLast(taskType).clone();
     }
 
-    public ExecutionData getExecutionReportIndex(TaskType taskType, int i) throws IndexOutOfBoundsException {
+    public Execution getExecutionReportIndex(TaskType taskType, int i) throws IndexOutOfBoundsException {
         return taskManager.getExecutionReportIndex(taskType, i).clone();
     }
 
-    public ExecutionData getExecutionByExeNumber(TaskType taskType, int executionNumber) {
-        ExecutionData executionData = taskManager.getExecutionByExeNumber(taskType, executionNumber);
-        if (executionData != null) {
-            executionData = executionData.clone();
+    public Execution getExecutionByExeNumber(TaskType taskType, int executionNumber) {
+        Execution execution = taskManager.getExecutionByExeNumber(taskType, executionNumber);
+        if (execution != null) {
+            execution = execution.clone();
         }
 
-        return executionData;
+        return execution;
     }
 
     public String getFormalizedTargetDataString(TargetDTO targetReport) {
         return EngineUtils.getFormalizedTargetDataString(targetReport);
     }
 
-    public String getFormalizedExecutionReportString(ExecutionData executionData) {
-        return EngineUtils.getFormalizedExecutionReportString(executionData);
+    public String getFormalizedExecutionReportString(Execution execution) {
+        return EngineUtils.getFormalizedExecutionReportString(execution);
     }
 
-    public String getFormalizedConfigurationString(ConfigurationData config) {
+    public String getFormalizedConfigurationString(ConfigurationDTO config) {
         return EngineUtils.getFormalizedConfigurationString(config);
     }
 
@@ -278,5 +280,17 @@ public class Engine implements Serializable {
 
     public void activeConfig_UpdateParticipatingTargets(TaskType taskType, Collection<String> participatingTargetNames) {
         taskManager.activeConfig_UpdateParticipatingTargets(taskType, participatingTargetNames);
+    }
+
+    public synchronized  ExecutionManager getExecutionManager() {
+        return executionManager;
+    }
+
+    public boolean addExecution(Execution execution) {
+        return getExecutionManager().addExecution(execution);
+    }
+
+    public boolean addUserToConfiguration(String executionName, String userName) {
+        return getExecutionManager().addUserToConfiguration(executionName, userName);
     }
 }

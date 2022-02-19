@@ -116,7 +116,7 @@
          <content>
             <SplitPane dividerPositions="0.5409836065573771" prefHeight="200.0" prefWidth="200.0">
                <items>
-                  <SplitPane dividerPositions="0.24725943970767356" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                  <SplitPane dividerPositions="0.3467600700525394" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
                     <items>
                         <fx:include fx:id="graphGeneralDetailsComponent" source="../../graph/general/GraphGeneralDetails.fxml" />
                         <BorderPane prefHeight="200.0" prefWidth="200.0">
@@ -129,7 +129,7 @@
                         </BorderPane>
                     </items>
                   </SplitPane>
-                  <SplitPane dividerPositions="0.14419225634178906" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
+                  <SplitPane dividerPositions="0.3432574430823117" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0">
                     <items>
                         <fx:include fx:id="graphGeneralDetailsComponent_ChosenTargetsGraph" source="../../graph/general/GraphGeneralDetails.fxml" />
                         <BorderPane prefHeight="200.0" prefWidth="200.0">

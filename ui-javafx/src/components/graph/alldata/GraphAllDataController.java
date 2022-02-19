@@ -22,7 +22,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import logic.Engine;
-import task.ExecutionData;
+import task.Execution;
 
 import java.util.Collection;
 import java.util.List;
@@ -191,11 +191,11 @@ public class GraphAllDataController implements FileLoadedListener, ExecutionEndL
     }
 
     @Override
-    public void executedEnded(ExecutionData executionData) {
-        Button newButtonStartGraph = graphChooserMenuComponentController.addNewExecutionStartGraph(executionData);
+    public void executedEnded(Execution execution) {
+        Button newButtonStartGraph = graphChooserMenuComponentController.addNewExecutionStartGraph(execution);
         if (newButtonStartGraph != null) {
             newButtonStartGraph.setOnAction(event -> {
-                ExecutionData exeData = Engine.getInstance().getExecutionByExeNumber(executionData.getTaskType(), executionData.getExecutionNumber());
+                Execution exeData = Engine.getInstance().getExecutionByExeNumber(execution.getTaskType(), execution.getExecutionNumber());
                 if (exeData != null) {
                     workingGraph = exeData.getStartingGraph();
                     populateData(workingGraph);
@@ -203,10 +203,10 @@ public class GraphAllDataController implements FileLoadedListener, ExecutionEndL
             });
         }
 
-        Button newButtonEndGraph = graphChooserMenuComponentController.addNewExecutionEndGraph(executionData);
+        Button newButtonEndGraph = graphChooserMenuComponentController.addNewExecutionEndGraph(execution);
         if (newButtonEndGraph != null) {
             newButtonEndGraph.setOnAction(event -> {
-                ExecutionData exeData = Engine.getInstance().getExecutionByExeNumber(executionData.getTaskType(), executionData.getExecutionNumber());
+                Execution exeData = Engine.getInstance().getExecutionByExeNumber(execution.getTaskType(), execution.getExecutionNumber());
                 if (exeData != null) {
                     workingGraph = exeData.getEndGraph();
                     populateData(workingGraph);

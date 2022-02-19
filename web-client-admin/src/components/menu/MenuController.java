@@ -12,7 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import task.ExecutionData;
+import task.Execution;
 import task.configuration.Configuration;
 
 public class MenuController implements ExecutionStartListener, ExecutionEndListener, FileLoadedListener, GraphChosenListener {
@@ -116,7 +116,7 @@ public class MenuController implements ExecutionStartListener, ExecutionEndListe
     }
 
     @Override
-    public void executedEnded(ExecutionData executionData) {
+    public void executedEnded(Execution execution) {
         loadFileButton.disableProperty().set(false);
     }
 

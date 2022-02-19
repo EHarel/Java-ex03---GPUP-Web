@@ -19,11 +19,11 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import logic.Engine;
-import task.ExecutionData;
+import task.Execution;
 import task.TaskProcess;
 import task.TaskType;
 import task.configuration.Configuration;
-import task.configuration.ConfigurationData;
+import task.configuration.ConfigurationDTO;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -117,7 +117,7 @@ public class TaskSettingsController implements FileLoadedListener {
                 paneStartPoint.setDisable(false);
                 boolean isDisableIncremental = true;
                 try {
-                    ExecutionData lastExecution = Engine.getInstance().getExecutionLast(taskType);
+                    Execution lastExecution = Engine.getInstance().getExecutionLast(taskType);
                     isDisableIncremental = (lastExecution == null);
                 } catch (Exception e) {
                     isDisableIncremental = true;
@@ -212,7 +212,7 @@ public class TaskSettingsController implements FileLoadedListener {
         if (isRunFromScratch()) {
             graph = (DependenciesGraph) Engine.getInstance().getGraph();
         } else {
-            ExecutionData lastExecution = Engine.getInstance().getExecutionLast(getChosenTaskType());
+            Execution lastExecution = Engine.getInstance().getExecutionLast(getChosenTaskType());
             if (lastExecution != null) {
                 graph = getLastGraphReset(lastExecution);
             }
@@ -262,7 +262,7 @@ public class TaskSettingsController implements FileLoadedListener {
 
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------- GETTERS AND SETTERS (PRIVATE) ----------------------------------- */
-    private DependenciesGraph getLastGraphReset(ExecutionData lastExecution) {
+    private DependenciesGraph getLastGraphReset(Execution lastExecution) {
         DependenciesGraph graph = null;
 
         if (lastExecution != null) {
@@ -451,7 +451,7 @@ public class TaskSettingsController implements FileLoadedListener {
             return;
         }
 
-        Collection<ConfigurationData> configData = Engine.getInstance().getConfigAll(taskType);
+        Collection<ConfigurationDTO> configData = Engine.getInstance().getConfigAll(taskType);
         existingConfigurationsListView.getItems().clear();
 
         configData.forEach(configurationData -> {
@@ -562,7 +562,7 @@ public class TaskSettingsController implements FileLoadedListener {
     /* ---------------------------------------------------------------------------------------------------- */
     private void updateActiveConfig(TaskType taskType) {
         try {
-            ConfigurationData configData = Engine.getInstance().getConfigActive(taskType);
+            ConfigurationDTO configData = Engine.getInstance().getConfigActive(taskType);
             if (configData != null) {
                 labelActiveConfiguration.setText(configData.getName());
             } else {
@@ -592,7 +592,7 @@ public class TaskSettingsController implements FileLoadedListener {
         }
 
         startPointRBSwitched();
-        ExecutionData lastExecution = Engine.getInstance().getExecutionLast(taskType);
+        Execution lastExecution = Engine.getInstance().getExecutionLast(taskType);
         if (lastExecution == null) {
             loadInitialGraph();
         } else {

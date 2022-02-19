@@ -100,7 +100,7 @@ public class TaskSetConfigurationDefault implements DoesAction {
 
     private void printLoaded(Configuration config) {
         System.out.println("Default parameters loaded.\n");
-        ConfigUtils.printConfig(config.getData());
+        ConfigUtils.printConfig(config.toDTO());
         System.out.println();
     }
 }

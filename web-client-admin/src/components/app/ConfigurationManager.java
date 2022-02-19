@@ -2,9 +2,7 @@ package components.app;
 
 import task.TaskType;
 import task.configuration.Configuration;
-import task.configuration.ConfigurationCompilation;
-import task.configuration.ConfigurationData;
-import task.configuration.ConfigurationSimulation;
+import task.configuration.ConfigurationDTO;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,13 +63,13 @@ public class ConfigurationManager {
         return added;
     }
 
-    public synchronized Collection<ConfigurationData> getConfigDataAll(TaskType taskType) {
-        Collection<ConfigurationData> configData = new ArrayList<>();
+    public synchronized Collection<ConfigurationDTO> getConfigDataAll(TaskType taskType) {
+        Collection<ConfigurationDTO> configData = new ArrayList<>();
 
         if (taskType != null) {
             for (Configuration config : configurations) {
                 if (config.getTaskType() == taskType) {
-                    configData.add(config.getData());
+                    configData.add(config.toDTO());
                 }
             }
         }
@@ -79,18 +77,18 @@ public class ConfigurationManager {
         return configData;
     }
 
-    public synchronized ConfigurationData getActiveConfigData(TaskType taskType) {
-        ConfigurationData configData = null;
+    public synchronized ConfigurationDTO getActiveConfigData(TaskType taskType) {
+        ConfigurationDTO configData = null;
 
         switch (taskType) {
             case SIMULATION:
                 if (activeSimConfig != null) {
-                    configData = activeSimConfig.getData();
+                    configData = activeSimConfig.toDTO();
                 }
                 break;
             case COMPILATION:
                 if (activeCompConfig != null) {
-                    configData = activeCompConfig.getData();
+                    configData = activeCompConfig.toDTO();
                 }
                 break;
         }
@@ -98,8 +96,8 @@ public class ConfigurationManager {
         return configData;
     }
 
-    public synchronized ConfigurationData getConfigDataSpecific(TaskType taskType, String configName) {
-        ConfigurationData configData = null;
+    public synchronized ConfigurationDTO getConfigDataSpecific(TaskType taskType, String configName) {
+        ConfigurationDTO configData = null;
         Configuration chosenConfig = null;
 
         for (Configuration config :
@@ -111,7 +109,7 @@ public class ConfigurationManager {
         }
 
         if (chosenConfig != null) {
-            configData = chosenConfig.getData();
+            configData = chosenConfig.toDTO();
         }
 
         return configData;

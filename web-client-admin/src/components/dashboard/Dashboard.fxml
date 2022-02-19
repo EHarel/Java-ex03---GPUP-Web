@@ -15,7 +15,7 @@
          <center>
             <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" BorderPane.alignment="CENTER">
               <items>
-                  <fx:include source="execution/ExecutionTableAdmin.fxml" />
+                  <fx:include fx:id="component_ExecutionTable" source="execution/ExecutionTableAdmin.fxml" />
                   <fx:include fx:id="component_GraphTable" source="graphs/UploadedGraphsTable.fxml" />
               </items>
             </SplitPane>

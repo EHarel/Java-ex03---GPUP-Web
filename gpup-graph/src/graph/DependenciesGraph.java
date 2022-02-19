@@ -4,6 +4,7 @@ import algorithm.DFS;
 import algorithm.TopologicalSort;
 import datastructure.QueueLinkedList;
 import exception.*;
+import task.TaskType;
 import task.configuration.Configuration;
 import util.GraphUtils;
 
@@ -11,7 +12,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class DependenciesGraph implements Graph, Serializable {
+public class DependenciesGraph implements Serializable {
 //    private static final long serialVersionUID = 5; // 11-Dec-2021, target participation count
     private static final long serialVersionUID = 6; // 16-Feb-2021 -- Pricing, name of uploading user
 
@@ -123,12 +124,10 @@ public class DependenciesGraph implements Graph, Serializable {
         this.priceSimulation = priceSimulation;
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public boolean setName(String name) {
         boolean res = false;
 
@@ -148,7 +147,6 @@ public class DependenciesGraph implements Graph, Serializable {
         this.serialSets = serialSets;
     }
 
-    @Override
     public int size() {
         return targets.size();
     }
@@ -245,7 +243,6 @@ public class DependenciesGraph implements Graph, Serializable {
         return dependencyCount;
     }
 
-    @Override
     public boolean contains(String targetName) {
         boolean contains = false;
 
@@ -387,7 +384,7 @@ public class DependenciesGraph implements Graph, Serializable {
         return resSet;
     }
 
-    @Override
+     
     public boolean removeLeafOrIndependent(Target targetToRemove) {
         boolean removed = false;
 
@@ -417,8 +414,8 @@ public class DependenciesGraph implements Graph, Serializable {
     /* ---------------------------------------------------------------------------------------------------- */
 
 
-    @Override
-    public GraphDTO getGeneralDataAllTargets() {
+     
+    public GraphDTO toDTO() {
         Map<TargetDTO.Dependency, Integer> dependencyIntegerMap = sizeDependency();
         GraphDTO graphDTO = new GraphDTO();
 
@@ -450,7 +447,7 @@ public class DependenciesGraph implements Graph, Serializable {
         return targetDTOs;
     }
 
-    @Override
+     
     public Collection<SerialSetDTO> getSerialSetDTO() {
         Collection<SerialSetDTO> serialSetDTOS = new LinkedList<>();
 
@@ -473,7 +470,7 @@ public class DependenciesGraph implements Graph, Serializable {
         return targetDTOList;
     }
 
-    @Override
+     
     public TargetDTO getSpecificDataOneTarget(String targetName) {
         Target target = getTarget(targetName);
 
@@ -484,7 +481,7 @@ public class DependenciesGraph implements Graph, Serializable {
         return target.toData();
     }
 
-    @Override
+     
     public Collection<TargetDTO> getAllRequiredForTargetsFromTarget(String targetName) {
         Collection<TargetDTO> dependencies = new LinkedList<>();
         Target target = getTarget(targetName);
@@ -545,7 +542,7 @@ public class DependenciesGraph implements Graph, Serializable {
         return allDependencies;
     }
 
-    @Override
+     
     public Collection<TargetDTO> getAllDependentOnTargetsFromTarget(String targetName) {
         Collection<TargetDTO> dependencies = new LinkedList<>();
         Target target = getTarget(targetName);
@@ -562,7 +559,7 @@ public class DependenciesGraph implements Graph, Serializable {
         return dependencies;
     }
 
-    @Override
+     
     /* TODO
         I have two methods here that are essentially the same.
         They differ only in the return value.
@@ -603,12 +600,12 @@ public class DependenciesGraph implements Graph, Serializable {
     /* --------------------------------------------- PATHS ------------------------------------------------ */
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
-    @Override
+     
     public Collection<List<TargetDTO>> getTargetPaths(String targetName, DFS.EdgeDirection direction) throws NonexistentTargetException, UninitializedNullException {
         return getPathInTargetDataFormat(targetName, null, direction, null);
     }
 
-    @Override
+     
     public Collection<List<TargetDTO>> getCycleWithTarget(String targetName) throws NonexistentTargetException, UninitializedNullException {
         ArrayList<Collection<List<TargetDTO>>> paths = getPathsBetweenTargets(targetName, targetName);
 
@@ -628,7 +625,7 @@ public class DependenciesGraph implements Graph, Serializable {
      * If one or both targets don't exist, returns null.
      * If no path exists, returns an empty list.
      */
-    @Override
+     
     public ArrayList<Collection<List<TargetDTO>>> getPathsBetweenTargets(String target1Name, String target2Name) throws NonexistentTargetException, UninitializedNullException {
         Collection<List<TargetDTO>> paths1to2Data = getPathInTargetDataFormat(target1Name, target2Name, DFS.EdgeDirection.DEPENDENT_ON, null);
         Collection<List<TargetDTO>> paths2to1Data = getPathInTargetDataFormat(target2Name, target1Name, DFS.EdgeDirection.DEPENDENT_ON, null);
@@ -671,7 +668,7 @@ public class DependenciesGraph implements Graph, Serializable {
      * @return A queue of sorted vertices. If there exists a cycle,
      * return value is determined by parameter returnNullOnCycle.
      */
-    @Override
+     
     public datastructure.Queue<TargetDTO> getTopologicalSort(boolean returnNullOnCycle) {
         datastructure.Queue<Target> targetQ = new TopologicalSort(this).getSortedTargets(returnNullOnCycle);
         datastructure.Queue<TargetDTO> targetDataQ = null;
@@ -943,6 +940,24 @@ public class DependenciesGraph implements Graph, Serializable {
         }
 
         subGraph.setSerialSets(duplicateSets);
+    }
+
+    /**
+     * Returns price per target.
+     */
+    public Integer getPrice(TaskType taskType) {
+        Integer pricePerTarget = null;
+
+        switch (taskType) {
+            case SIMULATION:
+                pricePerTarget = getPriceSimulation();
+                break;
+            case COMPILATION:
+                pricePerTarget = getPriceCompilation();
+                break;
+        }
+
+        return pricePerTarget;
     }
 
 //

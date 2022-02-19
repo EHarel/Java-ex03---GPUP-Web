@@ -22,7 +22,7 @@ public abstract class Task implements Runnable {
     protected Target target;
     protected Configuration configuration;
     protected DependenciesGraph workingGraph;
-    protected ExecutionData executionData;
+    protected Execution execution;
     protected TaskManager taskManager;
 
 
@@ -31,7 +31,7 @@ public abstract class Task implements Runnable {
             @NotNull Target target,
             @NotNull Configuration configuration,
             DependenciesGraph workingGraph,
-            ExecutionData executionData
+            Execution execution
     ) throws IllegalArgumentException {
         this.taskType = taskType;
 
@@ -46,7 +46,7 @@ public abstract class Task implements Runnable {
         this.target = target;
         this.configuration = configuration;
         this.workingGraph = workingGraph;
-        this.executionData = executionData;
+        this.execution = execution;
         this.taskManager = Engine.getInstance().getTaskManager();
     }
 
@@ -105,7 +105,7 @@ public abstract class Task implements Runnable {
         checkPause();
 
         taskManager.getConsumerManager().getEndTargetConsumers().forEach(consumer -> consumer.accept(target.toData()));
-        executionData.getProcessedData().addTargetData(target.toData());
+        execution.getProcessedData().addTargetData(target.toData());
         taskManager.getThreadManager().decrementActiveThreads(Thread.currentThread().getId());
         releaseLocks(lockedSets);
     }
@@ -246,7 +246,7 @@ public abstract class Task implements Runnable {
                             dependentOn,
                             configuration,
                             workingGraph,
-                            executionData);
+                            execution);
 
                     taskManager.getThreadManager().execute(newTask);
                 }

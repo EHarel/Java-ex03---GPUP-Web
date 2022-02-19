@@ -1,11 +1,17 @@
 package components.app;
 
 import components.dashboard.DashboardWorkerController;
+import components.execution.processedtargets.TargetDTOTable;
 import components.login.LoginWorkerController;
+import events.LoginPerformedListener;
+import graph.TargetDTO;
 import javafx.event.ActionEvent;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
+
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class AppMainController {
@@ -18,6 +24,14 @@ public class AppMainController {
     private Parent dashboard;
     private DashboardWorkerController dashboardController;
 
+    private List<LoginPerformedListener> loginPerformedListeners;
+
+    private List<TargetDTOTable> processedTargets;
+
+    public AppMainController() {
+        loginPerformedListeners = new LinkedList<>();
+        processedTargets = new LinkedList<>();
+    }
 
     public void setMainScene(Scene scene) {
         this.mainScene = scene;
@@ -37,6 +51,10 @@ public class AppMainController {
 
     public void loginSuccessful(String userName) {
         displayMainApp();
+
+        loginPerformedListeners.forEach(loginPerformedListener -> {
+            loginPerformedListener.loginPerformed(userName);
+        });
     }
 
     private void displayMainApp() {
@@ -67,7 +85,17 @@ public class AppMainController {
         this.dashboard = parent;
         this.dashboardController = dashboardController;
 
+        this.dashboardController.setMainController(this);
+
     }
+
+    public void addEventListener_LoginPerformed(LoginPerformedListener listener) {
+        if (listener != null) {
+            loginPerformedListeners.add(listener);
+        }
+    }
+
+    public List<TargetDTOTable> getProcessedTargets() { return getProcessedTargets(); }
 }
 
 //

@@ -15,6 +15,18 @@
         <servlet-name>GraphsListServlet</servlet-name>
         <servlet-class>gpupweb.servlets.GraphListServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ExecutionUploadServlet</servlet-name>
+        <servlet-class>gpupweb.servlets.ExecutionUploadServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ExecutionListServlet</servlet-name>
+        <servlet-class>gpupweb.servlets.ExecutionListServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ExecutionSubscribeServlet</servlet-name>
+        <servlet-class>gpupweb.servlets.ExecutionSubscribeServlet</servlet-class>
+    </servlet>
 
     <!-- MAPPING -->
     <servlet-mapping>
@@ -28,5 +40,17 @@
     <servlet-mapping>
         <servlet-name>GraphsListServlet</servlet-name>
         <url-pattern>/graphlist</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExecutionUploadServlet</servlet-name>
+        <url-pattern>/execution/upload</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExecutionListServlet</servlet-name>
+        <url-pattern>/executionlist</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExecutionSubscribeServlet</servlet-name>
+        <url-pattern>/execution/subscribe</url-pattern>
     </servlet-mapping>
 </web-app>

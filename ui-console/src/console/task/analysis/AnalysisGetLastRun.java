@@ -3,7 +3,7 @@ package console.task.analysis;
 import console.menu.loader.ExecutionAnalysisMenu;
 import console.menu.system.DoesAction;
 import logic.Engine;
-import task.ExecutionData;
+import task.Execution;
 import task.TaskType;
 
 public class AnalysisGetLastRun implements DoesAction {
@@ -22,8 +22,8 @@ public class AnalysisGetLastRun implements DoesAction {
             return;
         }
 
-        ExecutionData executionData = engine.getExecutionLast(TaskType.SIMULATION);
+        Execution execution = engine.getExecutionLast(TaskType.SIMULATION);
 
-        new ExecutionAnalysisMenu(executionData).run();
+        new ExecutionAnalysisMenu(execution).run();
     }
 }

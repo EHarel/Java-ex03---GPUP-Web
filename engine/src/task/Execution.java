@@ -1,47 +1,90 @@
 package task;
 
 import graph.DependenciesGraph;
+import graph.GraphDTO;
 import graph.TargetDTO;
-import task.configuration.Configuration;
+import task.configuration.*;
+import task.execution.ExecutionDTO;
+import task.execution.ExecutionStatus;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.*;
 
-public class ExecutionData implements Serializable, Cloneable {
-//    private static final long serialVersionUID = 3; // 24-Nov-2021
-    private static final long serialVersionUID = 4; // 08-Dec-2021, name change
-
-
+public class Execution implements Cloneable {
     /* ---------------------------------------------------------------------------------------------------- */
     /* ------------------------------------------ DATA MEMBERS -------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
+    protected String executionName;
+    private final String creatingUser;
     protected final TaskType taskType;
     protected final int executionNumber;
     private final DependenciesGraph startingGraph;
-    private final Configuration configuration;
+    private Configuration configuration;
     private TaskProcess.StartPoint startPoint;
     private ProcessedData processedData;
     protected boolean taskComplete;
     private DependenciesGraph endGraph;
     private Instant startInstant;
     private Instant endInstant;
+    private final Integer pricePerTarget;
+    private ExecutionStatus executionStatus;
+    private Collection<String> participatingWorkerNames;
 
 
     /* ---------------------------------------------------------------------------------------------------- */
     /* ------------------------------------------- CONSTRUCTOR -------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
-    public ExecutionData(
+    public Execution(
             TaskType taskType,
             int executionNumber,
             DependenciesGraph startingGraph,
             Configuration configuration,
             ProcessedData previousProcessedData) {
-        this.taskType= taskType;
+        this.taskType = taskType;
+        this.creatingUser = "Old code";
         this.executionNumber = executionNumber;
         this.startingGraph = startingGraph;
         this.configuration = configuration;
-        processedData = new ProcessedData(previousProcessedData);
+        this.processedData = new ProcessedData(previousProcessedData);
+        this.pricePerTarget = null;
+    }
+
+    public Execution(ExecutionDTO executionDTO) {
+        this.executionName = executionDTO.getExecutionName();
+        this.creatingUser = executionDTO.getCreatingUser();
+        this.taskType = executionDTO.getTaskType();
+        this.executionNumber = 0;
+        this.startingGraph = new DependenciesGraph(executionDTO.getGraphDTO());
+        try {
+            switch (taskType) {
+                case COMPILATION:
+                    this.configuration = new ConfigurationCompilation((ConfigurationDTOCompilation) executionDTO.getConfigDTO());
+                    break;
+                case SIMULATION:
+                    this.configuration = new ConfigurationSimulation((ConfigurationDTOSimulation) executionDTO.getConfigDTO());
+                    break;
+            }
+        } catch (Exception ignore) {
+        }
+
+        this.processedData = new ProcessedData(null);
+        this.taskComplete = false; // TODO: should this be taken from the DTO as well?
+        this.pricePerTarget = executionDTO.getPricePerTarget();
+        this.executionStatus = executionDTO.getExecutionStatus();
+        this.participatingWorkerNames = new ArrayList<>();
+        executionDTO.getParticipatingUsersNames().forEach(s -> {this.participatingWorkerNames.add(s); });
+
+        // private TaskProcess.StartPoint startPoint;
+    }
+
+
+    public String getExecutionName() {
+        return executionName;
+    }
+
+    public void setExecutionName(String executionName) {
+        this.executionName = executionName;
     }
 
     public TaskType getTaskType() {
@@ -60,7 +103,7 @@ public class ExecutionData implements Serializable, Cloneable {
         return configuration;
     }
 
-    public void setStartPoint (TaskProcess.StartPoint startPoint) {
+    public void setStartPoint(TaskProcess.StartPoint startPoint) {
         this.startPoint = startPoint;
     }
 
@@ -68,7 +111,9 @@ public class ExecutionData implements Serializable, Cloneable {
         this.taskComplete = taskComplete;
     }
 
-    public boolean getTaskComplete() { return this.taskComplete; }
+    public boolean getTaskComplete() {
+        return this.taskComplete;
+    }
 
     public DependenciesGraph getEndGraph() {
         return endGraph;
@@ -102,7 +147,9 @@ public class ExecutionData implements Serializable, Cloneable {
         this.processedData = processedData;
     }
 
-    public TargetDTO getSpecificTargetData(String targetName) { return this.processedData.getSpecificTargetData(targetName); }
+    public TargetDTO getSpecificTargetData(String targetName) {
+        return this.processedData.getSpecificTargetData(targetName);
+    }
 
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
@@ -110,8 +157,8 @@ public class ExecutionData implements Serializable, Cloneable {
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     @Override
-    public ExecutionData clone() {
-        ExecutionData clone = new ExecutionData(
+    public Execution clone() {
+        Execution clone = new Execution(
                 this.taskType,
                 this.executionNumber,
                 this.startingGraph.duplicate(),
@@ -129,6 +176,59 @@ public class ExecutionData implements Serializable, Cloneable {
         return clone;
     }
 
+    public ExecutionDTO toDTO() {
+        ConfigurationDTOSimulation configSimDTO = null;
+        ConfigurationDTOCompilation configCompDTO = null;
+
+        switch (configuration.getTaskType()) {
+            case SIMULATION:
+                configSimDTO = (ConfigurationDTOSimulation) configuration.toDTO();
+                break;
+            case COMPILATION:
+                configCompDTO = (ConfigurationDTOCompilation) configuration.toDTO();
+                break;
+        }
+
+        ExecutionDTO executionDTO = new ExecutionDTO(
+                this.executionName,
+                this.creatingUser,
+                // this.configuration.toDTO(),
+                this.startingGraph.toDTO(),
+                this.taskType,
+                this.pricePerTarget,
+                this.participatingWorkerNames.size(),
+                this.executionStatus,
+                configCompDTO,
+                configSimDTO,
+                this.participatingWorkerNames
+        );
+
+        return executionDTO;
+    }
+
+    /**
+     * @return True if the name was added, false if a worker by given name already exists in the list.
+     */
+    public boolean addNewWorkerName(String newWorkerName) {
+        boolean added = false;
+        boolean existingName = false;
+
+        for (String existingWorker :
+                participatingWorkerNames) {
+            if (existingWorker.equals(newWorkerName)) {
+                existingName = true;
+                break;
+            }
+        }
+
+        if (!existingName) {
+            participatingWorkerNames.add(newWorkerName);
+            added = true;
+        }
+
+
+        return added;
+    }
 
 
 
@@ -138,7 +238,7 @@ public class ExecutionData implements Serializable, Cloneable {
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     public class ProcessedData implements Serializable, Cloneable {
-//        private static final long serialVersionUID = 2; // 25-Nov-2021
+        //        private static final long serialVersionUID = 2; // 25-Nov-2021
         private static final long serialVersionUID = 3; // 27-Nov-2021
 
 
@@ -198,7 +298,9 @@ public class ExecutionData implements Serializable, Cloneable {
             return res;
         }
 
-        public Collection<TargetDTO> getAllTargetData() { return name2TargetReport.values(); }
+        public Collection<TargetDTO> getAllTargetData() {
+            return name2TargetReport.values();
+        }
 
         public Collection<TargetDTO> getUnprocessedTargets() {
             Collection<TargetDTO> allUnprocessed = new LinkedList<>();

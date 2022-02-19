@@ -1,6 +1,5 @@
 package gpupweb.servlets;
 
-import gpupweb.constants.Constants;
 import gpupweb.utils.ServletUtils;
 import gpupweb.utils.SessionUtils;
 import jakarta.servlet.ServletException;
@@ -9,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import users.UserDTO;
 import users.UserManager;
-import utilshared.UserType;
+import utilsharedall.UserType;
 
 import java.io.IOException;
 
@@ -40,8 +39,8 @@ public class LoginServlet extends HttpServlet {
 
         if (usernameFromSession == null) { //user is not logged in yet
             try {
-                String usernameFromParameter = request.getParameter(utilshared.Constants.QP_USERNAME);
-                String userTypeStr = request.getParameter(utilshared.Constants.QP_USERTYPE);
+                String usernameFromParameter = request.getParameter(utilsharedall.Constants.QP_USERNAME);
+                String userTypeStr = request.getParameter(utilsharedall.Constants.QP_USERTYPE);
                 UserType usertypeFromParameter = UserType.valueOf(userTypeStr);
 
                 if (usernameFromParameter == null || usernameFromParameter.isEmpty()) {
@@ -75,7 +74,9 @@ public class LoginServlet extends HttpServlet {
                             String errorMessage = "Username " + usernameFromParameter + " already exists. Please enter a different username.";
 
                             // stands for unauthorized as there is already such user with this name
-                            response.setStatus(401);
+//                            response.setStatus(401);
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
                             response.getOutputStream().print(errorMessage);
                         } else {
                             //add the new user to the users list
@@ -83,17 +84,17 @@ public class LoginServlet extends HttpServlet {
                             //set the username in a session so it will be available on each request
                             //the true parameter means that if a session object does not exists yet
                             //create a new one
-                            request.getSession(true).setAttribute(utilshared.Constants.QP_USERNAME, usernameFromParameter);
+                            request.getSession(true).setAttribute(utilsharedall.Constants.QP_USERNAME, usernameFromParameter);
 
                             //redirect the request to the chat room - in order to actually change the URL
                             System.out.println("On login, request URI is: " + request.getRequestURI());
-                            response.setStatus(200);
+                            response.setStatus(HttpServletResponse.SC_OK);
                             response.getOutputStream().print(CHAT_ROOM_URL);
                         }
                     }
                 }
             } catch (IllegalArgumentException exception) {
-                response.setStatus(400);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.getOutputStream().print("Invalid user type parameter");
             }
         } else {

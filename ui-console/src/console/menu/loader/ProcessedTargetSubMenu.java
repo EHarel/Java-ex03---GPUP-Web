@@ -3,7 +3,7 @@ package console.menu.loader;
 import console.menu.system.MenuAction;
 import console.menu.system.SubMenu;
 import console.task.analysis.report.*;
-import task.ExecutionData;
+import task.Execution;
 
 public class ProcessedTargetSubMenu extends SubMenu {
     private static final String subMenuName = "Target Processing";
@@ -28,24 +28,24 @@ public class ProcessedTargetSubMenu extends SubMenu {
     MenuAction menuUnprocessed;
     MenuAction menuLeftToCompletion;
 
-    ExecutionData executionData;
+    Execution execution;
 
-    public ProcessedTargetSubMenu(SubMenu parentItem , PathMenu.ReportType reportType, ExecutionData executionData) {
+    public ProcessedTargetSubMenu(SubMenu parentItem , PathMenu.ReportType reportType, Execution execution) {
         super(subMenuName, parentItem);
         setReportTypeStr(reportType);
         super.setName(reportTypeStr + subMenuName);
-        this.executionData = executionData;
+        this.execution = execution;
         updateMenuNamesWithReportType();
 
-        new MenuAction(reportTypeStr + "Report review", this, new ReportOverview(executionData, reportType));
-        menuAllProcessed = new MenuAction(strAllProcessed, this, new ReportProcessed(executionData, reportType));
-        menuNonFailedThisRun = new MenuAction(strNonFailedThisRun, this, new ReportNonFailed(executionData, reportType));
-        menuNonFailedAllRuns = new MenuAction(strNonFailedAllRuns, this, new ReportNonFailedAllRuns(executionData, reportType));
-        menuSuccessfulThisRun = new MenuAction(strSuccessful, this, new ReportSuccess(executionData, reportType));
-        menuSuccessWarningsThisRun = new MenuAction(strSuccessWithWarnings, this, new ReportSuccessWarnings(executionData, reportType));
-        menuFailed = new MenuAction(strFailed, this, new ReportFailed(executionData, reportType));
-        menuUnprocessed = new MenuAction(strUnprocessed, this, new ReportUnprocessed(executionData, reportType));
-        menuLeftToCompletion = new MenuAction(strLeftToCompletion, this, new ReportLeftToCompletion(executionData, reportType));
+        new MenuAction(reportTypeStr + "Report review", this, new ReportOverview(execution, reportType));
+        menuAllProcessed = new MenuAction(strAllProcessed, this, new ReportProcessed(execution, reportType));
+        menuNonFailedThisRun = new MenuAction(strNonFailedThisRun, this, new ReportNonFailed(execution, reportType));
+        menuNonFailedAllRuns = new MenuAction(strNonFailedAllRuns, this, new ReportNonFailedAllRuns(execution, reportType));
+        menuSuccessfulThisRun = new MenuAction(strSuccessful, this, new ReportSuccess(execution, reportType));
+        menuSuccessWarningsThisRun = new MenuAction(strSuccessWithWarnings, this, new ReportSuccessWarnings(execution, reportType));
+        menuFailed = new MenuAction(strFailed, this, new ReportFailed(execution, reportType));
+        menuUnprocessed = new MenuAction(strUnprocessed, this, new ReportUnprocessed(execution, reportType));
+        menuLeftToCompletion = new MenuAction(strLeftToCompletion, this, new ReportLeftToCompletion(execution, reportType));
     }
 
     private String setReportTypeStr(PathMenu.ReportType reportType) {
@@ -86,49 +86,49 @@ public class ProcessedTargetSubMenu extends SubMenu {
     }
 
     private void updateAllProcessedStr() {
-        int countAllProcessed = executionData.getProcessedData().getAllProcessedTargetsOfAllResults().size();
+        int countAllProcessed = execution.getProcessedData().getAllProcessedTargetsOfAllResults().size();
 
         menuAllProcessed.setName(strAllProcessed + surroundNumWithParentheses(countAllProcessed));
     }
 
     private void updateNonFailedThisRunStr() {
-        int num = executionData.getProcessedData().getProcessedTargetsNoFailure().size();
+        int num = execution.getProcessedData().getProcessedTargetsNoFailure().size();
 
         menuNonFailedThisRun.setName(strNonFailedThisRun + surroundNumWithParentheses(num));
     }
 
     private void updateNonFailedAllRunsStr() {
-        int num = executionData.getProcessedData().getSuccessTargetsAllRunWithWarnings().size();
+        int num = execution.getProcessedData().getSuccessTargetsAllRunWithWarnings().size();
 
         menuNonFailedAllRuns.setName(strNonFailedAllRuns + surroundNumWithParentheses(num));
     }
 
     private void updateSuccessfulStr() {
-        int num = executionData.getProcessedData().getSuccessfulTargets().size();
+        int num = execution.getProcessedData().getSuccessfulTargets().size();
 
         menuSuccessfulThisRun.setName(strSuccessful + surroundNumWithParentheses(num));
     }
 
     private void updateSuccessWithWarningsStr() {
-        int num = executionData.getProcessedData().getWarningTargets().size();
+        int num = execution.getProcessedData().getWarningTargets().size();
 
         menuSuccessWarningsThisRun.setName(strSuccessWithWarnings + surroundNumWithParentheses(num));
     }
 
     private void updateFailedTargetsStr() {
-        int num = executionData.getProcessedData().getFailedTargets().size();
+        int num = execution.getProcessedData().getFailedTargets().size();
 
         menuFailed.setName(strFailed + surroundNumWithParentheses(num));
     }
 
     private void updateUnprocessedStr() {
-        int num = executionData.getProcessedData().getUnprocessedTargets().size();
+        int num = execution.getProcessedData().getUnprocessedTargets().size();
 
         menuUnprocessed.setName(strUnprocessed + surroundNumWithParentheses(num));
     }
 
     private void updateLeftToCompletionStr() {
-        int num = executionData.getProcessedData().getTargetsLeftToCompletion().size();
+        int num = execution.getProcessedData().getTargetsLeftToCompletion().size();
 
         menuLeftToCompletion.setName(strLeftToCompletion + surroundNumWithParentheses(num));
     }

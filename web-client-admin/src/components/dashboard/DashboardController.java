@@ -1,8 +1,10 @@
 package components.dashboard;
 
 import components.app.AppMainController;
+import components.dashboard.execution.ExecutionTableAdminController;
 import components.dashboard.graphs.UploadedGraphsTableController;
 import components.dashboard.users.UserTableController;
+import events.LoginPerformedListener;
 import graph.GraphDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -28,6 +30,9 @@ public class DashboardController {
     @FXML private ScrollPane component_GraphTable;
     @FXML private UploadedGraphsTableController component_GraphTableController;
 
+    @FXML private ScrollPane component_ExecutionTable;
+    @FXML private ExecutionTableAdminController component_ExecutionTableController;
+
 
     private GraphDTO currentlyChosenGraph;
 
@@ -44,6 +49,7 @@ public class DashboardController {
 //        });
 
         component_GraphTableController.setDashboardController(this);
+        component_ExecutionTableController.setMainController(mainController);
     }
 
     public void setMainController(AppMainController mainController) {
@@ -57,6 +63,7 @@ public class DashboardController {
     public void setActive(boolean isActive) {
         component_GraphTableController.setActive(isActive);
         component_UserTableController.setActive(isActive);
+        component_ExecutionTableController.setActive(isActive);
     }
 
     public void rowChangedEvent() {

@@ -8,7 +8,7 @@ import graph.Target;
 import graph.TargetDTO;
 import logic.Engine;
 import task.configuration.Configuration;
-import task.configuration.ConfigurationData;
+import task.configuration.ConfigurationDTO;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -28,7 +28,7 @@ public class TaskProcess implements Serializable {
     protected boolean taskComplete = false;
     protected final TaskType type;
     protected final DependenciesGraph originalGraphDuplicate;
-    protected List<ExecutionData> executionDataHistory;
+    protected List<Execution> executionHistory;
     protected Configuration activeConfiguration;
     protected Configuration lastUsedConfiguration;
     protected List<Configuration> configurations;
@@ -42,7 +42,7 @@ public class TaskProcess implements Serializable {
     public TaskProcess(TaskType type, DependenciesGraph graph, Configuration config) {
         this.type = type;
         this.originalGraphDuplicate = graph.duplicate();
-        this.executionDataHistory = new LinkedList<>();
+        this.executionHistory = new LinkedList<>();
         this.activeConfiguration = null;
         this.configurations = new LinkedList<>();
         this.addConfigAndSetActive(config);
@@ -164,13 +164,13 @@ public class TaskProcess implements Serializable {
         return added;
     }
 
-    public ConfigurationData getConfigurationDataActiveOnly() {
-        ConfigurationData configData = null;
+    public ConfigurationDTO getConfigurationDataActiveOnly() {
+        ConfigurationDTO configData = null;
 
         if (activeConfiguration != null) {
-            configData = activeConfiguration.getData();
+            configData = activeConfiguration.toDTO();
         } else if (rememberConfigurationBetweenExecutions && lastUsedConfiguration != null) {
-            configData = lastUsedConfiguration.getData();
+            configData = lastUsedConfiguration.toDTO();
         }
 
         return configData;
@@ -180,13 +180,13 @@ public class TaskProcess implements Serializable {
         return activeConfiguration;
     }
 
-    public ConfigurationData getSpecificConfig(String configName) {
-        ConfigurationData configData = null;
+    public ConfigurationDTO getSpecificConfig(String configName) {
+        ConfigurationDTO configData = null;
 
         if (configName != null) {
             for (Configuration config : configurations) {
                 if (config.getName().equalsIgnoreCase(configName)) {
-                    configData = config.getData();
+                    configData = config.toDTO();
                     break;
                 }
             }
@@ -195,11 +195,11 @@ public class TaskProcess implements Serializable {
         return configData;
     }
 
-    public Collection<ConfigurationData> getConfigurationDataAll() {
-        Collection<ConfigurationData> configData = new LinkedList<>();
+    public Collection<ConfigurationDTO> getConfigurationDataAll() {
+        Collection<ConfigurationDTO> configData = new LinkedList<>();
 
         for (Configuration config : configurations) {
-            configData.add(config.getData());
+            configData.add(config.toDTO());
         }
 
         return configData;
@@ -240,42 +240,42 @@ public class TaskProcess implements Serializable {
     /* ------------------------------------------- GET REPORTS -------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
-    public List<ExecutionData> getAllReports() {
-        return executionDataHistory;
+    public List<Execution> getAllReports() {
+        return executionHistory;
     }
 
     public int getExecutionCount() {
-        return executionDataHistory.size();
+        return executionHistory.size();
     }
 
     /**
      * @return null if there have been no executions thus far.
      */
-    public ExecutionData getLastExecution() {
-        ExecutionData executionData = null;
+    public Execution getLastExecution() {
+        Execution execution = null;
 
-        if (executionDataHistory.size() > 0) {
-            executionData = executionDataHistory.get(executionDataHistory.size() - 1);
+        if (executionHistory.size() > 0) {
+            execution = executionHistory.get(executionHistory.size() - 1);
         }
 
-        return executionData;
+        return execution;
     }
 
-    public ExecutionData getReportAtIndex(int i) throws IndexOutOfBoundsException {
-        return executionDataHistory.get(i);
+    public Execution getReportAtIndex(int i) throws IndexOutOfBoundsException {
+        return executionHistory.get(i);
     }
 
-    public ExecutionData getReportByNumber(int executionNumber) {
-        ExecutionData executionData = null;
+    public Execution getReportByNumber(int executionNumber) {
+        Execution execution = null;
 
-        for (ExecutionData exeData : executionDataHistory) {
+        for (Execution exeData : executionHistory) {
             if (exeData.getExecutionNumber() == executionNumber) {
-                executionData = exeData;
+                execution = exeData;
                 break;
             }
         }
 
-        return executionData;
+        return execution;
     }
 
 
@@ -289,22 +289,22 @@ public class TaskProcess implements Serializable {
             return;
         }
         activeConfiguration.setParticipatingTargets(chosenTargetsForExecution);
-        ExecutionData executionData = createNextExecution(startPoint);
-        prepareThreads(executionData);
-        startProcessingTargets(executionData.getEndGraph(), executionData);
-        executionDataHistory.add(executionData);
+        Execution execution = createNextExecution(startPoint);
+        prepareThreads(execution);
+        startProcessingTargets(execution.getEndGraph(), execution);
+        executionHistory.add(execution);
         activeConfiguration = rememberConfigurationBetweenExecutions ? activeConfiguration : null;
-        checkIfTaskCompleted(executionData);
-        executionData.setEndInstant(Instant.now());
+        checkIfTaskCompleted(execution);
+        execution.setEndInstant(Instant.now());
     }
 
-    private void prepareThreads(ExecutionData executionData) {
+    private void prepareThreads(Execution execution) {
         int threadsForRun = activeConfiguration.getNumberOfThreads();
 
-        taskManager.getThreadManager().prepareForNewExecution(threadsForRun, executionData);
+        taskManager.getThreadManager().prepareForNewExecution(threadsForRun, execution);
     }
 
-    private ExecutionData createNextExecution(StartPoint startPoint) {
+    private Execution createNextExecution(StartPoint startPoint) {
         Instant startInstant = Instant.now();
         DependenciesGraph startGraph = getLastGraphForExecutionDuplicated(startPoint);
         startGraph = getGraphWithParticipatingTargets(startGraph);
@@ -312,18 +312,18 @@ public class TaskProcess implements Serializable {
         DependenciesGraph endGraph = startGraph.duplicate();
         endGraph.setName("End Graph -- Execution " + (getNextExecutionNum(startPoint)));
 
-        ExecutionData.ProcessedData lastProcessedData = null;
+        Execution.ProcessedData lastProcessedData = null;
         if (getLastExecution() != null) {
             lastProcessedData = getLastExecution().getProcessedData();
         }
 
         int nextExecutionNum = getNextExecutionNum(startPoint);
-        ExecutionData executionData = new ExecutionData(this.type, nextExecutionNum, startGraph, activeConfiguration, lastProcessedData);
-        executionData.setStartPoint(startPoint);
-        executionData.setStartInstant(startInstant);
-        executionData.setEndGraph(endGraph);
+        Execution execution = new Execution(this.type, nextExecutionNum, startGraph, activeConfiguration, lastProcessedData);
+        execution.setStartPoint(startPoint);
+        execution.setStartInstant(startInstant);
+        execution.setEndGraph(endGraph);
 
-        return executionData;
+        return execution;
     }
 
 //    private void updateParticipatingTargets(DependenciesGraph graph) {
@@ -380,12 +380,12 @@ public class TaskProcess implements Serializable {
     private DependenciesGraph getLastGraphForExecutionDuplicated(StartPoint startPoint) {
         DependenciesGraph resGraph;
 
-        if (startPoint == StartPoint.FROM_SCRATCH || executionDataHistory.size() == 0) {
+        if (startPoint == StartPoint.FROM_SCRATCH || executionHistory.size() == 0) {
             resGraph = originalGraphDuplicate.duplicate();
             taskComplete = false;
         } else {
-            ExecutionData lastExecutionData = executionDataHistory.get(executionDataHistory.size() - 1);
-            resGraph = lastExecutionData.getEndGraph().duplicate();
+            Execution lastExecution = executionHistory.get(executionHistory.size() - 1);
+            resGraph = lastExecution.getEndGraph().duplicate();
         }
 
         resGraph.setName("Start Graph -- Execution " + getNextExecutionNum(startPoint));
@@ -400,19 +400,19 @@ public class TaskProcess implements Serializable {
         if (startPoint == StartPoint.FROM_SCRATCH) {
             nextExecutionNum = 1;
         } else {
-            nextExecutionNum = executionDataHistory.size() + 1;
+            nextExecutionNum = executionHistory.size() + 1;
         }
 
         return nextExecutionNum;
     }
 
-    private void checkIfTaskCompleted(ExecutionData executionData) {
-        taskComplete = determineTaskComplete(executionData.getEndGraph());
-        executionData.setTaskComplete(taskComplete);
+    private void checkIfTaskCompleted(Execution execution) {
+        taskComplete = determineTaskComplete(execution.getEndGraph());
+        execution.setTaskComplete(taskComplete);
     }
 
-    private void startProcessingTargets(DependenciesGraph workingGraph, ExecutionData executionData) {
-        QueueStateUpdate queue = getInitialTasks(workingGraph, executionData);
+    private void startProcessingTargets(DependenciesGraph workingGraph, Execution execution) {
+        QueueStateUpdate queue = getInitialTasks(workingGraph, execution);
 
         this.taskManager.getConsumerManager().getStartTargetProcessingConsumers().forEach(dependenciesGraphConsumer -> dependenciesGraphConsumer.accept(workingGraph));
         while (!queue.isEmpty()) {
@@ -420,7 +420,7 @@ public class TaskProcess implements Serializable {
         }
     }
 
-    private QueueStateUpdate getInitialTasks(DependenciesGraph workingGraph, ExecutionData executionData) {
+    private QueueStateUpdate getInitialTasks(DependenciesGraph workingGraph, Execution execution) {
         QueueStateUpdate queue = new QueueStateUpdate(this.taskManager.getConsumerManager());
 
         for (Target target : workingGraph.targets()) {
@@ -430,7 +430,7 @@ public class TaskProcess implements Serializable {
                         target,
                         activeConfiguration,
                         workingGraph,
-                        executionData));
+                        execution));
                 target.setTimeOfEntryIntoTaskQueue(Instant.now());
             }
         }
