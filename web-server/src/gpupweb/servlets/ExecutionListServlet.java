@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import logic.Engine;
 import task.Execution;
+import task.ExecutionManager;
 import task.execution.ExecutionDTO;
 import users.User;
 import users.UserDTO;
@@ -30,7 +31,12 @@ public class ExecutionListServlet extends HttpServlet {
         //returning JSON objects, not HTML
         response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
-            Collection<Execution> executions = Engine.getInstance().getExecutionManager().getExecutions();
+//            Collection<Execution> executions = Engine.getInstance().getExecutionManager().getExecutions();
+
+
+            ExecutionManager executionManager = ServletUtils.getExecutionManager(getServletContext());
+            Collection<Execution> executions = executionManager.getExecutions();
+
             Collection<ExecutionDTO> executionDTOS = new ArrayList<>();
 
             executions.forEach(execution -> {

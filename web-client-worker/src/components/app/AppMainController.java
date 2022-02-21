@@ -1,6 +1,8 @@
 package components.app;
 
 import components.dashboard.DashboardWorkerController;
+import components.execution.ExecutionManager;
+import components.execution.ThreadManager;
 import components.execution.processedtargets.TargetDTOTable;
 import components.login.LoginWorkerController;
 import events.LoginPerformedListener;
@@ -27,6 +29,9 @@ public class AppMainController {
     private List<LoginPerformedListener> loginPerformedListeners;
 
     private List<TargetDTOTable> processedTargets;
+    ExecutionManager executionManager;
+    ThreadManager threadManager;
+
 
     public AppMainController() {
         loginPerformedListeners = new LinkedList<>();
@@ -49,7 +54,11 @@ public class AppMainController {
         this.root.setCenter(login);
     }
 
-    public void loginSuccessful(String userName) {
+    public void loginSuccessful(String userName, Integer threadCount) {
+
+        threadManager = new ThreadManager(threadCount);
+        executionManager = new ExecutionManager(threadCount, this);
+
         displayMainApp();
 
         loginPerformedListeners.forEach(loginPerformedListener -> {
@@ -96,6 +105,12 @@ public class AppMainController {
     }
 
     public List<TargetDTOTable> getProcessedTargets() { return getProcessedTargets(); }
+
+    public void newTargetsReceived(List<TargetDTO> asList) {
+        if (asList.size() > 0) {
+            executionManager.acceptNewTargets(asList);
+        }
+    }
 }
 
 //

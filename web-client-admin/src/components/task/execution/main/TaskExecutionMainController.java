@@ -1,5 +1,6 @@
 package components.task.execution.main;
 
+import componentcode.executiontable.ExecutionDTOTable;
 import components.app.AppMainController;
 import components.graph.targettable.TargetDTOTable;
 import components.task.execution.dynamicpanel.TaskExecutionDynamicPanelController;
@@ -10,12 +11,23 @@ import events.ExecutionStartListener;
 import events.FileLoadedListener;
 import graph.DependenciesGraph;
 import graph.TargetDTO;
+import httpclient.HttpClientUtil;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.HttpUrl;
+import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 import task.Execution;
 import task.configuration.Configuration;
+import task.execution.ExecutionStatus;
+import utilsharedall.Constants;
+
+import java.io.IOException;
 
 public class TaskExecutionMainController implements FileLoadedListener, ExecutionStartListener, ExecutionEndListener {
     /* ---------------------------------------------------------------------------------------------------- */
@@ -117,7 +129,7 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
         }
 
         statusTablesComponentController.newFileLoaded();
-        dynamicPanelComponentController.newFileLoaded();
+//        dynamicPanelComponentController.newFileLoaded();
     }
 
     public void TaskSettingsEvent_UpdateChosenTargetsAction() {
@@ -144,8 +156,12 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
                 });
     }
 
-    public void startButtonPressed() {
-//        mainController.startExecutionButtonPressed();
+    public void event_ButtonPressed_StartExecution() {
+        mainController.event_ButtonPressed_StartExecution();
+    }
+
+    public void eventButtonPressed_PauseExecution() {
+        mainController.event_ButtonPressed_PauseExecution();
     }
 
     public void finishedProcessingTarget(TargetDTO targetDTO) {
@@ -163,7 +179,7 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
 
     @Override
     public void executionStarted(Configuration startingConfig) {
-        dynamicPanelComponentController.startExecution(startingConfig);
+        dynamicPanelComponentController.startExecution();
     }
 
     public void threadChangedDuringExecution(int oldValue, int newValue) {
@@ -202,9 +218,110 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
     public void reset() {
         clear();
     }
+
+    /**
+     * This method handles the event of a new execution being selected.
+     * It clears the current execution displayed and shows the new one.
+     */
+    public void event_ExecutionSelected(ExecutionDTOTable currentlySelectedRow) {
+        reset();
+        setWorkingGraph(new DependenciesGraph(currentlySelectedRow.getGraphDTO()));
+    }
+
+    public void sendServerRequest_ExecutionStart() {
+        String executionName = mainController.getChosenExecutionName();
+        sendServerRequest_ExecutionStatusUpdate(executionName, ExecutionStatus.EXECUTING);
+    }
+
+    public void sendServerRequest_ExecutionPause() {
+        String executionName = mainController.getChosenExecutionName();
+        sendServerRequest_ExecutionStatusUpdate(executionName, ExecutionStatus.PAUSED);
+    }
+
+    public void sendServerRequest_ExecutionStop() {
+        String executionName = mainController.getChosenExecutionName();
+        sendServerRequest_ExecutionStatusUpdate(executionName, ExecutionStatus.STOPPED);
+    }
+
+    public void sendServerRequest_ExecutionContinue() {
+        sendServerRequest_ExecutionStart();
+    }
+
+    private void sendServerRequest_ExecutionStatusUpdate(String executionName, ExecutionStatus executionStatus) {
+        // Request parameters:
+        // Execution name
+        // Operation status
+
+        if (executionName == null || executionStatus == null) {
+            return;
+        }
+
+
+        //noinspection ConstantConditions
+        String finalUrl = HttpUrl
+                .parse(Constants.EXECUTION_STATUS_UPDATE)
+                .newBuilder()
+                .addQueryParameter(Constants.QP_EXECUTION_NAME, executionName)
+                .addQueryParameter(Constants.QP_EXECUTION_STATUS, executionStatus.name())
+                .build()
+                .toString();
+
+//        updateHttpStatusLine("New request is launched for: " + finalUrl); // Aviad Code
+
+        HttpClientUtil.runAsync(finalUrl, new Callback() {
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                Platform.runLater(() ->
+                        getExecutionTextArea().appendText("Something went wrong with updating the status!" + Constants.LINE_SEPARATOR + e.getMessage()));
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                String responseBody = response.body().string();
+                if (response.code() != 200) {
+                    Platform.runLater(() ->
+                            getExecutionTextArea().appendText("Something went wrong with updating the status!" + Constants.LINE_SEPARATOR + responseBody));
+                } else {
+                    Platform.runLater(() -> {
+
+                        getExecutionTextArea().appendText("Status changed to " + executionStatus + "!" + Constants.LINE_SEPARATOR);
+//                        chatAppMainController.updateUserName(userName);   // Aviad code
+//                        chatAppMainController.switchToChatRoom();         // Aviad code
+
+                        invokeBasedOnStatus(executionStatus);
+                    });
+                }
+            }
+        });
+    }
+
+    private void invokeBasedOnStatus(ExecutionStatus executionStatus) {
+        switch (executionStatus) {
+            case NEW:
+                break;
+            case EXECUTING:
+                dynamicPanelComponentController.startExecution();
+                break;
+            case ENDED:
+                break;
+            case PAUSED:
+                dynamicPanelComponentController.pauseExecution();
+                break;
+            case STOPPED:
+                dynamicPanelComponentController.stopExecution();
+                break;
+        }
+    }
 }
 
 
 /* ---------------------------------------------------------------------------------------------------- */
 /* ------------------------------------------- BIND METHODS ------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------- */
+
+
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* ------------------------------------------- OLD METHODS -------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------- */

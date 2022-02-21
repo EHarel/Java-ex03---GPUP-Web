@@ -1,5 +1,6 @@
 package components.app;
 
+import componentcode.executiontable.ExecutionDTOTable;
 import components.css.Themes;
 import components.dashboard.DashboardController;
 import components.graph.alldata.GraphAllDataController;
@@ -89,7 +90,9 @@ public class AppMainController {
     private Stage primaryStage;
 
 
-    public boolean getAllowAnimations() { return allowAnimations.get(); }
+    public boolean getAllowAnimations() {
+        return allowAnimations.get();
+    }
 
     /* ------------------------------------------ CUSTOM FIELDS ------------------------------------------- */
     private String username;
@@ -117,9 +120,6 @@ public class AppMainController {
         graphManager = new GraphManager();
         configManager = new ConfigurationManager();
     }
-
-
-
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -339,7 +339,7 @@ public class AppMainController {
 
         loginController.getButton_Login().addEventHandler(ActionEvent.ACTION,
                 event -> {
-            // Try login to server
+                    // Try login to server
 
                     // If failed, present message
                     // If successful, switch views
@@ -361,7 +361,7 @@ public class AppMainController {
 
 
         menuController.getButtonDisableAnimations().selectedProperty().addListener((observable, oldValue, newValue) -> {
-            allowAnimations.set(! menuController.getButtonDisableAnimations().isSelected());
+            allowAnimations.set(!menuController.getButtonDisableAnimations().isSelected());
         });
 
 
@@ -547,7 +547,9 @@ public class AppMainController {
         graphChosenListeners.forEach(GraphChosenListener::graphChosen);
     }
 
-    public DependenciesGraph getChosenGraph() { return chosenGraph; }
+    public DependenciesGraph getChosenGraph() {
+        return chosenGraph;
+    }
 
     public void addGraphs(GraphDTO[] graphDTOs) {
         graphManager.addGraphs(graphDTOs);
@@ -577,6 +579,35 @@ public class AppMainController {
         this.primaryStage = primaryStage;
     }
 
+    public void event_ExecutionRowSelected(ExecutionDTOTable currentlySelectedRow) {
+        taskExecutionController.event_ExecutionSelected(currentlySelectedRow);
+    }
+
+
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------- EVENTS ---------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    public void event_ButtonPressed_StartExecution() {
+        // In the old-code section there is the old version of this method. Might be worth it to consider.
+
+        // Send
+        taskExecutionController.sendServerRequest_ExecutionStart();
+    }
+
+    public String getChosenExecutionName() {
+        return dashboardController.getChosenExecutionName();
+    }
+
+    public void event_ButtonPressed_PauseExecution() {
+
+        taskExecutionController.sendServerRequest_ExecutionPause();
+    }
+
+    public void event_ButtonPressed_StopExecution() {
+        taskExecutionController.sendServerRequest_ExecutionStop();
+    }
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -602,7 +633,6 @@ public class AppMainController {
 //
 //        threadNumCB.getSelectionModel().select(0);
 //    }
-
 
 
 //

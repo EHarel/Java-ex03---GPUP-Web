@@ -10,6 +10,7 @@ import task.configuration.ConfigurationDTO;
 import task.consumer.ConsumerExecutionSummary;
 import task.consumer.ConsumerManager;
 import task.consumer.ConsumerWriteTargetToFile;
+import task.execution.ExecutionStatus;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;
@@ -59,9 +60,9 @@ public class Engine implements Serializable {
 
 
 
-    public synchronized GraphManager getGraphManager() {
-        return graphManager;
-    }
+//    public synchronized GraphManager getGraphManager() {
+//        return graphManager;
+//    }
 
 
 
@@ -249,7 +250,7 @@ public class Engine implements Serializable {
     }
 
     private void addNewSaveObject(SaveObject saveObject) {
-        getGraphManager().addGraph(saveObject.getDependenciesGraph());
+//        getGraphManager().addGraph(saveObject.getDependenciesGraph());
 //        this.taskManager = new TaskManager(dependenciesGraph, saveObject.getMaxParallelism());
     }
 
@@ -282,15 +283,27 @@ public class Engine implements Serializable {
         taskManager.activeConfig_UpdateParticipatingTargets(taskType, participatingTargetNames);
     }
 
-    public synchronized  ExecutionManager getExecutionManager() {
-        return executionManager;
-    }
+//    public synchronized  ExecutionManager getExecutionManager() {
+//        return executionManager;
+//    }
 
-    public boolean addExecution(Execution execution) {
-        return getExecutionManager().addExecution(execution);
-    }
+//    public boolean addExecution(Execution execution) {
+//        return getExecutionManager().addExecution(execution);
+//    }
 
-    public boolean addUserToConfiguration(String executionName, String userName) {
-        return getExecutionManager().addUserToConfiguration(executionName, userName);
-    }
+//    public boolean addUserToConfiguration(String executionName, String userName) {
+//        return getExecutionManager().addUserToConfiguration(executionName, userName);
+//    }
+
+//    public boolean isExecutionCreator(String executionName, String userName) {
+//        return getExecutionManager().isExecutionCreator(executionName, userName);
+//    }
+
+//    public boolean updateExecutionStatus(String executionName, ExecutionStatus executionStatus) {
+//        return getExecutionManager().updateExecutionStatus(executionName, executionStatus);
+//    }
+
+//    public Collection<Target> getTargetsForUser(String username, Integer targetCount) {
+//        return getExecutionManager().getTargetsForUser(username, targetCount);
+//    }
 }

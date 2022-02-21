@@ -6,6 +6,7 @@ import graph.GraphManager;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
 import logic.Engine;
+import task.ExecutionManager;
 import users.UserManager;
 
 import static gpupweb.constants.Constants.INT_PARAMETER_ERROR;
@@ -15,6 +16,8 @@ public class ServletUtils {
 	private static final String USER_MANAGER_ATTRIBUTE_NAME = "userManager";
 	private static final String GRAPH_MANAGER_ATTRIBUTE_NAME = "graphManager";
 	private static final String CHAT_MANAGER_ATTRIBUTE_NAME = "chatManager";
+	private static final String EXECUTION_MANAGER_ATTRIBUTE_NAME = "executionManager";
+
 
 	/*
 	Note how the synchronization is done only on the question and\or creation of the relevant managers and once they exists -
@@ -23,6 +26,7 @@ public class ServletUtils {
 	private static final Object userManagerLock = new Object();
 	private static final Object graphManagerLock = new Object();
 	private static final Object chatManagerLock = new Object();
+	private static final Object executionManagerLock = new Object();
 
 	public static UserManager getUserManager(ServletContext servletContext) {
 		synchronized (userManagerLock) {
@@ -34,16 +38,26 @@ public class ServletUtils {
 		return (UserManager) servletContext.getAttribute(USER_MANAGER_ATTRIBUTE_NAME);
 	}
 
-	public static GraphManager getGraphManager(ServletContext servletContext) {
-		return Engine.getInstance().getGraphManager();
+	public static ExecutionManager getExecutionManager(ServletContext servletContext) {
+		synchronized (executionManagerLock) {
+			if (servletContext.getAttribute(EXECUTION_MANAGER_ATTRIBUTE_NAME) == null) {
+				servletContext.setAttribute(EXECUTION_MANAGER_ATTRIBUTE_NAME, new ExecutionManager());
+			}
+		}
 
-//		synchronized (graphManagerLock) {
-//			if (servletContext.getAttribute(GRAPH_MANAGER_ATTRIBUTE_NAME) == null) {
-//				servletContext.setAttribute(GRAPH_MANAGER_ATTRIBUTE_NAME, new GraphManager());
-//			}
-//		}
-//
-//		return (UserManager) servletContext.getAttribute(USER_MANAGER_ATTRIBUTE_NAME);
+		return (ExecutionManager) servletContext.getAttribute(EXECUTION_MANAGER_ATTRIBUTE_NAME);
+	}
+
+	public static GraphManager getGraphManager(ServletContext servletContext) {
+//		return Engine.getInstance().getGraphManager();
+
+		synchronized (graphManagerLock) {
+			if (servletContext.getAttribute(GRAPH_MANAGER_ATTRIBUTE_NAME) == null) {
+				servletContext.setAttribute(GRAPH_MANAGER_ATTRIBUTE_NAME, new GraphManager());
+			}
+		}
+
+		return (GraphManager) servletContext.getAttribute(GRAPH_MANAGER_ATTRIBUTE_NAME);
 	}
 
 //	public static ChatManager getChatManager(ServletContext servletContext) {

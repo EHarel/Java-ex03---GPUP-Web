@@ -93,8 +93,8 @@ public class ExecutionStatusTablesController {
 
 
     public void setWorkingGraph(DependenciesGraph workingGraph) {
-        this.workingGraph = workingGraph;
         clear();
+        this.workingGraph = workingGraph;
         if (workingGraph != null) {
             populateData();
             this.workingGraphStartingTargetCount = workingGraph.targets().size();
@@ -105,22 +105,22 @@ public class ExecutionStatusTablesController {
     private void populateData() {
         if (workingGraph != null) {
             workingGraph.targets().forEach(target -> {
-                tableAllTargetsComponentController.AppendTarget(target.toData(), workingGraph);
+                tableAllTargetsComponentController.AppendTarget(target.toDTO(), workingGraph);
                 switch (target.getTaskStatus().getTaskResult()) {
                     case UNPROCESSED: {
                         if (target.getTaskStatus().getTargetState() == TargetDTO.TargetState.SKIPPED) {
 //                            tableSkippedComponentController.AppendTarget(target.toData(), workingGraph);
                         } else {
-                            tableUnprocessedComponentController.AppendTarget(target.toData(), workingGraph);
+                            tableUnprocessedComponentController.AppendTarget(target.toDTO(), workingGraph);
                         }
                         break;
                     }
                     case FAILURE:
-                        tableFailedComponentController.AppendTarget(target.toData(), workingGraph);
+                        tableFailedComponentController.AppendTarget(target.toDTO(), workingGraph);
                         break;
                     case SUCCESS:
                     case SUCCESS_WITH_WARNINGS:
-                        tableSucceededComponentController.AppendTarget(target.toData(), workingGraph);
+                        tableSucceededComponentController.AppendTarget(target.toDTO(), workingGraph);
                         break;
                 }
             });

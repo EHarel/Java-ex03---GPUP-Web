@@ -7,11 +7,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class ThreadManager implements Serializable {
-//    private static final long serialVersionUID = 1; // 09-Dec-2021 - Creation
-    private static final long serialVersionUID = 2; // 13-Dec-2021 - Creation
-
-
+public class ThreadManager {
     private int maxParallelism;
     private int currentParallelism;
 

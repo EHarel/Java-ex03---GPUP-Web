@@ -106,10 +106,14 @@ public class ExecutionTableWorkerController implements LoginPerformedListener {
         sharedController.getAutoUpdateProperty().set(isActive);
     }
 
-    public void addMainController(AppMainController mainController) {
+    public void setMainController(AppMainController mainController) {
         this.mainController = mainController;
         this.mainController.addEventListener_LoginPerformed(this);
 
+    }
+
+    public void setDashboardController(DashboardWorkerController dashboardWorkerController) {
+        this.dashboardController = dashboardWorkerController;
     }
 
     public ExecutionDTOTable getCurrentlySelectedRow() {
@@ -119,9 +123,5 @@ public class ExecutionTableWorkerController implements LoginPerformedListener {
     @Override
     public void loginPerformed(String username) {
         this.sharedController.setUsername(username);
-    }
-
-    public void setDashboardController(DashboardWorkerController dashboardWorkerController) {
-        this.dashboardController = dashboardWorkerController;
     }
 }

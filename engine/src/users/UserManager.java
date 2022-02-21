@@ -1,6 +1,7 @@
 package users;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,8 +32,8 @@ public class UserManager {
     }
 
     public synchronized Set<User> getUsers() {
-//        return Collections.unmodifiableSet(users); // Aviad code
-        return users;
+        return Collections.unmodifiableSet(users); // Aviad code
+//        return users;
     }
 
     public boolean isUserExists(String username) {

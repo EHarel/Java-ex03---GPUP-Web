@@ -41,7 +41,7 @@ public class ConfigurationDTOCompilation extends ConfigurationDTO implements Clo
     }
 
     @Override
-    public ConfigurationDTO clone() {
+    public ConfigurationDTOCompilation clone() {
         return new ConfigurationDTOCompilation(
                 this.name,
                 this.threadCount,

@@ -44,6 +44,7 @@ public class LoginAdminController {
     @FXML
     public void initialize() {
         label_LoginResult.textProperty().bind(resultMessageProperty);
+        button_Login.setDefaultButton(true);
 //        util.http.HttpClientUtil.setCookieManagerLoggingFacility(line ->
 //                Platform.runLater(() ->
 //                        updateHttpStatusLine(line)));

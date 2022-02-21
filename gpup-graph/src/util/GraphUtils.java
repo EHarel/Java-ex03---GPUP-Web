@@ -124,7 +124,7 @@ public class GraphUtils {
             List<TargetDTO> dataPath = new ArrayList<>(path.size());
 
             for (Target target : path) {
-                dataPath.add(target.toData());
+                dataPath.add(target.toDTO());
             }
 
             data.add(dataPath);

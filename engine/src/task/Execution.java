@@ -1,7 +1,8 @@
 package task;
 
+import datastructure.QueueStateUpdate;
 import graph.DependenciesGraph;
-import graph.GraphDTO;
+import graph.Target;
 import graph.TargetDTO;
 import task.configuration.*;
 import task.execution.ExecutionDTO;
@@ -20,16 +21,19 @@ public class Execution implements Cloneable {
     protected final TaskType taskType;
     protected final int executionNumber;
     private final DependenciesGraph startingGraph;
+    private DependenciesGraph endGraph;
     private Configuration configuration;
     private TaskProcess.StartPoint startPoint;
     private ProcessedData processedData;
     protected boolean taskComplete;
-    private DependenciesGraph endGraph;
     private Instant startInstant;
     private Instant endInstant;
     private final Integer pricePerTarget;
     private ExecutionStatus executionStatus;
     private Collection<String> participatingWorkerNames;
+
+    private boolean startedRunning = false;
+    QueueStateUpdate queue;
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -55,7 +59,6 @@ public class Execution implements Cloneable {
         this.creatingUser = executionDTO.getCreatingUser();
         this.taskType = executionDTO.getTaskType();
         this.executionNumber = 0;
-        this.startingGraph = new DependenciesGraph(executionDTO.getGraphDTO());
         try {
             switch (taskType) {
                 case COMPILATION:
@@ -67,13 +70,18 @@ public class Execution implements Cloneable {
             }
         } catch (Exception ignore) {
         }
+        this.startingGraph = new DependenciesGraph(executionDTO.getGraphDTO());
 
         this.processedData = new ProcessedData(null);
         this.taskComplete = false; // TODO: should this be taken from the DTO as well?
         this.pricePerTarget = executionDTO.getPricePerTarget();
         this.executionStatus = executionDTO.getExecutionStatus();
         this.participatingWorkerNames = new ArrayList<>();
-        executionDTO.getParticipatingUsersNames().forEach(s -> {this.participatingWorkerNames.add(s); });
+        executionDTO.getParticipatingUsersNames().forEach(s -> {
+            this.participatingWorkerNames.add(s);
+        });
+
+        this.startingGraph.setConfigurationForTargets(configuration);
 
         // private TaskProcess.StartPoint startPoint;
     }
@@ -85,6 +93,10 @@ public class Execution implements Cloneable {
 
     public void setExecutionName(String executionName) {
         this.executionName = executionName;
+    }
+
+    public String getCreatingUser() {
+        return creatingUser;
     }
 
     public TaskType getTaskType() {
@@ -150,6 +162,167 @@ public class Execution implements Cloneable {
     public TargetDTO getSpecificTargetData(String targetName) {
         return this.processedData.getSpecificTargetData(targetName);
     }
+
+    public ExecutionStatus getExecutionStatus() {
+        return executionStatus;
+    }
+
+    public Collection<String> getParticipatingWorkerNames() {
+        return participatingWorkerNames;
+    }
+
+    public synchronized void setExecutionStatus(ExecutionStatus executionStatus) {
+        this.executionStatus = executionStatus;
+
+        if (executionStatus == ExecutionStatus.EXECUTING) {
+            if (!startedRunning) {
+                // First run!
+                startedRunning = true;
+                startExecution();
+            }
+        }
+    }
+
+
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* -------------------------------------------- EXECUTION --------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    private void startExecution() {
+
+//        if (!executionValidityChecks(startPoint)) {
+//            return;
+//        }
+
+        this.endGraph = this.startingGraph.duplicate();
+
+        this.endGraph.setConfigurationForTargets(this.configuration);
+
+        prepareQueue(this.endGraph, this);
+//        executionHistory.add(execution);
+//        activeConfiguration = rememberConfigurationBetweenExecutions ? activeConfiguration : null;
+//        checkIfTaskCompleted(execution);
+//        execution.setEndInstant(Instant.now());
+    }
+
+    private void prepareQueue(DependenciesGraph workingGraph, Execution execution) {
+//        QueueStateUpdate queue = getInitialTasks(workingGraph, execution);
+        this.queue = getInitialTasks(workingGraph, execution);
+
+
+//        this.taskManager.getConsumerManager().getStartTargetProcessingConsumers().forEach(dependenciesGraphConsumer -> dependenciesGraphConsumer.accept(workingGraph));
+//        while (!queue.isEmpty()) {
+//            taskManager.getThreadManager().execute(queue.dequeue());
+//        }
+    }
+
+    private QueueStateUpdate getInitialTasks(DependenciesGraph workingGraph, Execution execution) {
+//        QueueStateUpdate queue = new QueueStateUpdate(this.taskManager.getConsumerManager());
+        QueueStateUpdate queue = new QueueStateUpdate(null);
+
+        TaskType type = this.configuration.getTaskType();
+        Configuration activeConfiguration = this.configuration;
+
+        for (Target target : workingGraph.targets()) {
+            if (targetCanBeProcessed(target)) {
+                queue.enqueue(TaskFactory.getActualTask(
+                        type,
+                        target,
+                        activeConfiguration,
+                        workingGraph,
+                        execution));
+                target.setTimeOfEntryIntoTaskQueue(Instant.now());
+            }
+        }
+
+        return queue;
+    }
+
+    public static boolean targetCanBeProcessed(Target target) {
+        if (target.getTaskStatus().getTargetState() == TargetDTO.TargetState.SKIPPED) {
+            return false;
+        }
+
+        if (!targetStateAllowsInsertion(target)) {
+            return false;
+        }
+
+        if (!targetDependenciesAllowProcessing(target)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static boolean targetDependenciesAllowProcessing(Target target) {
+        boolean dependenciesAllow = true;
+
+        for (Target dependencyTarget : target.getTargetsThisIsDependentOn()) {
+            if (!targetSucceededWithOrWithoutWarnings(dependencyTarget)) {
+                dependenciesAllow = false;
+                break;
+            }
+        }
+
+        return dependenciesAllow;
+    }
+
+    public static boolean targetSucceededWithOrWithoutWarnings(Target target) {
+        boolean succeededWithOrWithoutWarnings = false;
+
+        if (target.getTaskStatus().getTargetState() == TargetDTO.TargetState.FINISHED) {
+            switch (target.getTaskStatus().getTaskResult()) {
+                case SUCCESS_WITH_WARNINGS:
+                case SUCCESS:
+                    succeededWithOrWithoutWarnings = true;
+                    break;
+            }
+        }
+
+        return succeededWithOrWithoutWarnings;
+    }
+
+    /**
+     * Checks if the target can be processed, solely on its current state.
+     * This does not check for neighbors' state. That needs to be done separately.
+     * Note that WAITING state means target is already in datastructure.Queue, and thus returns false, because it cannot be inserted again.
+     *
+     * @param target target to analyze.
+     * @return true if target can be inserted.
+     */
+    private static boolean targetStateAllowsInsertion(Target target) {
+        boolean allowsInsertion = false;
+
+        switch (target.getTaskStatus().getTargetState()) {
+            case IN_PROCESS:
+            case WAITING:
+                allowsInsertion = false;
+                break;
+            case FINISHED:
+                switch (target.getTaskStatus().getTaskResult()) {
+                    case SUCCESS:
+                    case SUCCESS_WITH_WARNINGS:
+                        allowsInsertion = false;
+                        break;
+                    case FAILURE:
+                        allowsInsertion = true;
+                        break;
+                }
+                break;
+            default:
+                allowsInsertion = true;
+                break;
+        }
+
+        return allowsInsertion;
+    }
+
+    public Target getNextTargetFromQueue() {
+        Task nextTask = queue.dequeue();
+        return nextTask.getTarget();
+    }
+
 
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
@@ -230,6 +403,20 @@ public class Execution implements Cloneable {
         return added;
     }
 
+    public boolean containsWorker(String username) {
+        return getParticipatingWorkerNames().contains(username);
+    }
+
+    public Target releaseTargetFromQueue() {
+        Target target = null;
+        Task task = queue.dequeue();
+
+        if (task != null) {
+            target = task.getTarget();
+        }
+
+        return target;
+    }
 
 
     /* ---------------------------------------------------------------------------------------------------- */

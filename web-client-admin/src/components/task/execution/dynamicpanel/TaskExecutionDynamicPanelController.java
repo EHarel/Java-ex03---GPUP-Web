@@ -7,19 +7,15 @@ import components.task.execution.main.TaskExecutionMainController;
 import graph.DependenciesGraph;
 import graph.TargetDTO;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 import logic.Engine;
 import task.Execution;
-import task.configuration.Configuration;
 
 public class TaskExecutionDynamicPanelController {
     @FXML private Parent mainScene;
@@ -35,9 +31,10 @@ public class TaskExecutionDynamicPanelController {
     @FXML
     private Button continueButton;
     @FXML
-    private TextArea taskExecutionUpdatesTA;
+    private Button buttonStop;
     @FXML
-    private ChoiceBox<Integer> threadNumCB;
+    private TextArea taskExecutionUpdatesTA;
+
 
     @FXML private Parent specificTargetDetailsComponent;
     @FXML private SpecificTargetController specificTargetDetailsComponentController;
@@ -61,10 +58,10 @@ public class TaskExecutionDynamicPanelController {
         startButton.disableProperty().bind(isExecuting);
         continueButton.disableProperty().bind(isPaused.not());
         pauseButton.disableProperty().bind(isPaused);
-        threadNumCB.disableProperty().bind(isPaused.not());
+//        threadNumCB.disableProperty().bind(isPaused.not());
         buttonResetForNewExecution.disableProperty().bind(isExecuting);
 
-        setThreadChoiceBoxHandler();
+//        setThreadChoiceBoxHandler();
 
         reset();
     }
@@ -72,19 +69,6 @@ public class TaskExecutionDynamicPanelController {
 
     public void setMainAppController(AppMainController mainController) {
         this.mainAppController = mainController;
-    }
-
-    private void setThreadChoiceBoxHandler() {
-        threadNumCB.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                if (isExecuting.get()) {
-                    if (! oldValue.equals(newValue)) {
-                        threadNumNewValueDuringExecution = threadNumCB.getItems().get(newValue.intValue());
-                    }
-                }
-            }
-        });
     }
 
     private void updateTextAreaWithThreadChange(int oldValue, int newValue) {
@@ -115,11 +99,16 @@ public class TaskExecutionDynamicPanelController {
 
     @FXML
     void startButtonActionListener(ActionEvent event) {
-        taskExecutionMainController.startButtonPressed();
+        taskExecutionMainController.event_ButtonPressed_StartExecution();
+    }
+
+    @FXML void buttonStopActionListener(ActionEvent event) {
+        mainAppController.event_ButtonPressed_StopExecution();
     }
 
     @FXML
     void pauseButtonActionListener(ActionEvent event) {
+        taskExecutionMainController.eventButtonPressed_PauseExecution();
         if (isExecuting.get()) {
             taskExecutionUpdatesTA.appendText("Pausing execution, this might take a moment...\n\n");
             isPaused.set(true);
@@ -146,45 +135,12 @@ public class TaskExecutionDynamicPanelController {
         }
     }
 
-    public void startExecution(Configuration startingConfig) {
+    public void startExecution() {
         isPaused.set(false);
         isExecuting.set(true);
         taskExecutionUpdatesTA.appendText("Starting execution...\n\n");
 //        startButton.disableProperty().set(true);
-        updateStartingThreadCount(startingConfig);
-    }
-
-    private void updateStartingThreadCount(Configuration startingConfig) {
-        int startThreadCount = startingConfig.getNumberOfThreads();
-        threadNumCBSetNewSelectedNumber(startThreadCount);
-        threadNumValueDuringPause = startThreadCount;
-        threadNumNewValueDuringExecution = startThreadCount;
-    }
-
-    /**
-     * Clears the old selection (if exists) and highlights the new item by the given number.
-     */
-    private void threadNumCBSetNewSelectedNumber(int numberToSelect) {
-        // Check if there is already a selected number
-        Integer selectedInteger = threadNumCB.getSelectionModel().getSelectedItem();
-        if (selectedInteger != null) {
-            if (selectedInteger.intValue() == numberToSelect) {
-                return;
-            } else {
-                threadNumCB.getSelectionModel().clearSelection();
-            }
-        }
-
-        // Update
-        int index = 0;
-        for (Integer integer : threadNumCB.getItems()) {
-            if (integer == numberToSelect) {
-                threadNumCB.getSelectionModel().select(index);
-                return;
-            }
-
-            index++;
-        }
+//        updateStartingThreadCount(startingConfig);
     }
 
     public void finishedProcessingTarget(TargetDTO targetDTO) {
@@ -197,16 +153,18 @@ public class TaskExecutionDynamicPanelController {
         taskExecutionUpdatesTA.appendText(str);
     }
 
-    public void newFileLoaded() {
-//        AppMainController.setThreadNumberChoiceBox(threadNumCB);
-        reset();
-    }
-
     private void reset() {
         isPaused.set(true);
         taskExecutionUpdatesTA.clear();
         specificTargetDetailsComponentController.clear();
         isExecuting.set(false);
+    }
+
+    public void pauseExecution() {
+
+    }
+
+    public void stopExecution() {
     }
 
     public void endExecution(Execution execution) {
@@ -236,3 +194,66 @@ public class TaskExecutionDynamicPanelController {
         specificTargetDetailsComponentController.populateData(newValue, taskProcessWorkingGraph);
     }
 }
+
+
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------- */
+/* --------------------------------------------- OLD CODE --------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------- */
+
+/*
+
+
+    private void updateStartingThreadCount(Configuration startingConfig) {
+        int startThreadCount = startingConfig.getNumberOfThreads();
+        threadNumCBSetNewSelectedNumber(startThreadCount);
+        threadNumValueDuringPause = startThreadCount;
+        threadNumNewValueDuringExecution = startThreadCount;
+    }
+
+    /**
+     * Clears the old selection (if exists) and highlights the new item by the given number.
+     */
+//private void threadNumCBSetNewSelectedNumber(int numberToSelect) {
+//    // Check if there is already a selected number
+//    Integer selectedInteger = threadNumCB.getSelectionModel().getSelectedItem();
+//    if (selectedInteger != null) {
+//        if (selectedInteger.intValue() == numberToSelect) {
+//            return;
+//        } else {
+//            threadNumCB.getSelectionModel().clearSelection();
+//        }
+//    }
+//
+//    // Update
+//    int index = 0;
+//    for (Integer integer : threadNumCB.getItems()) {
+//        if (integer == numberToSelect) {
+//            threadNumCB.getSelectionModel().select(index);
+//            return;
+//        }
+//
+//        index++;
+//    }
+//}
+
+/*
+    private void setThreadChoiceBoxHandler() {
+        threadNumCB.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                if (isExecuting.get()) {
+                    if (! oldValue.equals(newValue)) {
+                        threadNumNewValueDuringExecution = threadNumCB.getItems().get(newValue.intValue());
+                    }
+                }
+            }
+        });
+    }
+
+ */
+
+
+

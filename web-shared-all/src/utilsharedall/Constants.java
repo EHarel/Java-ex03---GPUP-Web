@@ -10,7 +10,10 @@ public class Constants {
     // Query Parameter Constants
     public final static String QP_USERTYPE = "usertype";
     public final static String QP_USERNAME = "username";
-    public final static String QP_EXECUTIONNAME = "executionName";
+    public final static String QP_EXECUTION_NAME = "executionName";
+    public final static String QP_EXECUTION_STATUS = "executionStatus";
+    public final static String QP_TARGET_COUNT = "targetCount";
+
 
     public final static String BP_EXECUTION_DTO = "executionDTO";
 
@@ -26,10 +29,15 @@ public class Constants {
     public final static String GRAPH_LIST = FULL_SERVER_PATH + "/graphlist";
     public final static String EXECUTION_LIST = FULL_SERVER_PATH + "/executionlist";
 
+    public final static String EXECUTION_TARGET_FETCH = FULL_SERVER_PATH + "/execution/targets";
+
+
+
     public final static String FILE_UPLOAD = FULL_SERVER_PATH + "/file-upload";
 
     public final static String EXECUTION_UPLOAD = FULL_SERVER_PATH + "/execution/upload";
     public final static String EXECUTION_SUBSCRIBE = FULL_SERVER_PATH + "/execution/subscribe";
+    public final static String EXECUTION_STATUS_UPDATE = FULL_SERVER_PATH + "/execution/status";
 
 
 

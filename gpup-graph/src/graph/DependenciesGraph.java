@@ -441,7 +441,7 @@ public class DependenciesGraph implements Serializable {
         Set<TargetDTO> targetDTOs = new HashSet<>();
 
         targets.values().forEach(target -> {
-            targetDTOs.add(target.toData());
+            targetDTOs.add(target.toDTO());
         });
 
         return targetDTOs;
@@ -463,7 +463,7 @@ public class DependenciesGraph implements Serializable {
 
         for (Target target : targets.values()) {
             if (target.getDependency() == dependency) {
-                targetDTOList.add(target.toData());
+                targetDTOList.add(target.toDTO());
             }
         }
 
@@ -478,7 +478,7 @@ public class DependenciesGraph implements Serializable {
             return null;
         }
 
-        return target.toData();
+        return target.toDTO();
     }
 
      
@@ -490,7 +490,7 @@ public class DependenciesGraph implements Serializable {
             Collection<Target> collection = target.getTargetsThisIsRequiredFor();
             if (collection != null) {
                 for (Target targetDependency : collection) {
-                    dependencies.add(targetDependency.toData());
+                    dependencies.add(targetDependency.toDTO());
                 }
             }
         }
@@ -551,7 +551,7 @@ public class DependenciesGraph implements Serializable {
             Collection<Target> collection = target.getTargetsThisIsDependentOn();
             if (collection != null) {
                 for (Target targetDependency : collection) {
-                    dependencies.add(targetDependency.toData());
+                    dependencies.add(targetDependency.toDTO());
                 }
             }
         }
@@ -569,7 +569,7 @@ public class DependenciesGraph implements Serializable {
         List<TargetDTO> targetData = new ArrayList<>();
 
         for (Target target : targets.values()) {
-            targetData.add(target.toData());
+            targetData.add(target.toDTO());
         }
 
         return targetData;
@@ -579,7 +579,7 @@ public class DependenciesGraph implements Serializable {
         Map<String, TargetDTO> targetsData = new HashMap<>(targets.size());
 
         for (Target target : targets.values()) {
-            targetsData.put(target.getName(), target.toData());
+            targetsData.put(target.getName(), target.toDTO());
         }
 
         return targetsData;
@@ -678,7 +678,7 @@ public class DependenciesGraph implements Serializable {
 
             while (!targetQ.isEmpty()) {
                 Target currTarget = targetQ.dequeue();
-                targetDataQ.enqueue(currTarget.toData());
+                targetDataQ.enqueue(currTarget.toDTO());
             }
         }
 
@@ -753,7 +753,8 @@ public class DependenciesGraph implements Serializable {
 
     public DependenciesGraph duplicate() {
         DependenciesGraph duplicateGraph = new DependenciesGraph();
-        duplicateGraph.setName(this.name + " (Duplicate)");
+//        duplicateGraph.setName(this.name + " (Duplicate)");
+        duplicateGraph.setName(this.name);
 
         duplicationAddTargetsWithoutDependencies(duplicateGraph);
         duplicationAddDependencies(duplicateGraph);
@@ -958,6 +959,12 @@ public class DependenciesGraph implements Serializable {
         }
 
         return pricePerTarget;
+    }
+
+    public void setConfigurationForTargets(Configuration configuration) {
+        targets.values().forEach(target -> {
+            target.getTaskStatus().setConfig(configuration);
+        });
     }
 
 //

@@ -1,7 +1,10 @@
 package gpupweb.servlets;
 
 import exception.*;
+import file.FileManager;
+import gpupweb.utils.ServletUtils;
 import gpupweb.utils.SessionUtils;
+import graph.DependenciesGraph;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -44,10 +47,14 @@ public class FileUploadServlet extends HttpServlet {
             //to write the content of the file to a string
             fileContent.append(readFromInputStream(part.getInputStream()));
 
-            Engine engine = Engine.getInstance();
+//            Engine engine = Engine.getInstance();
 
             try {
-                engine.loadXMLFromInputStream(part.getInputStream(), usernameFromSession);
+//                engine.loadXMLFromInputStream(part.getInputStream(), usernameFromSession);
+
+                DependenciesGraph graph = FileManager.getGraphFromXMLInputStreamIfValid(part.getInputStream(), usernameFromSession);
+                ServletUtils.getGraphManager(getServletContext()).addGraph(graph);
+
             } catch (JAXBException e) {
                 e.printStackTrace();
             } catch (ExistingItemException e) {

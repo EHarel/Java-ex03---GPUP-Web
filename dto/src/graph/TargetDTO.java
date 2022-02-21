@@ -1,6 +1,8 @@
 package graph;
 
 import task.configuration.ConfigurationDTO;
+import task.configuration.ConfigurationDTOCompilation;
+import task.configuration.ConfigurationDTOSimulation;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -138,6 +140,12 @@ public class TargetDTO implements Serializable, Cloneable {
      * (5) All targets that may have closed down to processing (FROZEN) due to this one (if it FAILED)
      */
     public static class TaskStatusDTO implements Serializable, Cloneable {
+        public task.configuration.ConfigurationDTO getConfigData() {
+            ConfigurationDTO configDTO = configDTOComp != null ? configDTOComp : configDTOSim;
+
+            return configDTO;
+        }
+
         public enum TaskResult implements Serializable, Cloneable {
             SUCCESS, SUCCESS_WITH_WARNINGS, FAILURE, UNPROCESSED
         }
@@ -148,7 +156,13 @@ public class TargetDTO implements Serializable, Cloneable {
         private final boolean participatesInExecution;
         private final Instant startInstant;
         private final Instant endInstant;
-        private final ConfigurationDTO configData;
+
+        // Changes for ex03 json constructors
+//        private final ConfigurationDTO configData;
+        private ConfigurationDTOSimulation configDTOSim;
+        private ConfigurationDTOCompilation configDTOComp;
+
+
         private final TaskResult taskResult;
         private final TargetState targetState;
         private final Collection<String> targetsOpenedAsResult;
@@ -161,7 +175,9 @@ public class TargetDTO implements Serializable, Cloneable {
                              boolean participatesInExecution,
                              Instant startInstant,
                              Instant endInstant,
-                             ConfigurationDTO configData,
+//                             ConfigurationDTO configData,
+                             ConfigurationDTOSimulation configDTOSim,
+                             ConfigurationDTOCompilation configDTOComp,
                              TaskResult taskResult,
                              TargetState taskState,
                              Collection<String> targetsThatAreWaitingAsResult,
@@ -172,7 +188,11 @@ public class TargetDTO implements Serializable, Cloneable {
             this.participatesInExecution = participatesInExecution;
             this.startInstant = startInstant;
             this.endInstant = endInstant;
-            this.configData = configData;
+
+//            this.configData = configData;
+            this.configDTOComp = configDTOComp;
+            this.configDTOSim = configDTOSim;
+
             this.taskResult = taskResult;
             this.targetState = taskState;
             this.targetsOpenedAsResult = targetsThatAreWaitingAsResult;
@@ -213,11 +233,35 @@ public class TargetDTO implements Serializable, Cloneable {
             return targetsSkippedAsResult_AllPaths;
         }
 
-        public ConfigurationDTO getConfigData() {
-            return configData;
+        public String getErrorDetails() {return this.errorDetails; }
+
+//        public ConfigurationDTO getConfigData() {
+//            return configData;
+//        }
+
+        public ConfigurationDTOSimulation getConfigDTOSim() {
+            return configDTOSim;
         }
 
-        public String getErrorDetails() {return this.errorDetails; }
+        public void setConfigDTOSim(ConfigurationDTOSimulation configDTOSim) {
+            this.configDTOSim = configDTOSim;
+        }
+
+        public ConfigurationDTOCompilation getConfigDTOComp() {
+            return configDTOComp;
+        }
+
+        public void setConfigDTOComp(ConfigurationDTOCompilation configDTOComp) {
+            this.configDTOComp = configDTOComp;
+        }
+
+        public TaskResult getTaskResult() {
+            return taskResult;
+        }
+
+        public TargetState getTargetState() {
+            return targetState;
+        }
 
         @Override
         public TaskStatusDTO clone() {
@@ -225,9 +269,21 @@ public class TargetDTO implements Serializable, Cloneable {
             Collection<String> skippedClone = cloneCollection(targetsSkippedAsResult);
             Collection<List<String>> skippedAllPaths = clonePaths(targetsSkippedAsResult_AllPaths);
 
-            ConfigurationDTO configData = null;
-            if (this.configData != null) {
-                configData = this.configData.clone();
+
+
+//            ConfigurationDTO configData = null;
+//            if (this.configData != null) {
+//                configData = this.configData.clone();
+//            }
+
+            ConfigurationDTOCompilation DTOCompConfig = null;
+            if (this.configDTOComp != null) {
+                DTOCompConfig = this.configDTOComp.clone();
+            }
+
+            ConfigurationDTOSimulation DTOSimConfig = null;
+            if (this.configDTOSim != null) {
+                DTOSimConfig = this.configDTOSim.clone();
             }
 
             return new TaskStatusDTO(
@@ -235,7 +291,9 @@ public class TargetDTO implements Serializable, Cloneable {
                     this.participatesInExecution,
                     this.startInstant,
                     this.endInstant,
-                    configData,
+//                    configData,
+                    DTOSimConfig,
+                    DTOCompConfig,
                     this.taskResult,
                     this.targetState,
                     openedClone,

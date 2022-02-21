@@ -60,6 +60,25 @@ public class FileManager {
         }
     }
 
+    /**
+     *
+     * @return graph if the file is valid, otherwise null or exceptions.
+     */
+    public static DependenciesGraph getGraphFromXMLInputStreamIfValid(InputStream inputStream, String uploadingUser) throws
+            FileNotFoundException,
+            JAXBException,
+            ExistingItemException,
+            DependencyOnNonexistentTargetException,
+            ImmediateCircularDependencyException,
+            NullOrEmptyStringException,
+            InvalidInputRangeException,
+            NonexistentTargetException,
+            SerialSetNameRepetitionException {
+        SaveObject saveObject = FileManager.loadXMLFromInputStream(inputStream, uploadingUser);
+
+        return saveObject.getDependenciesGraph();
+    }
+
     // Code from ex01 and ex02
 //    /**
 //     * This method also updates the file path to save the reports into.

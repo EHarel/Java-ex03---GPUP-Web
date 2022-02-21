@@ -383,7 +383,6 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
             }
 
             updateSelectedTargets(selectedTargets);
-            mainController.TaskSettingsEvent_updateChosenButtonAction();
         });
     }
 

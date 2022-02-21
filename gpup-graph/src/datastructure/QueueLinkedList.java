@@ -3,6 +3,7 @@ package datastructure;
 public class QueueLinkedList<T> implements Queue<T> {
     QueueNode oldestNode;
     QueueNode youngestNode;
+    int size = 0;
 
     /**
      *
@@ -16,6 +17,7 @@ public class QueueLinkedList<T> implements Queue<T> {
 
         QueueNode<T> temp = this.oldestNode;
         this.oldestNode = this.oldestNode.getNext();
+        size--;
 
         if (this.oldestNode == null) {
             this.youngestNode = null;
@@ -35,6 +37,7 @@ public class QueueLinkedList<T> implements Queue<T> {
 
         this.youngestNode.setNext(temp);
         this.youngestNode = temp;
+        size++;
     }
 
     @Override
