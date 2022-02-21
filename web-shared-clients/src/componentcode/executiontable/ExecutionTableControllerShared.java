@@ -21,7 +21,7 @@ public class ExecutionTableControllerShared {
 
 
     public ExecutionTableControllerShared(TableView<ExecutionDTOTable> usersTable) {
-        autoUpdate = new SimpleBooleanProperty();
+        this.autoUpdate = new SimpleBooleanProperty();
         this.usersTable = usersTable;
         this.username = null;
 
@@ -39,7 +39,7 @@ public class ExecutionTableControllerShared {
                 this::updateExecutionList,
                 this.username);
         timer = new Timer();
-        timer.schedule(listRefresher, Constants.REFRESH_RATE, Constants.REFRESH_RATE);
+        timer.schedule(listRefresher, Constants.REFRESH_RATE_EXECUTIONS, Constants.REFRESH_RATE_EXECUTIONS);
     }
 
     private void updateExecutionList(List<ExecutionDTOTable> list) {

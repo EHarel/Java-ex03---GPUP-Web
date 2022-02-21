@@ -2,19 +2,21 @@ package gpupweb.servlets;
 
 import gpupweb.utils.ServletUtils;
 import gpupweb.utils.SessionUtils;
+import graph.Target;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import logic.Engine;
-import task.ExecutionManager;
+import task.execution.ExecutionStatus;
 import utilsharedall.Constants;
 
 import java.io.IOException;
 
-public class ExecutionSubscribeServlet extends HttpServlet {
+public class ExecutionStatusUpdateServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        System.out.println("[ExecutionStatusUpdateServlet] Start");
         response.setContentType("text/plain;charset=UTF-8");
         String usernameFromSession = SessionUtils.getUsername(request);
 
@@ -23,15 +25,29 @@ public class ExecutionSubscribeServlet extends HttpServlet {
             response.getOutputStream().print("User not logged in");
         } else {
             String executionNameFromParameter = request.getParameter(Constants.QP_EXECUTION_NAME);
-            ExecutionManager executionManager = ServletUtils.getExecutionManager(getServletContext());
 
-            if (executionManager.addUserToConfiguration(executionNameFromParameter, usernameFromSession)) {
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getOutputStream().print("User added!");
+//            boolean isUploadingUser = Engine.getInstance().isExecutionCreator(executionNameFromParameter, usernameFromSession);
+
+            boolean isUploadingUser = ServletUtils.getExecutionManager(getServletContext()).isExecutionCreator(executionNameFromParameter, usernameFromSession);
+            isUploadingUser = true; // For debugging. TODO: remove this when done
+
+            if (!isUploadingUser) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getOutputStream().print("User is not creator of given task.");
             } else {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                response.getOutputStream().print("User already part of execution work force.");
+                ExecutionStatus executionStatus = ExecutionStatus.valueOf(request.getParameter(Constants.QP_EXECUTION_STATUS));
+
+                // TODO: code to check current status
+                if (ServletUtils.getExecutionManager(getServletContext()).updateExecutionStatus(executionNameFromParameter, executionStatus)) {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getOutputStream().print("Status updated.");
+                } else {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getOutputStream().print("Something went wrong :(");
+                }
             }
+
+            System.out.println("[ExecutionStatusUpdateServlet] End");
         }
     }
 

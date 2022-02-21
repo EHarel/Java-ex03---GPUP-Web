@@ -11,5 +11,8 @@
     <orderEntry type="library" name="okHttp" level="project" />
     <orderEntry type="module" module-name="web-shared-all" />
     <orderEntry type="module" module-name="web-shared-clients" />
+    <orderEntry type="module" module-name="gpup-graph" />
+    <orderEntry type="library" name="gson-2.1" level="project" />
+    <orderEntry type="module" module-name="gpup-configuration" />
   </component>
 </module>

@@ -102,7 +102,7 @@ public class LoginWorkerController {
                             resultMessageProperty.set("Something went wrong: " + responseBody));
                 } else {
                     Platform.runLater(() -> {
-                        appMainController.loginSuccessful(userName);
+                        appMainController.loginSuccessful(userName, threadCount);
 //                        chatAppMainController.updateUserName(userName);   // Aviad code
 //                        chatAppMainController.switchToChatRoom();         // Aviad code
                     });

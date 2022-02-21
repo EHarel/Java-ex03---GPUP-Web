@@ -111,12 +111,12 @@ public class ConfigurationCompilation extends Configuration implements Serializa
     }
 
     @Override
-    public ConfigurationDTO toDTO() {
+    public ConfigurationDTOCompilation toDTO() {
         return new ConfigurationDTOCompilation(this.name, this.numberOfThreads, this.sourceCodePath, this.outPath, this.outDirectoryCreated);
     }
 
     @Override
-    public Configuration clone() {
+    public ConfigurationCompilation clone() {
         ConfigurationCompilation configComp = null;
 
         try {

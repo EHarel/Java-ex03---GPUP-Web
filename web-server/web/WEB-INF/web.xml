@@ -27,6 +27,14 @@
         <servlet-name>ExecutionSubscribeServlet</servlet-name>
         <servlet-class>gpupweb.servlets.ExecutionSubscribeServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ExecutionStatusUpdateServlet</servlet-name>
+        <servlet-class>gpupweb.servlets.ExecutionStatusUpdateServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ExecutionTargetFetchServlet</servlet-name>
+        <servlet-class>gpupweb.servlets.ExecutionTargetFetchServlet</servlet-class>
+    </servlet>
 
     <!-- MAPPING -->
     <servlet-mapping>
@@ -52,5 +60,13 @@
     <servlet-mapping>
         <servlet-name>ExecutionSubscribeServlet</servlet-name>
         <url-pattern>/execution/subscribe</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExecutionStatusUpdateServlet</servlet-name>
+        <url-pattern>/execution/status</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExecutionTargetFetchServlet</servlet-name>
+        <url-pattern>/execution/targets</url-pattern>
     </servlet-mapping>
 </web-app>

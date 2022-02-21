@@ -14,6 +14,7 @@
          <children>
             <Label layoutX="33.0" layoutY="99.0" text="Enter Username:" />
             <TextField fx:id="textField_Username" layoutX="33.0" layoutY="116.0" prefHeight="25.0" prefWidth="457.0" />
+            <ComboBox fx:id="comboBox_ThreadChoice" layoutX="33.0" layoutY="179.0" prefHeight="25.0" prefWidth="94.0" />
             <Button fx:id="button_Login" layoutX="251.0" layoutY="223.0" mnemonicParsing="false" onAction="#onButton_LoginAction" prefHeight="25.0" prefWidth="86.0" text="Login" />
             <Label fx:id="label_LoginResult" layoutX="35.0" layoutY="286.0" prefHeight="99.0" prefWidth="544.0" wrapText="true" />
             <Label layoutX="33.0" layoutY="33.0" prefHeight="70.0" prefWidth="536.0" text="Welcome to GPUP! (Worker)">
@@ -21,7 +22,6 @@
                   <Font name="Aharoni Bold" size="36.0" />
                </font>
             </Label>
-            <ComboBox fx:id="comboBox_ThreadChoice" layoutX="33.0" layoutY="179.0" prefHeight="25.0" prefWidth="94.0" />
             <Label layoutX="33.0" layoutY="162.0" text="Choose how many threads:" />
          </children>
       </AnchorPane>

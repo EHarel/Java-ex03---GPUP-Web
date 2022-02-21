@@ -18,7 +18,6 @@ import okhttp3.HttpUrl;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import utilsharedall.Constants;
-import utilsharedall.UserType;
 
 import java.io.IOException;
 
@@ -61,7 +60,7 @@ public class DashboardWorkerController implements LoginPerformedListener {
         String finalUrl = HttpUrl
                 .parse(Constants.EXECUTION_SUBSCRIBE)
                 .newBuilder()
-                .addQueryParameter(Constants.QP_EXECUTIONNAME, executionDTOTable.getExecutionName())
+                .addQueryParameter(Constants.QP_EXECUTION_NAME, executionDTOTable.getExecutionName())
                 .build()
                 .toString();
 
@@ -96,7 +95,7 @@ public class DashboardWorkerController implements LoginPerformedListener {
     public void setMainController(AppMainController mainController) {
         this.mainController = mainController;
         this.mainController.addEventListener_LoginPerformed(this);
-        this.component_ExecutionTableWorkerController.addMainController(mainController);
+        this.component_ExecutionTableWorkerController.setMainController(mainController);
     }
 
     @Override

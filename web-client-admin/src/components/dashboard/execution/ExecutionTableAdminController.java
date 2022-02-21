@@ -2,16 +2,14 @@ package components.dashboard.execution;
 
 import componentcode.executiontable.ExecutionDTOTable;
 import componentcode.executiontable.ExecutionTableControllerShared;
-import componentcode.usertable.UserTableControllerShared;
 import components.app.AppMainController;
-import components.graph.targettable.TargetDTOTable;
-import graph.TargetDTO;
+import components.dashboard.DashboardController;
 import javafx.fxml.FXML;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import task.execution.ExecutionDTO;
 import task.execution.ExecutionStatus;
 
 public class ExecutionTableAdminController {
@@ -59,6 +57,8 @@ public class ExecutionTableAdminController {
     /* ------------------------------------------ CUSTOM FIELDS ------------------------------------------- */
     private ExecutionTableControllerShared sharedController;
     private AppMainController mainController;
+    private ExecutionDTOTable currentlySelectedRow;
+    private DashboardController dashboardController;
 
 
     @FXML
@@ -75,10 +75,28 @@ public class ExecutionTableAdminController {
         tableColumn_Workers.setCellValueFactory(new PropertyValueFactory<ExecutionDTOTable, Integer>("totalWorkers"));
         tableColumn_Status.setCellValueFactory(new PropertyValueFactory<ExecutionDTOTable, ExecutionStatus>("executionStatus"));
 
+        setDoubleClickEvent();
 
         sharedController = new ExecutionTableControllerShared(tableView_Executions);
         setActive(false);
         sharedController.startListRefresher();
+    }
+
+    private void setDoubleClickEvent() {
+        tableView_Executions.setRowFactory( tv -> {
+            TableRow<ExecutionDTOTable> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    ExecutionDTOTable rowData = row.getItem();
+                    System.out.println("[Execution TableView] chosen row data: " + rowData);
+
+                    currentlySelectedRow = row.getItem();
+                    dashboardController.event_ExecutionRowSelected(currentlySelectedRow);
+                }
+            });
+
+            return row ;
+        });
     }
 
     public void setActive(boolean isActive) {
@@ -87,5 +105,9 @@ public class ExecutionTableAdminController {
 
     public void setMainController(AppMainController mainController) {
         this.mainController = mainController;
+    }
+
+    public void setDashboardController(DashboardController dashboardController) {
+        this.dashboardController = dashboardController;
     }
 }

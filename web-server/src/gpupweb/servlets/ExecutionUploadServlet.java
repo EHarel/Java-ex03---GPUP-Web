@@ -3,6 +3,7 @@ package gpupweb.servlets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import gpupweb.utils.ServletUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import logic.Engine;
 import task.Execution;
+import task.ExecutionManager;
 import task.execution.ExecutionDTO;
 import utilsharedall.Constants;
 
@@ -38,13 +40,16 @@ public class ExecutionUploadServlet extends HttpServlet {
 
             ExecutionDTO executionDTO = new Gson().fromJson(executionDTOStr, ExecutionDTO.class);
 
-            if (existingExecutionName(executionDTO.getExecutionName())) {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                response.getOutputStream().print("Execution name already exists.");
-            } else {
-                Execution execution = new Execution(executionDTO);
-                Engine.getInstance().addExecution(execution);
-                response.setStatus(HttpServletResponse.SC_OK);
+            synchronized (this) {
+                if (existingExecutionName(executionDTO.getExecutionName())) {
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    response.getOutputStream().print("Execution name already exists.");
+                } else {
+                    Execution execution = new Execution(executionDTO);
+                    ExecutionManager executionManager = ServletUtils.getExecutionManager(getServletContext());
+                    boolean isAdded = executionManager.addExecution(execution);
+                    response.setStatus(HttpServletResponse.SC_OK);
+                }
             }
         } catch (JsonSyntaxException jsonSyntaxException) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -58,7 +63,7 @@ public class ExecutionUploadServlet extends HttpServlet {
     }
 
     private boolean existingExecutionName(String executionName) {
-        return Engine.getInstance().getExecutionManager().isExistingExecutionName(executionName);
+        return ServletUtils.getExecutionManager(getServletContext()).isExistingExecutionName(executionName);
     }
 }
 

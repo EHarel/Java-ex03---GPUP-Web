@@ -20,15 +20,15 @@
   <tabs>
     <Tab text="(1) Task Configuration">
          <content>
-            <SplitPane fx:id="taskConfigurationSplitPane" dividerPositions="0.542907180385289" orientation="VERTICAL" prefHeight="313.0" prefWidth="280.0">
+            <SplitPane fx:id="taskConfigurationSplitPane" dividerPositions="0.5901926444833625" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" orientation="VERTICAL" prefHeight="313.0" prefWidth="280.0">
               <items>
-                  <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                  <AnchorPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="400.0" prefWidth="800.0">
                      <children>
                         <SplitPane dividerPositions="0.7275985663082437" orientation="VERTICAL" prefHeight="200.0" prefWidth="160.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
                           <items>
                               <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="200.0" prefWidth="1098.0">
                                  <content>
-                                  <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="191.0" prefWidth="1098.0">
+                                  <AnchorPane maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="1098.0">
                                        <children>
                                           <Pane layoutX="14.0" layoutY="14.0" minHeight="0.0" minWidth="0.0" prefHeight="159.0" prefWidth="142.0">
                                              <children>
@@ -76,7 +76,7 @@
                                     </AnchorPane>
                                  </content>
                               </ScrollPane>
-                              <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="70.0" prefWidth="1098.0" spacing="50.0">
+                              <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="1098.0" spacing="50.0">
                                  <children>
                                     <Pane minHeight="0.0" minWidth="0.0">
                                        <children>
@@ -86,9 +86,9 @@
                                     </Pane>
                                     <Pane maxHeight="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="41.0" prefWidth="277.0">
                                        <children>
-                                          <Button fx:id="buttonAddConfiguration" layoutX="63.0" layoutY="14.0" mnemonicParsing="false" onAction="#buttonAddConfigurationActionListener" prefHeight="25.0" prefWidth="151.0" text="Add Configuration" />
-                                          <Label alignment="CENTER" layoutX="22.0" layoutY="39.0" text="Add current settings as a new configuration." wrapText="true" />
-                                          <Label fx:id="labelAddConfigMsg" layoutX="6.0" layoutY="56.0" prefHeight="17.0" prefWidth="265.0" />
+                                          <Button fx:id="buttonAddConfiguration" layoutX="63.0" layoutY="-11.0" mnemonicParsing="false" onAction="#buttonAddConfigurationActionListener" prefHeight="25.0" prefWidth="151.0" text="Add Configuration" />
+                                          <Label alignment="CENTER" layoutX="22.0" layoutY="14.0" text="Add current settings as a new configuration." wrapText="true" />
+                                          <Label fx:id="labelAddConfigMsg" layoutX="6.0" layoutY="28.0" prefHeight="17.0" prefWidth="265.0" />
                                        </children>
                                     </Pane>
                                     <Pane prefHeight="200.0" prefWidth="200.0">
@@ -108,7 +108,7 @@
                         </SplitPane>
                      </children>
                   </AnchorPane>
-                <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="514.0" prefWidth="1098.0" />
+                <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="205.0" prefWidth="800.0" />
               </items>
             </SplitPane>
          </content></Tab>
@@ -159,11 +159,11 @@
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
+                  <TextField fx:id="textField_ExecutionName" layoutX="125.0" layoutY="124.0" prefHeight="25.0" prefWidth="556.0" />
+                  <Button fx:id="button_SubmitExecution" layoutX="14.0" layoutY="185.0" mnemonicParsing="false" onAction="#button_SubmitExecutionActionListener" prefHeight="25.0" prefWidth="147.0" text="Submit Execution" />
                   <Label layoutX="14.0" layoutY="14.0" text="Finalize your Execution:" />
                   <Label alignment="TOP_LEFT" layoutX="14.0" layoutY="41.0" prefHeight="72.0" prefWidth="646.0" text="After setting the task configuration, and choosing the relevant targets, you just need to choose a name for your execution. The name must be unique. We'll inform you if your chosen name is already taken." wrapText="true" />
                   <Label layoutX="14.0" layoutY="128.0" text="Execution Name:" />
-                  <Button fx:id="button_SubmitExecution" layoutX="14.0" layoutY="185.0" mnemonicParsing="false" onAction="#button_SubmitExecutionActionListener" prefHeight="25.0" prefWidth="147.0" text="Submit Execution" />
-                  <TextField fx:id="textField_ExecutionName" layoutX="125.0" layoutY="124.0" prefHeight="25.0" prefWidth="556.0" />
                   <Label layoutX="14.0" layoutY="226.0" text="Submission Result:" />
                   <Label fx:id="label_SubmissionResult" alignment="TOP_LEFT" layoutX="138.0" layoutY="226.0" prefHeight="143.0" prefWidth="526.0" wrapText="true" />
                </children>

@@ -25,7 +25,7 @@ public class QueueStateUpdate extends QueueLinkedList<Task> {
 
         if (consumerManager != null) {
             consumerManager.getTargetStateChangedConsumers().forEach(targetDTOConsumer -> {
-                targetDTOConsumer.accept(newValue.getTarget().toData());
+                targetDTOConsumer.accept(newValue.getTarget().toDTO());
             });
         }
 

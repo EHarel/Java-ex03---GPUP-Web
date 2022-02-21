@@ -36,10 +36,8 @@
           <RowConstraints maxHeight="20.0" minHeight="20.0" prefHeight="20.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label text="Random in range:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-            <Label text="Success Probability:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-            <Label text="Processing Time:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <Label text="Warnings Probability:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField fx:id="textFieldConfigName" prefHeight="25.0" prefWidth="306.0" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+            <TextField fx:id="processingTimeTextField" promptText="3000" text="1000" GridPane.columnIndex="3" GridPane.rowIndex="2" />
             <SplitPane dividerPositions="0.5" minWidth="-Infinity" orientation="VERTICAL" prefHeight="200.0" prefWidth="113.0" GridPane.columnIndex="3" GridPane.rowIndex="3">
               <items>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
@@ -58,14 +56,16 @@
                   </AnchorPane>
               </items>
             </SplitPane>
+            <TextField fx:id="warningsProbabilityTextField" text="0.5" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+            <TextField fx:id="successProbabilityTextField" text="0.5" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+            <Label text="Random in range:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label text="Success Probability:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <Label text="Processing Time:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label text="Warnings Probability:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <Label prefHeight="51.0" prefWidth="195.0" text="(Enter a number between 0 and 100, representing the %)" wrapText="true" GridPane.columnIndex="5" GridPane.rowIndex="5" />
             <Label text="(Enter a number between 0 and 100, representing the %)" wrapText="true" GridPane.columnIndex="5" GridPane.rowIndex="4" />
             <Label text="Processing time must be given as an integer in milliseconds. For example, 3000 is valid, but 3500 isn't" wrapText="true" GridPane.columnIndex="5" GridPane.rowIndex="2" />
-            <TextField fx:id="processingTimeTextField" promptText="3000" text="1000" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-            <TextField fx:id="warningsProbabilityTextField" text="0.5" GridPane.columnIndex="3" GridPane.rowIndex="4" />
-            <TextField fx:id="successProbabilityTextField" text="0.5" GridPane.columnIndex="3" GridPane.rowIndex="5" />
             <Label text="Configuration Name:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="textFieldConfigName" prefHeight="25.0" prefWidth="306.0" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.rowIndex="1" />
             <Label fx:id="labelNameMsg" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" wrapText="true" GridPane.columnIndex="7" GridPane.rowIndex="1" />
             <Label fx:id="labelProcessingTimeMsg" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" wrapText="true" GridPane.columnIndex="7" GridPane.rowIndex="2" />
             <Label fx:id="labelWarningsProbabilityMsg" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" GridPane.columnIndex="7" GridPane.rowIndex="4" />

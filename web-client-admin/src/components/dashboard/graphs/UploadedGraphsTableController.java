@@ -14,7 +14,6 @@ import utilsharedclient.Constants;
 import java.util.Collection;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 public class UploadedGraphsTableController {
 
@@ -89,7 +88,7 @@ public class UploadedGraphsTableController {
                     System.out.println("[Graph TableView] chosen row data: " + rowData);
 
                     currentlySelectedGraph = row.getItem();
-                    dashboardController.rowChangedEvent();
+                    dashboardController.event_GraphRowChanged();
                 }
             });
 
@@ -112,7 +111,7 @@ public class UploadedGraphsTableController {
                 this::updateUsersList,
                 dashboardController);
         timer = new Timer();
-        timer.schedule(listRefresher, Constants.REFRESH_RATE, Constants.REFRESH_RATE);
+        timer.schedule(listRefresher, Constants.REFRESH_RATE_GRAPHS, Constants.REFRESH_RATE_GRAPHS);
     }
 
     private void updateUsersList(List<GraphDTO> usersNames) {

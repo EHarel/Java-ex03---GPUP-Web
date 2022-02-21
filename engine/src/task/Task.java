@@ -72,8 +72,8 @@ public abstract class Task implements Runnable {
         Collection<SerialSet> lockedSets = acquiredSetLocks();
         target.getTaskStatus().setTargetState(TargetDTO.TargetState.IN_PROCESS);
 
-        taskManager.getConsumerManager().getTargetStateChangedConsumers().forEach(consumer -> consumer.accept(target.toData()));
-        taskManager.getConsumerManager().getStartTargetConsumers().forEach(consumer -> consumer.accept(target.toData()));
+        taskManager.getConsumerManager().getTargetStateChangedConsumers().forEach(consumer -> consumer.accept(target.toDTO()));
+        taskManager.getConsumerManager().getStartTargetConsumers().forEach(consumer -> consumer.accept(target.toDTO()));
 
         checkPause();
 
@@ -104,8 +104,8 @@ public abstract class Task implements Runnable {
 
         checkPause();
 
-        taskManager.getConsumerManager().getEndTargetConsumers().forEach(consumer -> consumer.accept(target.toData()));
-        execution.getProcessedData().addTargetData(target.toData());
+        taskManager.getConsumerManager().getEndTargetConsumers().forEach(consumer -> consumer.accept(target.toDTO()));
+        execution.getProcessedData().addTargetData(target.toDTO());
         taskManager.getThreadManager().decrementActiveThreads(Thread.currentThread().getId());
         releaseLocks(lockedSets);
     }
@@ -219,7 +219,7 @@ public abstract class Task implements Runnable {
         target.getTaskStatus().setTargetState(TargetDTO.TargetState.FINISHED);
         target.getTaskStatus().setTaskResult(result);
 
-        taskManager.getConsumerManager().getTargetStateChangedConsumers().forEach(targetDTOConsumer -> targetDTOConsumer.accept(target.toData()));
+        taskManager.getConsumerManager().getTargetStateChangedConsumers().forEach(targetDTOConsumer -> targetDTOConsumer.accept(target.toDTO()));
 
         Collection<List<String>> skippedTargetsNames_AllPaths = getSkippedTargetsAllPaths();
         target.getTaskStatus().setTargetsSkippedAsResult_AllPaths(skippedTargetsNames_AllPaths);
@@ -286,8 +286,8 @@ public abstract class Task implements Runnable {
                 Collection<Target> allSkippedTargets = EngineUtils.pathsToTargets_Exclude(allSkippedTargetsPaths, target);
 
                 for (Target skippedTarget : allSkippedTargets) {
-                    taskManager.getConsumerManager().getTargetStateChangedConsumers().forEach(targetDTOConsumer -> targetDTOConsumer.accept(skippedTarget.toData()));
-                    taskManager.getConsumerManager().getEndTargetConsumers().forEach(targetDTOConsumer -> targetDTOConsumer.accept(skippedTarget.toData()));
+                    taskManager.getConsumerManager().getTargetStateChangedConsumers().forEach(targetDTOConsumer -> targetDTOConsumer.accept(skippedTarget.toDTO()));
+                    taskManager.getConsumerManager().getEndTargetConsumers().forEach(targetDTOConsumer -> targetDTOConsumer.accept(skippedTarget.toDTO()));
                 }
             } catch (Exception ignore) { } // From within a task we work only with existing targets, no room for user input error
         }
