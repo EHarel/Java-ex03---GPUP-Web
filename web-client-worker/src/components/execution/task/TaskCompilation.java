@@ -1,10 +1,12 @@
 package components.execution.task;
 
 import com.sun.istack.internal.NotNull;
-import graph.DependenciesGraph;
+import components.app.AppMainController;
+import components.execution.ExecutionManager;
 import graph.Target;
 import graph.TargetDTO;
-import task.TaskType;
+import task.enums.TaskResult;
+import task.enums.TaskType;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationCompilation;
 
@@ -19,14 +21,16 @@ public class TaskCompilation extends Task {
     private static final int SUCCESS_CODE = 0;
 
     public TaskCompilation(@NotNull Target target,
-                           @NotNull Configuration configuration)
+                           @NotNull Configuration configuration,
+                           ExecutionManager executionManager,
+                           AppMainController mainController)
             throws IllegalArgumentException {
-        super(TaskType.COMPILATION, target, configuration);
+        super(TaskType.COMPILATION, target, configuration, executionManager,mainController);
     }
 
     @Override
-    protected TargetDTO.TaskStatusDTO.TaskResult runActualTask () {
-        TargetDTO.TaskStatusDTO.TaskResult result = TargetDTO.TaskStatusDTO.TaskResult.UNPROCESSED;
+    protected TaskResult runActualTask () {
+        TaskResult result = TaskResult.UNPROCESSED;
 
         try {
             prepareOutFolder();
@@ -38,8 +42,8 @@ public class TaskCompilation extends Task {
         return result;
     }
 
-    private TargetDTO.TaskStatusDTO.TaskResult runCompilation() {
-        TargetDTO.TaskStatusDTO.TaskResult taskResult = TargetDTO.TaskStatusDTO.TaskResult.UNPROCESSED;
+    private TaskResult runCompilation() {
+        TaskResult taskResult = TaskResult.UNPROCESSED;
 
         if (validProcessingConditions(target)) {
             ProcessBuilder processBuilderCompilation = getProcessBuilder(target);
@@ -61,7 +65,7 @@ public class TaskCompilation extends Task {
             } catch (IOException | InterruptedException e) {
                 target.getTaskStatus().setEndInstant(Instant.now());
                 e.printStackTrace();
-                taskResult = TargetDTO.TaskStatusDTO.TaskResult.FAILURE;
+                taskResult = TaskResult.FAILURE;
             }
         }
 
@@ -129,13 +133,13 @@ public class TaskCompilation extends Task {
     }
 
     // TODO: any way to find out warnings?
-    private TargetDTO.TaskStatusDTO.TaskResult resultCodeToTaskResult(int resultCode) {
-        TargetDTO.TaskStatusDTO.TaskResult taskResult;
+    private TaskResult resultCodeToTaskResult(int resultCode) {
+        TaskResult taskResult;
 
         if (resultCode == SUCCESS_CODE) {
-            taskResult = TargetDTO.TaskStatusDTO.TaskResult.SUCCESS;
+            taskResult = TaskResult.SUCCESS;
         } else {
-            taskResult = TargetDTO.TaskStatusDTO.TaskResult.FAILURE;
+            taskResult = TaskResult.FAILURE;
         }
 
         return taskResult;

@@ -1,12 +1,15 @@
 package components.app;
 
+import componentcode.executiontable.ExecutionDTOTable;
 import components.dashboard.DashboardWorkerController;
 import components.execution.ExecutionManager;
-import components.execution.ThreadManager;
-import components.execution.processedtargets.TargetDTOTable;
+import components.execution.panelworker.ExecutionAndTaskPanelController;
+import components.execution.receivedtargets.TargetDTOWorkerDetails;
+import components.login.LoginPerformedListenerWorker;
 import components.login.LoginWorkerController;
-import events.LoginPerformedListener;
+import components.menu.MainMenuWorkerController;
 import graph.TargetDTO;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -17,6 +20,14 @@ import java.util.List;
 
 
 public class AppMainController {
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ------------------------------------------- DATA MEMBERS ------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+
+    /* ----------------------------------------------- FXML ----------------------------------------------- */
+
+
+    /* ----------------------------------------- COMPONENT FIELDS ----------------------------------------- */
     private BorderPane root;
     private Scene mainScene;
 
@@ -26,16 +37,51 @@ public class AppMainController {
     private Parent dashboard;
     private DashboardWorkerController dashboardController;
 
-    private List<LoginPerformedListener> loginPerformedListeners;
+    private Parent menu;
+    private MainMenuWorkerController menuController;
 
-    private List<TargetDTOTable> processedTargets;
+    private Parent executionAndTaskPanel;
+    private ExecutionAndTaskPanelController executionAndTaskPanelController;
+
+
+    /* ------------------------------------------ CUSTOM FIELDS ------------------------------------------- */
+    private List<LoginPerformedListenerWorker> loginPerformedListeners;
     ExecutionManager executionManager;
-    ThreadManager threadManager;
+    private boolean openedWorkerDirectory;
+    private String username;
+    SimpleIntegerProperty activeThreadsProperty;
+    SimpleIntegerProperty pointsEarned;
 
 
+
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ----------------------------------- CONSTRUCTOR AND INITIALIZER ------------------------------------ */
+    /* ---------------------------------------------------------------------------------------------------- */
     public AppMainController() {
         loginPerformedListeners = new LinkedList<>();
-        processedTargets = new LinkedList<>();
+        this.openedWorkerDirectory = false;
+        this.activeThreadsProperty = new SimpleIntegerProperty();
+        this.activeThreadsProperty.set(0);
+        this.pointsEarned = new SimpleIntegerProperty();
+        this.pointsEarned.set(0);
+    }
+
+
+
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* --------------------------------------- GETTERS AND SETTERS ---------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    public void setMenu(Parent parent, MainMenuWorkerController controller) {
+        this.menu = parent;
+        this.menuController = controller;
+
+        menuController.setMainController(this);
+
+        root.setTop(menu);
+
+//        setThemesListener(); // TODO: uncomment and implement
     }
 
     public void setMainScene(Scene scene) {
@@ -46,6 +92,26 @@ public class AppMainController {
         this.root = root;
     }
 
+    public String getUsername() {
+        return this.username;
+    }
+
+    public SimpleIntegerProperty getActiveThreadsProperty() { return this.activeThreadsProperty; }
+
+    public int getPointsEarned() {
+        return pointsEarned.get();
+    }
+
+    public SimpleIntegerProperty pointsEarnedProperty() {
+        return pointsEarned;
+    }
+
+
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------- COMPONENT CONTROL ----------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
     public void displayLogin() {
         this.root.setTop(null);
         this.root.setBottom(null);
@@ -54,28 +120,23 @@ public class AppMainController {
         this.root.setCenter(login);
     }
 
-    public void loginSuccessful(String userName, Integer threadCount) {
-
-        threadManager = new ThreadManager(threadCount);
-        executionManager = new ExecutionManager(threadCount, this);
-
-        displayMainApp();
-
-        loginPerformedListeners.forEach(loginPerformedListener -> {
-            loginPerformedListener.loginPerformed(userName);
-        });
-    }
-
     private void displayMainApp() {
-//        this.root.setTop(menu);
+        this.root.setTop(menu);
         this.root.setBottom(null);
         this.root.setLeft(null);
         this.root.setRight(null);
         this.root.setCenter(dashboard);
     }
 
+    private void displayDashboard() {
+        this.root.setCenter(dashboard);
+    }
 
-        public void setLogin(Parent parent, LoginWorkerController controller) {
+    private void displayExecutionAndTaskPanel() {
+        this.root.setCenter(executionAndTaskPanel);
+    }
+
+    public void setLogin(Parent parent, LoginWorkerController controller) {
         this.login = parent;
         this.loginController = controller;
 
@@ -83,7 +144,7 @@ public class AppMainController {
 
         loginController.getButton_Login().addEventHandler(ActionEvent.ACTION,
                 event -> {
-            // Try login to server
+                    // Try login to server
 
                     // If failed, present message
                     // If successful, switch views
@@ -98,19 +159,78 @@ public class AppMainController {
 
     }
 
-    public void addEventListener_LoginPerformed(LoginPerformedListener listener) {
+
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------- EVENTS ---------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    public void addEventListener_LoginPerformed(LoginPerformedListenerWorker listener) {
         if (listener != null) {
             loginPerformedListeners.add(listener);
         }
     }
 
-    public List<TargetDTOTable> getProcessedTargets() { return getProcessedTargets(); }
+    public void loginSuccessful(String userName, Integer threadCount) {
+        executionManager = new ExecutionManager(threadCount, this);
+        this.username = userName;
+        FileSystemUtils.setUsername(userName);
+
+        displayMainApp();
+
+
+        loginPerformedListeners.forEach(loginPerformedListener -> {
+            loginPerformedListener.loginPerformed(userName, threadCount);
+        });
+    }
+
+    public void event_SubscribedToExecution(ExecutionDTOTable executionDTO) {
+        FileSystemUtils.openExecutionDirectory(executionDTO);
+    }
 
     public void newTargetsReceived(List<TargetDTO> asList) {
         if (asList.size() > 0) {
             executionManager.acceptNewTargets(asList);
         }
     }
+
+    public void event_DashboardButtonPressed() {
+        displayDashboard();
+    }
+
+    public void event_ExecutionAndTaskPanelButtonPressed() {
+        displayExecutionAndTaskPanel();
+    }
+
+    public void setExecutionAndTaskPanelComponent(Parent parent, ExecutionAndTaskPanelController controller) {
+        this.executionAndTaskPanel = parent;
+        this.executionAndTaskPanelController = controller;
+        this.executionAndTaskPanelController.setMainController(this);
+    }
+
+    public void targetHistoryListUpdated() {
+        this.executionAndTaskPanelController.targetHistoryListUpdated(executionManager.getTargets());
+    }
+
+    public void updateSpecificTarget(TargetDTOWorkerDetails updatedTarget) {
+        this.executionAndTaskPanelController.specificTargetUpdated(updatedTarget);
+    }
+
+    public synchronized void incrementActiveThreadCount() {
+        activeThreadsProperty.set(activeThreadsProperty.get() + 1);
+    }
+
+    public synchronized void decrementActiveThreadCount() {
+        activeThreadsProperty.set(activeThreadsProperty.get() - 1);
+    }
+
+
+
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ------------------------------------------ MISC. METHODS ------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
 }
 
 //

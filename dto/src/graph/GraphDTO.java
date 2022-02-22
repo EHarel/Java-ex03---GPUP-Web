@@ -16,6 +16,7 @@ public class GraphDTO {
     private int countIndependents;
     private Collection<String> allTargetNames;
     private Set<TargetDTO> targetDTOs;
+    private String executionName;
 
 
     // countAlLTargets getter-setter
@@ -144,5 +145,9 @@ public class GraphDTO {
 
     public void setTargetDTOs(Set<TargetDTO> targetDTOS) {
         this.targetDTOs = targetDTOS;
+    }
+
+    public String getExecutionName() {
+        return this.executionName;
     }
 }

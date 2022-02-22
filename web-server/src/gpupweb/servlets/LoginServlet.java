@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import users.UserDTO;
 import users.UserManager;
+import utilsharedall.ConstantsAll;
 import utilsharedall.UserType;
 
 import java.io.IOException;
@@ -39,8 +40,8 @@ public class LoginServlet extends HttpServlet {
 
         if (usernameFromSession == null) { //user is not logged in yet
             try {
-                String usernameFromParameter = request.getParameter(utilsharedall.Constants.QP_USERNAME);
-                String userTypeStr = request.getParameter(utilsharedall.Constants.QP_USERTYPE);
+                String usernameFromParameter = request.getParameter(ConstantsAll.QP_USERNAME);
+                String userTypeStr = request.getParameter(ConstantsAll.QP_USERTYPE);
                 UserType usertypeFromParameter = UserType.valueOf(userTypeStr);
 
                 if (usernameFromParameter == null || usernameFromParameter.isEmpty()) {
@@ -84,7 +85,7 @@ public class LoginServlet extends HttpServlet {
                             //set the username in a session so it will be available on each request
                             //the true parameter means that if a session object does not exists yet
                             //create a new one
-                            request.getSession(true).setAttribute(utilsharedall.Constants.QP_USERNAME, usernameFromParameter);
+                            request.getSession(true).setAttribute(ConstantsAll.QP_USERNAME, usernameFromParameter);
 
                             //redirect the request to the chat room - in order to actually change the URL
                             System.out.println("On login, request URI is: " + request.getRequestURI());

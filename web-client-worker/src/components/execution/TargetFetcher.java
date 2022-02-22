@@ -2,6 +2,7 @@ package components.execution;
 
 import components.app.AppMainController;
 import graph.GraphDTO;
+import graph.Target;
 import graph.TargetDTO;
 import httpclient.HttpClientUtil;
 import javafx.beans.property.BooleanProperty;
@@ -10,15 +11,13 @@ import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
-import utilsharedall.Constants;
+import utilsharedall.ConstantsAll;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.TimerTask;
 import java.util.function.Consumer;
-
-import static utilsharedall.Constants.GSON_INSTANCE;
 
 public class TargetFetcher extends TimerTask {
     private final BooleanProperty shouldUpdate;
@@ -58,9 +57,9 @@ public class TargetFetcher extends TimerTask {
         }
 
         String finalUrl = HttpUrl
-                .parse(Constants.EXECUTION_TARGET_FETCH)
+                .parse(ConstantsAll.EXECUTION_TARGET_FETCH)
                 .newBuilder()
-                .addQueryParameter(Constants.QP_TARGET_COUNT, String.valueOf(availableThreads))
+                .addQueryParameter(ConstantsAll.QP_TARGET_COUNT, String.valueOf(availableThreads))
                 .build()
                 .toString();
 
@@ -81,9 +80,13 @@ public class TargetFetcher extends TimerTask {
 
                 if (jsonArrayOfTargets != null && !jsonArrayOfTargets.isEmpty()) {
 
-                    TargetDTO[] targetDTOs = Constants.GSON_INSTANCE.fromJson(jsonArrayOfTargets, TargetDTO[].class);
+                    TargetDTO[] targetDTOs = ConstantsAll.GSON_INSTANCE.fromJson(jsonArrayOfTargets, TargetDTO[].class);
 
-                    mainController.newTargetsReceived(Arrays.asList(targetDTOs));
+                    List<TargetDTO> targetDTOList = Arrays.asList(targetDTOs);
+
+                    if (targetDTOList.size() > 0) {
+                        mainController.newTargetsReceived(Arrays.asList(targetDTOs));
+                    }
                 }
                 shouldUpdate.set(true); // TODO: delete once done debugging
             }

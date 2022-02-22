@@ -4,7 +4,7 @@ import algorithm.DFS;
 import algorithm.TopologicalSort;
 import datastructure.QueueLinkedList;
 import exception.*;
-import task.TaskType;
+import task.enums.TaskType;
 import task.configuration.Configuration;
 import util.GraphUtils;
 
@@ -28,7 +28,7 @@ public class DependenciesGraph implements Serializable {
 
     private Integer priceCompilation;
     private Integer priceSimulation;
-
+    private String executionName;
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -60,6 +60,8 @@ public class DependenciesGraph implements Serializable {
         targetDTOs.forEach(targetDTO -> {
             targets.put(targetDTO.getName(), Target.recreateTargetWithoutDependencies(targetDTO));
         });
+
+        this.executionName = graphDTO.getExecutionName();
 
 
         // Add connections
@@ -755,11 +757,13 @@ public class DependenciesGraph implements Serializable {
         DependenciesGraph duplicateGraph = new DependenciesGraph();
 //        duplicateGraph.setName(this.name + " (Duplicate)");
         duplicateGraph.setName(this.name);
+        duplicateGraph.setExecutionNameForGraphAndTargets(this.executionName);
 
         duplicationAddTargetsWithoutDependencies(duplicateGraph);
         duplicationAddDependencies(duplicateGraph);
         duplicateSerialSets(duplicateGraph);
         duplicatePrices(duplicateGraph);
+
 
         return duplicateGraph;
     }
@@ -778,6 +782,7 @@ public class DependenciesGraph implements Serializable {
      */
     public DependenciesGraph DuplicateChosenOnly(Collection<String> chosenTargets) {
         DependenciesGraph subGraph = new DependenciesGraph();
+        subGraph.setExecutionNameForGraphAndTargets(this.executionName);
 
         if (areChosenTargetsAllGraphTargets(chosenTargets)) {
             subGraph = this.duplicate();
@@ -965,6 +970,12 @@ public class DependenciesGraph implements Serializable {
         targets.values().forEach(target -> {
             target.getTaskStatus().setConfig(configuration);
         });
+    }
+
+    public void setExecutionNameForGraphAndTargets(String executionName) {
+        this.executionName = executionName;
+
+        targets.values().forEach(target -> target.setExecutionName(executionName));
     }
 
 //

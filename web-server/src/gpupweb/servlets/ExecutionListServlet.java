@@ -6,23 +6,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import logic.Engine;
 import task.Execution;
 import task.ExecutionManager;
 import task.execution.ExecutionDTO;
-import users.User;
-import users.UserDTO;
-import users.UserManager;
 
 import java.io.IOException;
-import com.google.gson.Gson;
-import utilsharedall.Constants;
+
+import utilsharedall.ConstantsAll;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 public class ExecutionListServlet extends HttpServlet {
 
@@ -43,7 +37,7 @@ public class ExecutionListServlet extends HttpServlet {
                 executionDTOS.add(execution.toDTO());
             });
 
-            String json = Constants.GSON_INSTANCE.toJson(executionDTOS);
+            String json = ConstantsAll.GSON_INSTANCE.toJson(executionDTOS);
             out.println(json);
             out.flush();
         }

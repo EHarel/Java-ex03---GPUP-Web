@@ -5,12 +5,14 @@ import file.SaveObject;
 import exception.*;
 import graph.*;
 import task.*;
+import task.OldCode.TaskManager;
+import task.OldCode.TaskProcess;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationDTO;
 import task.consumer.ConsumerExecutionSummary;
 import task.consumer.ConsumerManager;
 import task.consumer.ConsumerWriteTargetToFile;
-import task.execution.ExecutionStatus;
+import task.enums.TaskType;
 
 import javax.xml.bind.JAXBException;
 import java.io.*;

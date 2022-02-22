@@ -14,7 +14,7 @@ import exception.UninitializedTaskException;
 import graph.TargetDTO;
 import task.Execution;
 import logic.Engine;
-import task.TaskProcess;
+import task.OldCode.TaskProcess;
 import task.configuration.ChosenTarget;
 import task.consumer.ConsumerManager;
 
@@ -203,10 +203,10 @@ public class TaskGeneral implements DoesAction {
 
                 str.append("\n\t").append(i).append(") ").append(targetDTO.getName()).append(" [");
 
-                if (report == null || report.getResult() == TargetDTO.TaskStatusDTO.TaskResult.UNPROCESSED) {
-                    str.append(TargetDTO.TaskStatusDTO.TaskResult.UNPROCESSED);
+                if (report == null || report.getResult() == TargetDTO.TaskResult.UNPROCESSED) {
+                    str.append(TargetDTO.TaskResult.UNPROCESSED);
                 } else {
-                    if (report.getResult() != TargetDTO.TaskStatusDTO.TaskResult.UNPROCESSED) {
+                    if (report.getResult() != TargetDTO.TaskResult.UNPROCESSED) {
                         str.append(report.getResult()).append(" -- ").append(engine.formatTimeDuration(report.getStartInstant(), report.getEndInstant()));
                     }
                 }

@@ -4,7 +4,8 @@ import graph.SerialSetDTO;
 import graph.Target;
 import graph.TargetDTO;
 import task.Execution;
-import task.TaskType;
+import task.enums.TaskResult;
+import task.enums.TaskType;
 import task.configuration.ConfigurationDTO;
 import task.configuration.ConfigurationDTOCompilation;
 import task.configuration.ConfigurationDTOSimulation;
@@ -68,9 +69,9 @@ public abstract class EngineUtils {
         } else {
             res = "\n\tTask Report: " +
                         "\n\t\tTarget state: " + taskStatusDTO.getState() +
-                        "\n\t\tTask result:  " + taskStatusDTO.getResult();
+                        "\n\t\tTask result:  " + taskStatusDTO.getTaskResult();
 
-            if (taskStatusDTO.getResult() != TargetDTO.TaskStatusDTO.TaskResult.UNPROCESSED) {
+            if (taskStatusDTO.getTaskResult() != TaskResult.UNPROCESSED) {
                 res = res +
                         "\n\t\tExecution run: " + taskStatusDTO.getExecutionNum() +
                         "\n\t\tConfiguration: " + taskStatusDTO.getConfigData().getName();
@@ -145,7 +146,6 @@ public abstract class EngineUtils {
 
         // Local variables just for ease of formatting
         Collection<String> allTargets = getNamesOfTargetsData(execution.getProcessedData().getAllTargetData());
-        Collection<String> allParticipatingTargets = getNamesOfParticipatingTargets(execution.getProcessedData().getAllTargetData());
         Collection<String> allProcessed = getNamesOfTargetsData(execution.getProcessedData().getAllProcessedTargetsOfAllResults());
         Collection<String> nonFailed = getNamesOfTargetsData(execution.getProcessedData().getProcessedTargetsNoFailure());
         Collection<String> success = getNamesOfTargetsData(execution.getProcessedData().getSuccessfulTargets());
@@ -270,18 +270,6 @@ public abstract class EngineUtils {
         Collection<String> names = new LinkedList<>();
 
         data.forEach(targetData -> names.add(targetData.getName()));
-
-        return names;
-    }
-
-    private static Collection<String> getNamesOfParticipatingTargets(Collection<TargetDTO> allTargetData) {
-        Collection<String> names = new LinkedList<>();
-
-        for (TargetDTO targetDTO : allTargetData) {
-            if (targetDTO.getTaskStatusDTO().isParticipatesInExecution()) {
-                names.add(targetDTO.getName());
-            }
-        }
 
         return names;
     }

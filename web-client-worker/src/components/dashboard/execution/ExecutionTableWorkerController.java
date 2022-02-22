@@ -4,16 +4,16 @@ import componentcode.executiontable.ExecutionDTOTable;
 import componentcode.executiontable.ExecutionTableControllerShared;
 import components.app.AppMainController;
 import components.dashboard.DashboardWorkerController;
+import components.login.LoginPerformedListenerWorker;
 import events.LoginPerformedListener;
-import graph.GraphDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import task.execution.ExecutionStatus;
+import task.enums.ExecutionStatus;
 
-public class ExecutionTableWorkerController implements LoginPerformedListener {
+public class ExecutionTableWorkerController implements LoginPerformedListenerWorker {
 
     @FXML
     private TableView<ExecutionDTOTable> tableView_Executions;
@@ -121,7 +121,7 @@ public class ExecutionTableWorkerController implements LoginPerformedListener {
     }
 
     @Override
-    public void loginPerformed(String username) {
+    public void loginPerformed(String username, int threadCount) {
         this.sharedController.setUsername(username);
     }
 }

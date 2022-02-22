@@ -113,7 +113,7 @@ public class SpecificTargetController {
 
                         // Check which of them have failed
                         allDependencies.forEach(targetDTO1 -> {
-                            if (targetDTO1.getTaskStatusDTO().getResult() == TargetDTO.TaskStatusDTO.TaskResult.FAILURE) {
+                            if (targetDTO1.getTaskStatusDTO().getResult() == TargetDTO.TaskResult.FAILURE) {
                                 failedDependencies.add(targetDTO1.getName());
                             }
                         });

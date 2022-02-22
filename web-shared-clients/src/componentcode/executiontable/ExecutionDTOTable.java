@@ -19,6 +19,7 @@ public class ExecutionDTOTable extends ExecutionDTO {
                 // executionDTO.getConfigDTO(),
                 executionDTO.getGraphDTO(),
                 executionDTO.getTaskType(),
+                executionDTO.getTaskStartPoint(),
                 executionDTO.getPricePerTarget(),
                 executionDTO.getTotalWorkers(),
                 executionDTO.getExecutionStatus(),

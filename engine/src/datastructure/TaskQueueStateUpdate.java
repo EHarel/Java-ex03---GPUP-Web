@@ -1,7 +1,7 @@
 package datastructure;
 
 import graph.TargetDTO;
-import task.Task;
+import task.OldCode.Task;
 import task.consumer.ConsumerManager;
 
 import java.time.Instant;
@@ -9,10 +9,10 @@ import java.time.Instant;
 /**
  * This queue updates a target's state to "WAITING" upon enqueue.
  */
-public class QueueStateUpdate extends QueueLinkedList<Task> {
+public class TaskQueueStateUpdate extends QueueLinkedList<Task> {
     ConsumerManager consumerManager;
 
-    public QueueStateUpdate(ConsumerManager taskManager) {
+    public TaskQueueStateUpdate(ConsumerManager taskManager) {
         super();
 
         this.consumerManager = taskManager;

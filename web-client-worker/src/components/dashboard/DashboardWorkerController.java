@@ -3,6 +3,7 @@ package components.dashboard;
 import componentcode.executiontable.ExecutionDTOTable;
 import components.app.AppMainController;
 import components.dashboard.execution.ExecutionTableWorkerController;
+import components.login.LoginPerformedListenerWorker;
 import events.LoginPerformedListener;
 import httpclient.HttpClientUtil;
 import javafx.application.Platform;
@@ -17,11 +18,11 @@ import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
-import utilsharedall.Constants;
+import utilsharedall.ConstantsAll;
 
 import java.io.IOException;
 
-public class DashboardWorkerController implements LoginPerformedListener {
+public class DashboardWorkerController implements LoginPerformedListenerWorker {
 
     @FXML
     private ScrollPane MainPane;
@@ -58,9 +59,9 @@ public class DashboardWorkerController implements LoginPerformedListener {
 
         //noinspection ConstantConditions
         String finalUrl = HttpUrl
-                .parse(Constants.EXECUTION_SUBSCRIBE)
+                .parse(ConstantsAll.EXECUTION_SUBSCRIBE)
                 .newBuilder()
-                .addQueryParameter(Constants.QP_EXECUTION_NAME, executionDTOTable.getExecutionName())
+                .addQueryParameter(ConstantsAll.QP_EXECUTION_NAME, executionDTOTable.getExecutionName())
                 .build()
                 .toString();
 
@@ -82,10 +83,9 @@ public class DashboardWorkerController implements LoginPerformedListener {
                             label_SubscribeResult.setText("Something went wrong: " + responseBody));
                 } else {
                     Platform.runLater(() -> {
-                        label_SubscribeResult.setText("Successfully subscribed to the event!");
+                        label_SubscribeResult.setText("Successfully subscribed to the execution!");
                         label_SelectedExecutionName.setText("");
-//                        chatAppMainController.updateUserName(userName);   // Aviad code
-//                        chatAppMainController.switchToChatRoom();         // Aviad code
+                        mainController.event_SubscribedToExecution(executionDTOTable);
                     });
                 }
             }
@@ -99,7 +99,7 @@ public class DashboardWorkerController implements LoginPerformedListener {
     }
 
     @Override
-    public void loginPerformed(String username) {
+    public void loginPerformed(String username, int threadCount) {
         this.component_ExecutionTableWorkerController.setActive(true);
     }
 

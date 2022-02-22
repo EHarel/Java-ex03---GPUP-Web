@@ -3,7 +3,6 @@ package console.task.configuration;
 import console.menu.loader.TaskSubMenu;
 import console.menu.system.DoesAction;
 import logic.Engine;
-import task.TaskType;
 
 public class TaskConfigToggle implements DoesAction {
     @Override

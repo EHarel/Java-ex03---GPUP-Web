@@ -1,7 +1,9 @@
 package task.execution;
 
 import graph.GraphDTO;
-import task.TaskType;
+import task.enums.ExecutionStatus;
+import task.enums.TaskStartPoint;
+import task.enums.TaskType;
 import task.configuration.ConfigurationDTO;
 import task.configuration.ConfigurationDTOCompilation;
 import task.configuration.ConfigurationDTOSimulation;
@@ -19,6 +21,7 @@ public class ExecutionDTO {
 
     private GraphDTO graphDTO;
     private TaskType taskType;
+    private TaskStartPoint taskStartPoint;
     private Integer pricePerTarget;
     private Integer totalWorkers;
     private ExecutionStatus executionStatus;
@@ -31,6 +34,7 @@ public class ExecutionDTO {
                         String creatingUser,
                         GraphDTO graphDTO,
                         TaskType taskType,
+                        TaskStartPoint taskStartPoint,
                         Integer pricePerTarget,
                         int totalWorkers,
                         ExecutionStatus executionStatus,
@@ -55,6 +59,8 @@ public class ExecutionDTO {
                 this.participatingUsersNames.add(s);
             });
         }
+
+        this.taskStartPoint = taskStartPoint;
     }
 
     public String getExecutionName() {
@@ -82,6 +88,10 @@ public class ExecutionDTO {
 
     public TaskType getTaskType() {
         return taskType;
+    }
+
+    public TaskStartPoint getTaskStartPoint() {
+        return taskStartPoint;
     }
 
     public Integer getPricePerTarget() {

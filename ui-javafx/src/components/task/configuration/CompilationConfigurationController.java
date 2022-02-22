@@ -10,7 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import logic.Engine;
-import task.TaskType;
+import task.enums.TaskType;
 import task.configuration.*;
 
 import javax.naming.NameNotFoundException;

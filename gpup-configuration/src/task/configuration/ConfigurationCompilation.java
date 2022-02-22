@@ -2,7 +2,7 @@ package task.configuration;
 
 import exception.InvalidInputRangeException;
 import exception.NonexistentElementException;
-import task.TaskType;
+import task.enums.TaskType;
 
 import javax.naming.NameNotFoundException;
 import java.io.Serializable;

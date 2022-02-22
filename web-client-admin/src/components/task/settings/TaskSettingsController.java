@@ -27,15 +27,14 @@ import logic.Engine;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import task.Execution;
-import task.TaskProcess;
-import task.TaskType;
+import task.enums.TaskType;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationDTO;
 import task.configuration.ConfigurationDTOCompilation;
 import task.configuration.ConfigurationDTOSimulation;
 import task.execution.ExecutionDTO;
-import task.execution.ExecutionStatus;
-import utilsharedall.Constants;
+import task.enums.ExecutionStatus;
+import utilsharedall.ConstantsAll;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -275,17 +274,29 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
         return graph;
     }
 
-    public TaskProcess.StartPoint GetTaskStartPoint() {
-        TaskProcess.StartPoint startPoint = null;
+    public task.enums.TaskStartPoint GetTaskStartPoint() {
+        task.enums.TaskStartPoint startPoint = null;
 
         if (startPointFromScratchRadioButton.isSelected()) {
-            startPoint = TaskProcess.StartPoint.FROM_SCRATCH;
+            startPoint = task.enums.TaskStartPoint.FROM_SCRATCH;
         } else if (startPointIncrementalRadioButton.isSelected()) {
-            startPoint = TaskProcess.StartPoint.INCREMENTAL;
+            startPoint = task.enums.TaskStartPoint.INCREMENTAL;
         }
 
         return startPoint;
     }
+
+//    public TaskProcess.StartPoint GetTaskStartPoint() {
+//        TaskProcess.StartPoint startPoint = null;
+//
+//        if (startPointFromScratchRadioButton.isSelected()) {
+//            startPoint = TaskProcess.StartPoint.FROM_SCRATCH;
+//        } else if (startPointIncrementalRadioButton.isSelected()) {
+//            startPoint = TaskProcess.StartPoint.INCREMENTAL;
+//        }
+//
+//        return startPoint;
+//    }
 
     public SimpleBooleanProperty getIsEditingNewConfigProperty() {
         return isEditingNewConfig;
@@ -824,12 +835,16 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
                 break;
         }
 
+        GetTaskStartPoint();
+        task.enums.TaskStartPoint startPoint = GetTaskStartPoint();
+
         ExecutionDTO executionDTO = new ExecutionDTO(
                 executionName,
                 mainController.getUsername(),
                 // config.toDTO(),
                 chosenGraph.toDTO(),
                 taskType,
+                startPoint,
                 chosenGraph.getPrice(taskType),
                 0,
                 ExecutionStatus.NEW,
@@ -837,10 +852,9 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
                 configDTOSim,
                 null);
 
-//        Gson gson = new Gson();
         Gson gson = new GsonBuilder().serializeNulls().create();
 
-        String executionDTOJson = gson.toJson(executionDTO) + Constants.LINE_SEPARATOR;
+        String executionDTOJson = gson.toJson(executionDTO) + ConstantsAll.LINE_SEPARATOR;
 
 //        RequestBody body =
 //                new MultipartBody.Builder()
@@ -848,17 +862,14 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
 //                        .build();
 
         String bodyStr =
-                Constants.BP_EXECUTION_DTO + "=" + gson.toJson(executionDTO) + Constants.LINE_SEPARATOR;
-
-
+                ConstantsAll.BP_EXECUTION_DTO + "=" + gson.toJson(executionDTO) + ConstantsAll.LINE_SEPARATOR;
 
         RequestBody body = RequestBody.create(
-                Constants.JSON, executionDTOJson);
+                ConstantsAll.JSON, executionDTOJson);
 
-//
 //        //noinspection ConstantConditions
         String finalUrl = HttpUrl
-                .parse(Constants.EXECUTION_UPLOAD)
+                .parse(ConstantsAll.EXECUTION_UPLOAD)
                 .newBuilder()
                 .build()
                 .toString();

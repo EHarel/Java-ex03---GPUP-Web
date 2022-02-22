@@ -7,16 +7,14 @@ import okhttp3.Callback;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import task.execution.ExecutionDTO;
-import users.UserDTO;
-import utilsharedall.Constants;
+import utilsharedall.ConstantsAll;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.TimerTask;
 import java.util.function.Consumer;
 
-import static utilsharedall.Constants.GSON_INSTANCE;
+import static utilsharedall.ConstantsAll.GSON_INSTANCE;
 
 public class ExecutionListRefresher extends TimerTask {
 
@@ -44,7 +42,7 @@ public class ExecutionListRefresher extends TimerTask {
 
         final int finalRequestNumber = ++requestNumber;
 //        httpRequestLoggerConsumer.accept("About to invoke: " + utilsharedclient.Constants.USERS_LIST + " | Users Request # " + finalRequestNumber);
-        HttpClientUtil.runAsync(Constants.EXECUTION_LIST, new Callback() {
+        HttpClientUtil.runAsync(ConstantsAll.EXECUTION_LIST, new Callback() {
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {

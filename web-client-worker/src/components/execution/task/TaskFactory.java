@@ -1,14 +1,10 @@
 package components.execution.task;
 
-import exception.InvalidInputRangeException;
-import graph.DependenciesGraph;
+import components.app.AppMainController;
+import components.execution.ExecutionManager;
 import graph.Target;
-import task.TaskType;
+import task.enums.TaskType;
 import task.configuration.Configuration;
-import task.configuration.ConfigurationDTO;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class TaskFactory {
 //    public static Map<TaskType, TaskProcess> init(DependenciesGraph dependenciesGraph) {
@@ -41,15 +37,17 @@ public class TaskFactory {
 
     public static Task getActualTask(TaskType taskType,
                                      Target target,
-                                     Configuration configuration) {
+                                     Configuration configuration,
+                                     ExecutionManager executionManager,
+                                     AppMainController mainController) {
         Task task = null;
 
         switch (taskType) {
             case SIMULATION:
-                task = new TaskSimulation(target, configuration);
+                task = new TaskSimulation(target, configuration, executionManager, mainController);
                 break;
             case COMPILATION:
-                task = new TaskCompilation(target, configuration);
+                task = new TaskCompilation(target, configuration, executionManager, mainController);
                 break;
         }
 

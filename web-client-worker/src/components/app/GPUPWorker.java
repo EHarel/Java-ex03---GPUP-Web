@@ -1,7 +1,9 @@
 package components.app;
 
 import components.dashboard.DashboardWorkerController;
+import components.execution.panelworker.ExecutionAndTaskPanelController;
 import components.login.LoginWorkerController;
+import components.menu.MainMenuWorkerController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -42,12 +44,29 @@ public class GPUPWorker extends javafx.application.Application {
     }
 
     public void loadSubComponents(AppMainController mainController) {
-//        loadMainMenu(mainController);
+        loadMainMenu(mainController);
         loadLogin(mainController);
         loadDashboard(mainController);
+        loadExecutionAndTaskPanel(mainController);
+
 //        loadTaskSettings(mainController);
 //        loadGraphAllDataComponentWithSubComponents(mainController);
 //        loadTaskExecution(mainController);
+    }
+
+    private void loadMainMenu(AppMainController mainController) {
+        try {
+            System.out.println("[loadMainMenu] Start");
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            URL url = getClass().getResource("/components/menu/MainMenuWorker.fxml");
+            fxmlLoader.setLocation(url);
+            Parent parent = fxmlLoader.load(url.openStream());
+            MainMenuWorkerController controller = fxmlLoader.getController();
+
+            mainController.setMenu(parent, controller);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void loadLogin(AppMainController mainController) {
@@ -91,20 +110,38 @@ public class GPUPWorker extends javafx.application.Application {
         }
     }
 
-//    private void loadMainMenu(AppMainController mainController) {
-//        try {
-//            System.out.println("[loadMainMenu] Start");
-//            FXMLLoader fxmlLoader = new FXMLLoader();
-//            URL url = getClass().getResource("/components/menu/Menu.fxml");
-//            fxmlLoader.setLocation(url);
-//            Parent parent = fxmlLoader.load(url.openStream());
-//            MenuController controller = fxmlLoader.getController();
-//
-//            mainController.setMenu(parent, controller);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
+
+    private void loadExecutionAndTaskPanel(AppMainController mainController) {
+        try {
+            System.out.println("[loadExecutionAndTaskPanel] Start");
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            URL url = getClass().getResource("/components/execution/panelworker/ExecutionAndTaskPanel.fxml");
+            fxmlLoader.setLocation(url);
+            Parent parent = fxmlLoader.load(url.openStream());
+            ExecutionAndTaskPanelController controller = fxmlLoader.getController();
+
+            mainController.setExecutionAndTaskPanelComponent(parent, controller);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Stage getStage() {
+        return GPUPWorker.mainStage;
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+
+
+/* ---------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------- */
+/* --------------------------------------------- OLD CODE --------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------- */
+
 
 //    private void loadGraphAllDataComponentWithSubComponents(AppMainController mainController) {
 //        try {
@@ -268,12 +305,3 @@ public class GPUPWorker extends javafx.application.Application {
 //            e.printStackTrace();
 //        }
 //    }
-
-    public static Stage getStage() {
-        return GPUPWorker.mainStage;
-    }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-}

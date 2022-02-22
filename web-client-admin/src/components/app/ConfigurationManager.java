@@ -1,6 +1,6 @@
 package components.app;
 
-import task.TaskType;
+import task.enums.TaskType;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationDTO;
 

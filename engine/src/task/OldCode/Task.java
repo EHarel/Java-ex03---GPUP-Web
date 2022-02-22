@@ -1,4 +1,4 @@
-package task;
+package task.OldCode;
 
 import algorithm.DFS;
 import com.sun.istack.internal.NotNull;
@@ -8,8 +8,11 @@ import graph.Target;
 import graph.TargetDTO;
 import logic.Engine;
 import logic.EngineUtils;
+import task.Execution;
 import task.configuration.Configuration;
 import task.consumer.ConsumerUpdateState;
+import task.enums.TaskResult;
+import task.enums.TaskType;
 
 import java.time.Instant;
 import java.util.*;
@@ -77,29 +80,14 @@ public abstract class Task implements Runnable {
 
         checkPause();
 
-
-
-
         runTaskOnTarget();
-
-
-
-
-
 
         checkPause();
 
-
-
-
-
         addOpenedTargets();
 
-
-
-
-
         removeTargetFromGraphIfDone();
+
         updateInstantsIfNecessary(start);
 
         checkPause();
@@ -215,7 +203,7 @@ public abstract class Task implements Runnable {
     }
 
     protected void runTaskOnTarget() {
-        TargetDTO.TaskStatusDTO.TaskResult result = runActualTask();
+        TaskResult result = runActualTask();
         target.getTaskStatus().setTargetState(TargetDTO.TargetState.FINISHED);
         target.getTaskStatus().setTaskResult(result);
 
@@ -230,7 +218,7 @@ public abstract class Task implements Runnable {
         target.getTaskStatus().setTargetsOpenedAsResult(getOpenedTargets());
     }
 
-    protected abstract TargetDTO.TaskStatusDTO.TaskResult runActualTask();
+    protected abstract TaskResult runActualTask();
 
     /**
      * This method receives a target that has just finished being processed,
@@ -273,9 +261,9 @@ public abstract class Task implements Runnable {
 
     protected Collection<List<String>> getSkippedTargetsAllPaths() {
         Collection<List<String>> allSkippedTargetsString = new ArrayList<>();
-        TargetDTO.TaskStatusDTO.TaskResult result = target.getTaskStatus().getTaskResult();
+        TaskResult result = target.getTaskStatus().getTaskResult();
 
-        if (result == TargetDTO.TaskStatusDTO.TaskResult.FAILURE) {
+        if (result == TaskResult.FAILURE) {
             Collection<Consumer<Target>> consumersForDFS = new LinkedList<>();
             consumersForDFS.add(new ConsumerUpdateState(TargetDTO.TargetState.SKIPPED));
             try {
@@ -315,10 +303,10 @@ public abstract class Task implements Runnable {
 
     protected Collection<String> getOpenedTargets() {
         Collection<String> openedTargets = new ArrayList<>();
-        TargetDTO.TaskStatusDTO.TaskResult result = target.getTaskStatus().getTaskResult();
+        TaskResult result = target.getTaskStatus().getTaskResult();
 
         // if (result != TargetReport.TaskResult.FAILURE) { // OLD CODE when Opened meant "all dependencies succeeded"
-        if (result != TargetDTO.TaskStatusDTO.TaskResult.UNPROCESSED) {
+        if (result != TaskResult.UNPROCESSED) {
             for (Target targetToCheck : target.getTargetsThisIsRequiredFor()) {
                 if (targetHasOpened(targetToCheck)) {
                     openedTargets.add(targetToCheck.getName());

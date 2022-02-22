@@ -1,6 +1,6 @@
 package task.configuration;
 
-import task.TaskType;
+import task.enums.TaskType;
 
 public abstract class ConfigurationDTO implements Cloneable {
     protected TaskType taskType;

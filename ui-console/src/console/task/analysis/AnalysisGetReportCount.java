@@ -2,7 +2,7 @@ package console.task.analysis;
 
 import console.menu.system.DoesAction;
 import logic.Engine;
-import task.TaskType;
+import task.enums.TaskType;
 
 public class AnalysisGetReportCount implements DoesAction {
     private Engine engine = Engine.getInstance();

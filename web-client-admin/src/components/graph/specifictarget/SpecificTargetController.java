@@ -7,6 +7,7 @@ import graph.DependenciesGraph;
 import graph.TargetDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import task.enums.TaskResult;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -113,7 +114,7 @@ public class SpecificTargetController {
 
                         // Check which of them have failed
                         allDependencies.forEach(targetDTO1 -> {
-                            if (targetDTO1.getTaskStatusDTO().getResult() == TargetDTO.TaskStatusDTO.TaskResult.FAILURE) {
+                            if (targetDTO1.getTaskStatusDTO().getTaskResult() == TaskResult.FAILURE) {
                                 failedDependencies.add(targetDTO1.getName());
                             }
                         });
@@ -123,7 +124,7 @@ public class SpecificTargetController {
                 }
             } else if (targetDTO.getTaskStatusDTO().getState() == TargetDTO.TargetState.FINISHED) {
                 labelStatus.setText("Finished");
-                labelStatusData.setText("Result: " + targetDTO.getTaskStatusDTO().getResult());
+                labelStatusData.setText("Result: " + targetDTO.getTaskStatusDTO().getTaskResult());
             }
         }
     }

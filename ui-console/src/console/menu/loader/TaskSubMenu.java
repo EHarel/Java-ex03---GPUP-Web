@@ -6,8 +6,8 @@ import console.menu.system.SubMenu;
 import console.task.analysis.AnalysisGetLastRun;
 import console.task.analysis.AnalysisGetReportCount;
 import console.task.analysis.AnalysisGetSpecificRun;
-import task.TaskProcess;
-import task.TaskType;
+import task.OldCode.TaskProcess;
+import task.enums.TaskType;
 
 public class TaskSubMenu extends SubMenu {
     private static final String subMenuName = "Task - ";

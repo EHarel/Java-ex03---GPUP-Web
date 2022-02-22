@@ -1,9 +1,12 @@
-package task;
+package task.OldCode;
 
 import com.sun.istack.internal.NotNull;
 import graph.*;
+import task.Execution;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationSimulation;
+import task.enums.TaskResult;
+import task.enums.TaskType;
 
 import java.util.Random;
 
@@ -20,11 +23,11 @@ public class TaskSimulation extends Task {
     }
 
     @Override
-    protected TargetDTO.TaskStatusDTO.TaskResult runActualTask() {
+    protected TaskResult runActualTask() {
         return runSimulation();
     }
 
-    private TargetDTO.TaskStatusDTO.TaskResult runSimulation() {
+    private TaskResult runSimulation() {
         simulateSleep();
 
         return getSimulationResult();
@@ -60,15 +63,15 @@ public class TaskSimulation extends Task {
         return sleepTime;
     }
 
-    private TargetDTO.TaskStatusDTO.TaskResult getSimulationResult() {
+    private TaskResult getSimulationResult() {
         boolean isSuccessful = isSuccessful();
         boolean isWithWarnings = isWithWarnings(isSuccessful);
 
-        TargetDTO.TaskStatusDTO.TaskResult taskResult;
+        TaskResult taskResult;
         if (isSuccessful) {
-            taskResult = isWithWarnings? TargetDTO.TaskStatusDTO.TaskResult.SUCCESS_WITH_WARNINGS : TargetDTO.TaskStatusDTO.TaskResult.SUCCESS;
+            taskResult = isWithWarnings? TaskResult.SUCCESS_WITH_WARNINGS : TaskResult.SUCCESS;
         } else {
-            taskResult = TargetDTO.TaskStatusDTO.TaskResult.FAILURE;
+            taskResult = TaskResult.FAILURE;
         }
 
         return taskResult;

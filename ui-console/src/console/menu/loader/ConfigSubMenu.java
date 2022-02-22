@@ -4,7 +4,7 @@ import console.menu.system.MenuAction;
 import console.menu.system.SubMenu;
 import console.task.configuration.*;
 import logic.Engine;
-import task.TaskType;
+import task.enums.TaskType;
 import task.configuration.ConfigurationDTO;
 
 public class ConfigSubMenu extends SubMenu {

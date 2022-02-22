@@ -1,9 +1,6 @@
 package users;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /*
 Adding and retrieving users is synchronized and in that manner - these actions are thread safe
@@ -12,10 +9,10 @@ of the user of this class to handle the synchronization of isUserExists with oth
  */
 public class UserManager {
 
-    private final Set<User> users;
+    private final Collection<User> users;
 
     public UserManager() {
-        users = new HashSet<>();
+        users = new LinkedList<>();
     }
 
     public synchronized boolean addUser(UserDTO userDTO) {
@@ -31,8 +28,8 @@ public class UserManager {
         return is_added;
     }
 
-    public synchronized Set<User> getUsers() {
-        return Collections.unmodifiableSet(users); // Aviad code
+    public synchronized Collection<User> getUsers() {
+        return Collections.unmodifiableCollection(users); // Aviad code
 //        return users;
     }
 

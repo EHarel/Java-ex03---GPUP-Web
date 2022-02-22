@@ -1,14 +1,17 @@
-package task;
+package task.OldCode;
 
-import datastructure.QueueStateUpdate;
+import datastructure.TaskQueueStateUpdate;
 import exception.InvalidInputRangeException;
 import exception.NoConfigurationException;
 import graph.DependenciesGraph;
 import graph.Target;
 import graph.TargetDTO;
 import logic.Engine;
+import task.Execution;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationDTO;
+import task.enums.TaskResult;
+import task.enums.TaskType;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -319,7 +322,7 @@ public class TaskProcess implements Serializable {
 
         int nextExecutionNum = getNextExecutionNum(startPoint);
         Execution execution = new Execution(this.type, nextExecutionNum, startGraph, activeConfiguration, lastProcessedData);
-        execution.setStartPoint(startPoint);
+//        execution.setStartPoint(startPoint);
         execution.setStartInstant(startInstant);
         execution.setEndGraph(endGraph);
 
@@ -412,7 +415,7 @@ public class TaskProcess implements Serializable {
     }
 
     private void startProcessingTargets(DependenciesGraph workingGraph, Execution execution) {
-        QueueStateUpdate queue = getInitialTasks(workingGraph, execution);
+        TaskQueueStateUpdate queue = getInitialTasks(workingGraph, execution);
 
         this.taskManager.getConsumerManager().getStartTargetProcessingConsumers().forEach(dependenciesGraphConsumer -> dependenciesGraphConsumer.accept(workingGraph));
         while (!queue.isEmpty()) {
@@ -420,8 +423,8 @@ public class TaskProcess implements Serializable {
         }
     }
 
-    private QueueStateUpdate getInitialTasks(DependenciesGraph workingGraph, Execution execution) {
-        QueueStateUpdate queue = new QueueStateUpdate(this.taskManager.getConsumerManager());
+    private TaskQueueStateUpdate getInitialTasks(DependenciesGraph workingGraph, Execution execution) {
+        TaskQueueStateUpdate queue = new TaskQueueStateUpdate(this.taskManager.getConsumerManager());
 
         for (Target target : workingGraph.targets()) {
             if (targetCanBeProcessed(target)) {
@@ -442,8 +445,8 @@ public class TaskProcess implements Serializable {
         boolean complete = true;
 
         for (Target target : workingGraph.targets()) {
-            if (target.getTaskStatus().getTaskResult() == TargetDTO.TaskStatusDTO.TaskResult.FAILURE
-                    || target.getTaskStatus().getTaskResult() == TargetDTO.TaskStatusDTO.TaskResult.UNPROCESSED) {
+            if (target.getTaskStatus().getTaskResult() == TaskResult.FAILURE
+                    || target.getTaskStatus().getTaskResult() == TaskResult.UNPROCESSED) {
                 complete = false;
                 break;
             }
