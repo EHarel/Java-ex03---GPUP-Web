@@ -1,13 +1,15 @@
-package task;
+package task.OldCode;
 
 import com.sun.istack.internal.NotNull;
 import file.FileManager;
 import graph.DependenciesGraph;
 import graph.Target;
-import graph.TargetDTO;
 import logic.EngineUtils;
+import task.Execution;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationCompilation;
+import task.enums.TaskResult;
+import task.enums.TaskType;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +28,8 @@ public class TaskCompilation extends Task {
     }
 
     @Override
-    protected TargetDTO.TaskStatusDTO.TaskResult runActualTask () {
-        TargetDTO.TaskStatusDTO.TaskResult result = TargetDTO.TaskStatusDTO.TaskResult.UNPROCESSED;
+    protected TaskResult runActualTask () {
+        TaskResult result = TaskResult.UNPROCESSED;
 
         try {
             prepareOutFolder();
@@ -39,8 +41,8 @@ public class TaskCompilation extends Task {
         return result;
     }
 
-    private TargetDTO.TaskStatusDTO.TaskResult runCompilation() {
-        TargetDTO.TaskStatusDTO.TaskResult taskResult = TargetDTO.TaskStatusDTO.TaskResult.UNPROCESSED;
+    private TaskResult runCompilation() {
+        TaskResult taskResult = TaskResult.UNPROCESSED;
 
         if (validProcessingConditions(target)) {
             ProcessBuilder processBuilderCompilation = getProcessBuilder(target);
@@ -62,7 +64,7 @@ public class TaskCompilation extends Task {
             } catch (IOException | InterruptedException e) {
                 target.getTaskStatus().setEndInstant(Instant.now());
                 e.printStackTrace();
-                taskResult = TargetDTO.TaskStatusDTO.TaskResult.FAILURE;
+                taskResult = TaskResult.FAILURE;
             }
         }
 
@@ -114,7 +116,7 @@ public class TaskCompilation extends Task {
         String targetFolder_d = compConfig.getOutPath();
         String targetFolder_cp = targetFolder_d;
         String srcCodeFolder = compConfig.getSourceCodePath(); // Must be an existing directory
-        String fileFQN = target.getUserData(); // engine.task.TaskProcess
+        String fileFQN = target.getUserData(); // engine.task.OldCode.TaskProcess
         String filePath = getFilePathFromFQN(fileFQN);
 
         ProcessBuilder processBuilderCompilation = new ProcessBuilder(
@@ -128,13 +130,13 @@ public class TaskCompilation extends Task {
     }
 
     // TODO: any way to find out warnings?
-    private TargetDTO.TaskStatusDTO.TaskResult resultCodeToTaskResult(int resultCode) {
-        TargetDTO.TaskStatusDTO.TaskResult taskResult;
+    private TaskResult resultCodeToTaskResult(int resultCode) {
+        TaskResult taskResult;
 
         if (resultCode == SUCCESS_CODE) {
-            taskResult = TargetDTO.TaskStatusDTO.TaskResult.SUCCESS;
+            taskResult = TaskResult.SUCCESS;
         } else {
-            taskResult = TargetDTO.TaskStatusDTO.TaskResult.FAILURE;
+            taskResult = TaskResult.FAILURE;
         }
 
         return taskResult;

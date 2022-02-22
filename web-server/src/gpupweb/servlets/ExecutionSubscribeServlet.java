@@ -6,9 +6,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import logic.Engine;
 import task.ExecutionManager;
-import utilsharedall.Constants;
+import utilsharedall.ConstantsAll;
 
 import java.io.IOException;
 
@@ -22,7 +21,7 @@ public class ExecutionSubscribeServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getOutputStream().print("User not logged in");
         } else {
-            String executionNameFromParameter = request.getParameter(Constants.QP_EXECUTION_NAME);
+            String executionNameFromParameter = request.getParameter(ConstantsAll.QP_EXECUTION_NAME);
             ExecutionManager executionManager = ServletUtils.getExecutionManager(getServletContext());
 
             if (executionManager.addUserToConfiguration(executionNameFromParameter, usernameFromSession)) {

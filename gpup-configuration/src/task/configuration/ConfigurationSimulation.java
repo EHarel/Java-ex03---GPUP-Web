@@ -1,7 +1,7 @@
 package task.configuration;
 
 import exception.InvalidInputRangeException;
-import task.TaskType;
+import task.enums.TaskType;
 
 import javax.naming.NameNotFoundException;
 import java.io.Serializable;

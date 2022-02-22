@@ -2,6 +2,7 @@ package components.graph.targettable;
 
 import graph.TargetDTO;
 import javafx.scene.control.CheckBox;
+import task.enums.TaskResult;
 
 public class TargetDTOTable extends TargetDTO {
     private CheckBox checkbox;
@@ -9,7 +10,7 @@ public class TargetDTOTable extends TargetDTO {
     private Integer numberTargetsThisTotalDependsOn;
     private Integer serialSetCount;
     private TargetState targetState;
-    private TaskStatusDTO.TaskResult taskResult;
+    private TaskResult taskResult;
 
     public TargetDTOTable(TargetDTO targetDTO, Integer totalRequiredFor, Integer totalDependsOn) {
         super(
@@ -30,7 +31,7 @@ public class TargetDTOTable extends TargetDTO {
         this.numberTargetsThisTotalDependsOn = totalDependsOn;
         this.serialSetCount = targetDTO.getSerialSetsDTOS().size();
         this.targetState = targetDTO.getTaskStatusDTO().getState();
-        this.taskResult = targetDTO.getTaskStatusDTO().getResult();
+        this.taskResult = targetDTO.getTaskStatusDTO().getTaskResult();
     }
 
     public CheckBox getCheckbox() { return this.checkbox; }
@@ -49,5 +50,5 @@ public class TargetDTOTable extends TargetDTO {
 
     public TargetState getTargetState() { return this.targetState; }
 
-    public TaskStatusDTO.TaskResult getTaskResult() { return this.taskResult; }
+    public TaskResult getTaskResult() { return this.taskResult; }
 }

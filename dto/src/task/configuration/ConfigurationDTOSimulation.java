@@ -1,6 +1,6 @@
 package task.configuration;
 
-import task.TaskType;
+import task.enums.TaskType;
 
 public class ConfigurationDTOSimulation extends ConfigurationDTO implements Cloneable {
     private int processingTime; // An integer given in milliseconds (so 1500 is invalid)

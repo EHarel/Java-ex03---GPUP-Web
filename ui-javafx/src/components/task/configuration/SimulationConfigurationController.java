@@ -10,7 +10,7 @@ import javafx.scene.paint.Color;
 import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import logic.Engine;
-import task.TaskType;
+import task.enums.TaskType;
 import task.configuration.ConfigurationDTOSimulation;
 import task.configuration.ConfigurationSimulation;
 

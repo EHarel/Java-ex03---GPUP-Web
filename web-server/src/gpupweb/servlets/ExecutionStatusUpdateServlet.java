@@ -2,14 +2,12 @@ package gpupweb.servlets;
 
 import gpupweb.utils.ServletUtils;
 import gpupweb.utils.SessionUtils;
-import graph.Target;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import logic.Engine;
-import task.execution.ExecutionStatus;
-import utilsharedall.Constants;
+import task.enums.ExecutionStatus;
+import utilsharedall.ConstantsAll;
 
 import java.io.IOException;
 
@@ -24,7 +22,7 @@ public class ExecutionStatusUpdateServlet extends HttpServlet {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getOutputStream().print("User not logged in");
         } else {
-            String executionNameFromParameter = request.getParameter(Constants.QP_EXECUTION_NAME);
+            String executionNameFromParameter = request.getParameter(ConstantsAll.QP_EXECUTION_NAME);
 
 //            boolean isUploadingUser = Engine.getInstance().isExecutionCreator(executionNameFromParameter, usernameFromSession);
 
@@ -35,7 +33,7 @@ public class ExecutionStatusUpdateServlet extends HttpServlet {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getOutputStream().print("User is not creator of given task.");
             } else {
-                ExecutionStatus executionStatus = ExecutionStatus.valueOf(request.getParameter(Constants.QP_EXECUTION_STATUS));
+                ExecutionStatus executionStatus = ExecutionStatus.valueOf(request.getParameter(ConstantsAll.QP_EXECUTION_STATUS));
 
                 // TODO: code to check current status
                 if (ServletUtils.getExecutionManager(getServletContext()).updateExecutionStatus(executionNameFromParameter, executionStatus)) {

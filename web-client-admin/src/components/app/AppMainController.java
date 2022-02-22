@@ -35,12 +35,12 @@ import logic.Engine;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import task.Execution;
-import task.TaskType;
+import task.enums.TaskType;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationCompilation;
 import task.configuration.ConfigurationDTO;
 import task.configuration.ConfigurationSimulation;
-import utilsharedall.Constants;
+import utilsharedall.ConstantsAll;
 
 import javax.naming.NameNotFoundException;
 import java.io.File;
@@ -240,7 +240,7 @@ public class AppMainController {
 
             //noinspection ConstantConditions
             String finalUrl = HttpUrl
-                    .parse(Constants.FILE_UPLOAD)
+                    .parse(ConstantsAll.FILE_UPLOAD)
                     .newBuilder()
                     .build()
                     .toString();

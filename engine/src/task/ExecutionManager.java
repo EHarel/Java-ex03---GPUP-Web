@@ -1,8 +1,8 @@
 package task;
 
 import graph.Target;
-import graph.TargetDTO;
-import task.execution.ExecutionStatus;
+import task.enums.ExecutionStatus;
+import task.enums.TaskResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -112,22 +112,16 @@ public class ExecutionManager {
      */
     public synchronized Collection<Target> getTargetsForUser(String username, Integer targetCount) {
         Collection<Target> chosenTargets = new ArrayList<>();
-
         Collection<Execution> activeExecutionsUserIsPartOf = getActiveExecutionsUserIsPartOf(username);
 
-        int startingTargetCount = targetCount;
-
-//        if (executions.size() != 0) {
         if (activeExecutionsUserIsPartOf.size() != 0) {
+            boolean targetsAvailable = true;
 
-            while (targetCount > 0) {
+            while (targetCount > 0 && targetsAvailable) {
+                int targetCountAtBeginningOfRound = targetCount; // Relevant to find out if targets are available
 
-                int targetCountAtBeginningOfRound = targetCount;
-
-                for (Execution execution :
-                        activeExecutionsUserIsPartOf) {
-                    Target target = execution.releaseTargetFromQueue();
-
+                for (Execution execution : activeExecutionsUserIsPartOf) {
+                    Target target = execution.removeTargetFromQueue();
                     if (target != null) {
                         chosenTargets.add(target);
                         targetCount--;
@@ -141,19 +135,8 @@ public class ExecutionManager {
                 /* If at the end of an iteration over the entire list of executions there have been no new targets found,
                 it means the executions might be waiting for updates, and have no available targets.
                 We stop in that case. */
-                if (targetCountAtBeginningOfRound == targetCount) {
-                    break;
-                }
-
-//                Execution execution = executions.get(indexOfNextExecutionToRelease);
-//                advanceIndex();
-//
-//                if (executionAllowsTargetRemovalForUser(execution, username)) {
-//                    chosenTargets.add(execution.releaseTargetFromQueue());
-//                    targetCount--;
-//                }
+                targetsAvailable = (targetCountAtBeginningOfRound != targetCount);
             }
-
         }
 
         return chosenTargets;
@@ -162,7 +145,7 @@ public class ExecutionManager {
     private Collection<Execution> getActiveExecutionsUserIsPartOf(String username) {
         Collection<Execution> activeExecutionsUserIsPartOf = new ArrayList<>();
 
-        for (Execution execution :  executions) {
+        for (Execution execution : executions) {
             if (execution.getExecutionStatus() == ExecutionStatus.EXECUTING) {
                 if (execution.containsWorker(username)) {
                     activeExecutionsUserIsPartOf.add(execution);
@@ -190,5 +173,19 @@ public class ExecutionManager {
         }
 
         return allowsTargetRemoval;
+    }
+
+    public synchronized boolean updateTargetTaskResult(String executionName, String targetName, TaskResult taskResult) {
+        boolean updated = false;
+
+        for (Execution execution :
+                executions) {
+            if (execution.getExecutionName().equals(executionName)) {
+                updated = execution.updateTargetTaskResult(targetName, taskResult);
+                break;
+            }
+        }
+
+        return updated;
     }
 }

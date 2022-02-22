@@ -3,7 +3,7 @@ package console.task.configuration;
 import console.Utils;
 import console.menu.system.DoesAction;
 import logic.Engine;
-import task.TaskType;
+import task.enums.TaskType;
 
 public class TaskRemoveConfiguration implements DoesAction {
     public enum RemoveCount {

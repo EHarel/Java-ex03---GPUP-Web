@@ -10,7 +10,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import task.execution.ExecutionStatus;
+import task.enums.ExecutionStatus;
 
 public class ExecutionTableAdminController {
 

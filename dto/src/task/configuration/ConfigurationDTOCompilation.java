@@ -1,6 +1,6 @@
 package task.configuration;
 
-import task.TaskType;
+import task.enums.TaskType;
 
 public class ConfigurationDTOCompilation extends ConfigurationDTO implements Cloneable {
     private String sourceCodePath;

@@ -3,7 +3,7 @@ package console.task;
 import console.Utils;
 import console.menu.loader.TaskSubMenu;
 import console.menu.system.DoesAction;
-import task.TaskType;
+import task.enums.TaskType;
 
 public class ChangeTaskType implements DoesAction {
     private final TaskSubMenu taskSubMenu;

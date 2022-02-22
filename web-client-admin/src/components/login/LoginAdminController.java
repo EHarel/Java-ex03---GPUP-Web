@@ -13,7 +13,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
-import utilsharedall.Constants;
+import utilsharedall.ConstantsAll;
 import utilsharedall.UserType;
 
 import java.io.IOException;
@@ -64,10 +64,10 @@ public class LoginAdminController {
 
         //noinspection ConstantConditions
         String finalUrl = HttpUrl
-                .parse(Constants.LOGIN_PAGE)
+                .parse(ConstantsAll.LOGIN_PAGE)
                 .newBuilder()
-                .addQueryParameter(Constants.QP_USERNAME, userName)
-                .addQueryParameter(Constants.QP_USERTYPE, UserType.Admin.name())
+                .addQueryParameter(ConstantsAll.QP_USERNAME, userName)
+                .addQueryParameter(ConstantsAll.QP_USERTYPE, UserType.Admin.name())
                 .build()
                 .toString();
 

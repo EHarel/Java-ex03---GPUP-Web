@@ -14,8 +14,7 @@ import java.io.IOException;
 import com.google.gson.Gson;
 
 import java.io.PrintWriter;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class UserListServlet extends HttpServlet {
 
@@ -26,9 +25,9 @@ public class UserListServlet extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();
             UserManager userManager = ServletUtils.getUserManager(getServletContext());
-            Set<User> usersList = userManager.getUsers();
+            Collection<User> usersList = userManager.getUsers();
 
-            Set<UserDTO> userListDTO = new HashSet<>();
+            List<UserDTO> userListDTO = new LinkedList<>();
             usersList.forEach(user -> {
                 userListDTO.add(user.toDTO());
             });

@@ -1,8 +1,11 @@
 package components.execution.task;
 
 import com.sun.istack.internal.NotNull;
+import components.app.AppMainController;
+import components.execution.ExecutionManager;
 import graph.*;
-import task.TaskType;
+import task.enums.TaskResult;
+import task.enums.TaskType;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationSimulation;
 
@@ -13,17 +16,19 @@ public class TaskSimulation extends Task {
     private static final int minSleepTime = 0;
 
     public TaskSimulation(@NotNull Target target,
-                          @NotNull Configuration configuration)
+                          @NotNull Configuration configuration,
+                          ExecutionManager executionManager,
+                          AppMainController mainController)
             throws IllegalArgumentException {
-        super(TaskType.SIMULATION, target, configuration);
+        super(TaskType.SIMULATION, target, configuration, executionManager, mainController);
     }
 
     @Override
-    protected TargetDTO.TaskStatusDTO.TaskResult runActualTask() {
+    protected TaskResult runActualTask() {
         return runSimulation();
     }
 
-    private TargetDTO.TaskStatusDTO.TaskResult runSimulation() {
+    private TaskResult runSimulation() {
         simulateSleep();
 
         return getSimulationResult();
@@ -59,15 +64,15 @@ public class TaskSimulation extends Task {
         return sleepTime;
     }
 
-    private TargetDTO.TaskStatusDTO.TaskResult getSimulationResult() {
+    private TaskResult getSimulationResult() {
         boolean isSuccessful = isSuccessful();
         boolean isWithWarnings = isWithWarnings(isSuccessful);
 
-        TargetDTO.TaskStatusDTO.TaskResult taskResult;
+        TaskResult taskResult;
         if (isSuccessful) {
-            taskResult = isWithWarnings? TargetDTO.TaskStatusDTO.TaskResult.SUCCESS_WITH_WARNINGS : TargetDTO.TaskStatusDTO.TaskResult.SUCCESS;
+            taskResult = isWithWarnings? TaskResult.SUCCESS_WITH_WARNINGS : TaskResult.SUCCESS;
         } else {
-            taskResult = TargetDTO.TaskStatusDTO.TaskResult.FAILURE;
+            taskResult = TaskResult.FAILURE;
         }
 
         return taskResult;

@@ -1,6 +1,5 @@
 package components.graph.targettable;
 
-import console.task.TaskGeneral;
 import graph.TargetDTO;
 import javafx.scene.control.CheckBox;
 
@@ -10,7 +9,7 @@ public class TargetDTOTable extends TargetDTO {
     private Integer numberTargetsThisTotalDependsOn;
     private Integer serialSetCount;
     private TargetState targetState;
-    private TargetDTO.TaskStatusDTO.TaskResult taskResult;
+    private TaskResult taskResult;
 
     public TargetDTOTable(TargetDTO targetDTO, Integer totalRequiredFor, Integer totalDependsOn) {
         super(
@@ -50,5 +49,5 @@ public class TargetDTOTable extends TargetDTO {
 
     public TargetState getTargetState() { return this.targetState; }
 
-    public TaskStatusDTO.TaskResult getTaskResult() { return this.taskResult; }
+    public TaskResult getTaskResult() { return this.taskResult; }
 }

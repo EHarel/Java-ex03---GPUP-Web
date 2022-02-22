@@ -7,8 +7,8 @@ public class Constants {
     public final static String LINE_SEPARATOR = System.getProperty("line.separator");
     public final static String JHON_DOE = "<Anonymous>";
     public final static int REFRESH_RATE = 10000;
-    public final static int REFRESH_RATE_GRAPHS = 2000;
-    public final static int REFRESH_RATE_EXECUTIONS = 2000;
+    public final static int REFRESH_RATE_GRAPHS = 500;
+    public final static int REFRESH_RATE_EXECUTIONS = 500;
     public final static int REFRESH_RATE_TARGETS = 20000;
     public final static String CHAT_LINE_FORMATTING = "%tH:%tM:%tS | %.10s: %s%n";
 

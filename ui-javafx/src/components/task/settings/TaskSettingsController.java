@@ -20,8 +20,8 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import logic.Engine;
 import task.Execution;
-import task.TaskProcess;
-import task.TaskType;
+import task.OldCode.TaskProcess;
+import task.enums.TaskType;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationDTO;
 

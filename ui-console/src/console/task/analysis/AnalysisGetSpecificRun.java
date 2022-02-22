@@ -5,7 +5,7 @@ import console.menu.loader.ExecutionAnalysisMenu;
 import console.menu.system.DoesAction;
 import logic.Engine;
 import task.Execution;
-import task.TaskType;
+import task.enums.TaskType;
 
 public class AnalysisGetSpecificRun implements DoesAction {
     private Engine engine = Engine.getInstance();

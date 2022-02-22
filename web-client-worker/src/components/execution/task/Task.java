@@ -1,30 +1,35 @@
 package components.execution.task;
 
-import algorithm.DFS;
 import com.sun.istack.internal.NotNull;
-import graph.DependenciesGraph;
-import graph.SerialSet;
+import components.app.AppMainController;
+import components.app.FileSystemUtils;
+import components.execution.ExecutionManager;
 import graph.Target;
 import graph.TargetDTO;
-import task.TaskType;
+import javafx.application.Platform;
+import task.enums.TaskResult;
+import task.enums.TaskType;
 import task.configuration.Configuration;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Consumer;
 
 public abstract class Task implements Runnable {
     protected final TaskType taskType;
+    private final AppMainController mainController;
     protected Target target;
     protected Configuration configuration;
-//    protected Execution execution;
-
+    private ExecutionManager executionManager;
 
     public Task(
             TaskType taskType,
             @NotNull Target target,
-            @NotNull Configuration configuration
+            @NotNull Configuration configuration,
+            ExecutionManager executionManager,
+            AppMainController mainController
     ) throws IllegalArgumentException {
         this.taskType = taskType;
 
@@ -38,9 +43,8 @@ public abstract class Task implements Runnable {
 
         this.target = target;
         this.configuration = configuration;
-//        this.workingGraph = workingGraph;
-//        this.execution = execution;
-//        this.taskManager = Engine.getInstance().getTaskManager();
+        this.executionManager = executionManager;
+        this.mainController = mainController;
     }
 
     public Target getTarget() {
@@ -57,48 +61,37 @@ public abstract class Task implements Runnable {
 
     @Override
     public void run() {
+        Platform.runLater(() -> {
+            mainController.incrementActiveThreadCount();
+        });
+
 //        checkPause();
         Instant start = Instant.now();
         target.setTimeOfExitOutOfTaskQueue(Instant.now()); // TODO: change - set time of work start?
 //        taskManager.getThreadManager().incrementActiveThreads(Thread.currentThread().getId());
 //        taskManager.getThreadManager().decrementRemainingTasks(Thread.currentThread().getId());
 //        Collection<SerialSet> lockedSets = acquiredSetLocks();
+//        target.getTaskStatus().setTargetState(TargetDTO.TargetState.IN_PROCESS);
         target.getTaskStatus().setTargetState(TargetDTO.TargetState.IN_PROCESS);
-
 //        taskManager.getConsumerManager().getTargetStateChangedConsumers().forEach(consumer -> consumer.accept(target.toDTO()));
 //        taskManager.getConsumerManager().getStartTargetConsumers().forEach(consumer -> consumer.accept(target.toDTO()));
-
-
         runTaskOnTarget();
-
 //        addOpenedTargets();
-
 //        removeTargetFromGraphIfDone();
         updateInstantsIfNecessary(start);
-
-
+        String formalizedTargetStr = TaskUtils.getFormalizedTargetDataString(target.toDTO());
+        writeToFile(target.toDTO());
 //        taskManager.getConsumerManager().getEndTargetConsumers().forEach(consumer -> consumer.accept(target.toDTO()));
 //        execution.getProcessedData().addTargetData(target.toDTO());
 //        taskManager.getThreadManager().decrementActiveThreads(Thread.currentThread().getId());
 //        releaseLocks(lockedSets);
+        Platform.runLater(() -> {
+            executionManager.doneTask(target, formalizedTargetStr);
+        });
     }
 
-//    private void checkPause() {
-//        Boolean pause = taskManager.getThreadManager().getPause();
-//
-//        if (pause == true) {
-//            synchronized (pause) {
-//                try {
-//                    pause.wait();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//    }
-
     protected void runTaskOnTarget() {
-        TargetDTO.TaskStatusDTO.TaskResult result = runActualTask();
+        TaskResult result = runActualTask();
 
         target.getTaskStatus().setTargetState(TargetDTO.TargetState.FINISHED);
         target.getTaskStatus().setTaskResult(result);
@@ -114,7 +107,7 @@ public abstract class Task implements Runnable {
 //        target.getTaskStatus().setTargetsOpenedAsResult(getOpenedTargets());
     }
 
-    protected abstract TargetDTO.TaskStatusDTO.TaskResult runActualTask();
+    protected abstract TaskResult runActualTask();
 
     /**
      * Some tasks may update their own start and end instants themselves. In case they don't,
@@ -124,6 +117,19 @@ public abstract class Task implements Runnable {
     private void updateInstantsIfNecessary(Instant start) {
         target.getTaskStatus().setStartInstant(start);
         target.getTaskStatus().setEndInstant(Instant.now());
+    }
+
+
+    private void writeToFile(TargetDTO targetDTO) {
+        Path fullDirPath = FileSystemUtils.getExecutionPath(targetDTO.getExecutionName());
+
+        String fullLogPath = fullDirPath.toString() + "/" + targetDTO.getName() + ".log";
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fullLogPath));
+            writer.write(TaskUtils.getFormalizedTargetDataString(targetDTO));
+            writer.close();
+        } catch (IOException ignore) { } // Can't stop the execution for this
     }
 }
 
@@ -326,4 +332,18 @@ public abstract class Task implements Runnable {
 
 //    private void removeTargetFromGraphIfDone() {
 //        workingGraph.tryRemoveSuccessful(target);
+//    }
+
+//    private void checkPause() {
+//        Boolean pause = taskManager.getThreadManager().getPause();
+//
+//        if (pause == true) {
+//            synchronized (pause) {
+//                try {
+//                    pause.wait();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
 //    }

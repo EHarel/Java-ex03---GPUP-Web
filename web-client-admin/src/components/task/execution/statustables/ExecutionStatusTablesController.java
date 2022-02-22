@@ -153,7 +153,7 @@ public class ExecutionStatusTablesController {
 //                tableSkippedComponentController.AppendTarget(targetDTO, workingGraph);
             }
 
-            switch (targetDTO.getTaskStatusDTO().getResult()) {
+            switch (targetDTO.getTaskStatusDTO().getTaskResult()) {
                 case SUCCESS_WITH_WARNINGS:
                 case SUCCESS: {
                     tableSucceededComponentController.AppendTarget(targetDTO, workingGraph);

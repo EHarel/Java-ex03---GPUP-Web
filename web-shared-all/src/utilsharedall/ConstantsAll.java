@@ -1,9 +1,12 @@
 package utilsharedall;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import okhttp3.MediaType;
 
-public class Constants {
+import java.time.format.DateTimeFormatter;
+
+public class ConstantsAll {
     public final static MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     public final static String LINE_SEPARATOR = System.getProperty("line.separator");
 
@@ -14,8 +17,10 @@ public class Constants {
     public final static String QP_EXECUTION_STATUS = "executionStatus";
     public final static String QP_TARGET_COUNT = "targetCount";
 
-
     public final static String BP_EXECUTION_DTO = "executionDTO";
+    public final static String BP_EXECUTION_NAME = QP_EXECUTION_NAME;
+    public final static String BP_TARGET_NAME = "targetName";
+    public final static String BP_TASK_RESULT = "taskResult";
 
 
     // Server resources locations
@@ -30,6 +35,8 @@ public class Constants {
     public final static String EXECUTION_LIST = FULL_SERVER_PATH + "/executionlist";
 
     public final static String EXECUTION_TARGET_FETCH = FULL_SERVER_PATH + "/execution/targets";
+    public final static String EXECUTION_TARGET_UPDATE = FULL_SERVER_PATH + "/execution/targets/update";
+
 
 
 
@@ -41,9 +48,12 @@ public class Constants {
 
 
 
-
-
+    public final static String WORKING_DIR = "C:/gpup-working-dir";
+    public final static String WORKING_DIR_WORKER = "C:/gpup-working-dir-worker";
 
     // GSON instance
-    public final static Gson GSON_INSTANCE = new Gson();
+//    public final static Gson GSON_INSTANCE = new Gson();
+    public final static Gson GSON_INSTANCE = new GsonBuilder().serializeNulls().create();
+
+    public final static DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH.mm.ss");
 }

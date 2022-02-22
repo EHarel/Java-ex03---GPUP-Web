@@ -14,6 +14,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import task.enums.TaskResult;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -53,7 +54,7 @@ public class TargetTableController {
     @FXML
     private TableColumn<TargetDTOTable, String> tableColumnUserData;
     @FXML
-    private TableColumn<TargetDTOTable, TargetDTO.TaskStatusDTO.TaskResult> tableColumnTaskResult;
+    private TableColumn<TargetDTOTable, TaskResult> tableColumnTaskResult;
     @FXML
     private TableColumn<TargetDTOTable, TargetDTO.TargetState> tableColumnTargetState;
 
@@ -79,7 +80,7 @@ public class TargetTableController {
         tableColumnDependsOnTotal.setCellValueFactory(new PropertyValueFactory<TargetDTOTable, Integer>("numberTargetsThisTotalDependsOn"));
         tableColumnSerialSetsCount.setCellValueFactory(new PropertyValueFactory<TargetDTOTable, Integer>("serialSetCount"));
         tableColumnTargetState.setCellValueFactory(new PropertyValueFactory<TargetDTOTable, TargetDTO.TargetState>("targetState"));
-        tableColumnTaskResult.setCellValueFactory(new PropertyValueFactory<TargetDTOTable, TargetDTO.TaskStatusDTO.TaskResult>("taskResult"));
+        tableColumnTaskResult.setCellValueFactory(new PropertyValueFactory<TargetDTOTable, TaskResult>("taskResult"));
         tableColumnUserData.setCellValueFactory(new PropertyValueFactory<TargetDTOTable, String>("userData"));
 
         HideSelectColumn();

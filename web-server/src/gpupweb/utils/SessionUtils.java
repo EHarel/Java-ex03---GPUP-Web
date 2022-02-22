@@ -2,13 +2,13 @@ package gpupweb.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import utilsharedall.Constants;
+import utilsharedall.ConstantsAll;
 
 public class SessionUtils {
 
     public static String getUsername (HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        Object sessionAttribute = session != null ? session.getAttribute(Constants.QP_USERNAME) : null;
+        Object sessionAttribute = session != null ? session.getAttribute(ConstantsAll.QP_USERNAME) : null;
         return sessionAttribute != null ? sessionAttribute.toString() : null;
     }
     

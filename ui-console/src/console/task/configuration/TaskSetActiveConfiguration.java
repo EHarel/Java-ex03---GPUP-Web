@@ -4,7 +4,6 @@ import console.Utils;
 import console.menu.loader.TaskSubMenu;
 import console.menu.system.DoesAction;
 import logic.Engine;
-import task.TaskType;
 
 public class TaskSetActiveConfiguration implements DoesAction {
     Engine engine = Engine.getInstance();

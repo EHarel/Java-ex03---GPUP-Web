@@ -9,7 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
-import utilsharedall.Constants;
+import utilsharedall.ConstantsAll;
 import httpclient.HttpClientUtil;
 import utilsharedall.UserType;
 
@@ -77,10 +77,10 @@ public class LoginWorkerController {
 
         //noinspection ConstantConditions
         String finalUrl = HttpUrl
-                .parse(Constants.LOGIN_PAGE)
+                .parse(ConstantsAll.LOGIN_PAGE)
                 .newBuilder()
-                .addQueryParameter(Constants.QP_USERNAME, userName)
-                .addQueryParameter(Constants.QP_USERTYPE, UserType.Worker.name())
+                .addQueryParameter(ConstantsAll.QP_USERNAME, userName)
+                .addQueryParameter(ConstantsAll.QP_USERTYPE, UserType.Worker.name())
                 .build()
                 .toString();
 

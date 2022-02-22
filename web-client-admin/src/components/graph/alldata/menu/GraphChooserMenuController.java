@@ -6,7 +6,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.VBox;
 import task.Execution;
-import task.TaskType;
+import task.enums.TaskType;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 

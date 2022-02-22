@@ -24,8 +24,8 @@ import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import task.Execution;
 import task.configuration.Configuration;
-import task.execution.ExecutionStatus;
-import utilsharedall.Constants;
+import task.enums.ExecutionStatus;
+import utilsharedall.ConstantsAll;
 
 import java.io.IOException;
 
@@ -259,10 +259,10 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
 
         //noinspection ConstantConditions
         String finalUrl = HttpUrl
-                .parse(Constants.EXECUTION_STATUS_UPDATE)
+                .parse(ConstantsAll.EXECUTION_STATUS_UPDATE)
                 .newBuilder()
-                .addQueryParameter(Constants.QP_EXECUTION_NAME, executionName)
-                .addQueryParameter(Constants.QP_EXECUTION_STATUS, executionStatus.name())
+                .addQueryParameter(ConstantsAll.QP_EXECUTION_NAME, executionName)
+                .addQueryParameter(ConstantsAll.QP_EXECUTION_STATUS, executionStatus.name())
                 .build()
                 .toString();
 
@@ -273,7 +273,7 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 Platform.runLater(() ->
-                        getExecutionTextArea().appendText("Something went wrong with updating the status!" + Constants.LINE_SEPARATOR + e.getMessage()));
+                        getExecutionTextArea().appendText("Something went wrong with updating the status!" + ConstantsAll.LINE_SEPARATOR + e.getMessage()));
             }
 
             @Override
@@ -281,11 +281,11 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
                 String responseBody = response.body().string();
                 if (response.code() != 200) {
                     Platform.runLater(() ->
-                            getExecutionTextArea().appendText("Something went wrong with updating the status!" + Constants.LINE_SEPARATOR + responseBody));
+                            getExecutionTextArea().appendText("Something went wrong with updating the status!" + ConstantsAll.LINE_SEPARATOR + responseBody));
                 } else {
                     Platform.runLater(() -> {
 
-                        getExecutionTextArea().appendText("Status changed to " + executionStatus + "!" + Constants.LINE_SEPARATOR);
+                        getExecutionTextArea().appendText("Status changed to " + executionStatus + "!" + ConstantsAll.LINE_SEPARATOR);
 //                        chatAppMainController.updateUserName(userName);   // Aviad code
 //                        chatAppMainController.switchToChatRoom();         // Aviad code
 

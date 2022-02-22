@@ -10,9 +10,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import logic.Engine;
 import task.ExecutionManager;
-import utilsharedall.Constants;
+import utilsharedall.ConstantsAll;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -34,18 +33,15 @@ public class ExecutionTargetFetchServlet extends HttpServlet {
         } else {
 
             try {
-                String targetCountParameterStr = request.getParameter(Constants.QP_TARGET_COUNT);
+                String targetCountParameterStr = request.getParameter(ConstantsAll.QP_TARGET_COUNT);
                 Integer targetCount = Integer.parseInt(targetCountParameterStr);
 
                 if (targetCount > 0) {
                     try (PrintWriter out = response.getWriter()) {
-                        String jsonTargets = null;
-                        Collection<Target> chosenTargets = new ArrayList<>();
-
                         ExecutionManager executionManager = ServletUtils.getExecutionManager(getServletContext());
 
                         System.out.println("[ExecutionTargetFetchServlet] - Pre-Invoking getTargetsForUser() from executionManager.");
-                        chosenTargets = executionManager.getTargetsForUser(usernameFromSession, targetCount);
+                        Collection<Target> chosenTargets = executionManager.getTargetsForUser(usernameFromSession, targetCount);
                         System.out.println("[ExecutionTargetFetchServlet] - Post-Invoking getTargetsForUser() from executionManager.");
 
                         Set<TargetDTO> chosenTargetsDTOs = new HashSet<>();
@@ -56,8 +52,12 @@ public class ExecutionTargetFetchServlet extends HttpServlet {
                         Gson gson = new GsonBuilder().serializeNulls().create();
 
                         System.out.println("[ExecutionTargetFetchServlet] - Pre-toJson on targets.");
-                        jsonTargets = gson.toJson(chosenTargetsDTOs);
+                        String jsonTargets = gson.toJson(chosenTargetsDTOs);
                         System.out.println("[ExecutionTargetFetchServlet] - Post-toJson on targets.");
+
+                        if (chosenTargetsDTOs.size() > 0) {
+                            System.out.println("Debugging line");
+                        }
 
                         out.println(jsonTargets);
                         out.flush();

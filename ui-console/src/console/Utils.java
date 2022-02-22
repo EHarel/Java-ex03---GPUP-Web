@@ -7,7 +7,7 @@ import graph.DependenciesGraph;
 import graph.TargetDTO;
 import logic.Engine;
 import graph.PathOptions;
-import task.TaskType;
+import task.enums.TaskType;
 import task.configuration.ChosenTarget;
 
 import java.util.*;

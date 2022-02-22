@@ -1,4 +1,4 @@
-package task.execution;
+package task.enums;
 
 public enum ExecutionStatus {
     NEW,

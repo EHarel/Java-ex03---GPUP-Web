@@ -1,7 +1,6 @@
 package gpupweb.servlets;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import gpupweb.utils.ServletUtils;
 import jakarta.servlet.ServletException;
@@ -9,11 +8,10 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import logic.Engine;
 import task.Execution;
 import task.ExecutionManager;
 import task.execution.ExecutionDTO;
-import utilsharedall.Constants;
+import utilsharedall.ConstantsAll;
 
 import java.io.*;
 import java.util.Properties;
@@ -33,7 +31,7 @@ public class ExecutionUploadServlet extends HttpServlet {
         Properties prop = new Properties();
         prop.load(request.getInputStream());
 
-        String executionDTOStr = prop.getProperty(Constants.BP_EXECUTION_DTO);
+        String executionDTOStr = prop.getProperty(ConstantsAll.BP_EXECUTION_DTO);
         try {
 
 //            Gson gson = new GsonBuilder().serializeNulls().create();

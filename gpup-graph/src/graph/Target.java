@@ -2,9 +2,9 @@ package graph;
 
 import task.configuration.*;
 import exception.NullOrEmptyStringException;
+import task.enums.TaskResult;
 import util.GraphUtils;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.*;
 
@@ -17,12 +17,7 @@ import java.util.*;
  * Middles: targets which are both dependent on and required for other targets.
  * Independents: targets which aren't dependent on and aren't required for other targets.
  */
-public class Target implements Serializable {
-    //    private static final long serialVersionUID = 3; // 24-Nov-2021
-//    private static final long serialVersionUID = 4; // 01-Dec-2021, participates in execution
-    private static final long serialVersionUID = 5; // 08-Dec-2021, serial sets
-
-
+public class Target {
     private final boolean caseSensitive = false;
 
 
@@ -38,6 +33,9 @@ public class Target implements Serializable {
     private Collection<SerialSet> serialSets;
     private Instant timeOfEntryIntoTaskQueue;
     private Instant timeOfExitOutOfTaskQueue;
+
+    private Collection<String> targetsThisIsDirectlyRequiredForNames;
+    private Collection<String> targetsThisIsDirectlyDependentOnNames;
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -66,6 +64,29 @@ public class Target implements Serializable {
         return newTarget;
     }
 
+    public static Target recreateTargetWithDependencyNamesOnly(TargetDTO targetDTO) {
+        Target newTarget = null;
+
+        try {
+            newTarget = new Target(targetDTO.getName());
+            newTarget.userData = targetDTO.getUserData();
+            newTarget.taskStatus = new TaskStatus(targetDTO.getTaskStatusDTO());
+            newTarget.targetsThisIsDirectlyDependentOnNames = targetDTO.targetsThisDirectlyDependsOn;
+            newTarget.targetsThisIsDirectlyRequiredForNames = targetDTO.targetsThisIsDirectlyRequiredFor;
+        } catch (NullOrEmptyStringException ignore) {
+        }
+
+        return newTarget;
+    }
+
+    public Collection<String> getTargetsThisIsDirectlyRequiredForNames() {
+        return targetsThisIsDirectlyRequiredForNames;
+    }
+
+    public Collection<String> getTargetsThisIsDirectlyDependentOnNames() {
+        return targetsThisIsDirectlyDependentOnNames;
+    }
+
 
     /* ---------------------------------------------------------------------------------------------------- */
     /* --------------------------------------- GETTERS AND SETTERS ---------------------------------------- */
@@ -88,6 +109,10 @@ public class Target implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public void setExecutionName(String executionName) {
+        this.taskStatus.setExecutionName(executionName);
     }
 
     // Package Friendly
@@ -406,14 +431,6 @@ public class Target implements Serializable {
         timeOfEntryIntoTaskQueue = timeOfExitOutOfTaskQueue = null;
     }
 
-    public void setParticipatesInExecution(boolean participates) {
-        taskStatus.setParticipatesInExecution(participates);
-    }
-
-    public boolean isParticipatesInExecution() {
-        return taskStatus.isParticipatesInExecution();
-    }
-
     /**
      * Checks if the target is directly dependent on a target by the given name.
      */
@@ -443,20 +460,15 @@ public class Target implements Serializable {
         return dependencyWithTarget;
     }
 
-    public static class TaskStatus implements Serializable, Cloneable {
-        private static final long serialVersionUID = 1; // 03-Dec-2021
+    public static class TaskStatus implements  Cloneable {
 
+        private String executionName;
         private int executionNum;
-        private boolean participatesInExecution;
         private Instant startInstant;
         private Instant endInstant;
-
-        // Old code
-//        private Configuration config;
         private ConfigurationCompilation configComp;
         private ConfigurationSimulation configSim;
-
-        private TargetDTO.TaskStatusDTO.TaskResult taskResult;
+        private TaskResult taskResult;
         private TargetDTO.TargetState targetState;
         private Collection<String> targetsOpenedAsResult;
         private Collection<String> targetsSkippedAsResult;
@@ -471,12 +483,12 @@ public class Target implements Serializable {
             reset();
 
             if (taskStatusDTO != null) {
+                this.executionName = taskStatusDTO.getExecutionName();
                 this.executionNum = taskStatusDTO.getExecutionNum();
-                this.participatesInExecution = taskStatusDTO.isParticipatesInExecution();
                 this.startInstant = taskStatusDTO.getStartInstant();
                 this.endInstant = taskStatusDTO.getEndInstant();
                 this.targetState = taskStatusDTO.getState();
-                this.taskResult = taskStatusDTO.getResult();
+                this.taskResult = taskStatusDTO.getTaskResult();
 
                 this.targetsOpenedAsResult = new LinkedList<>();
                 taskStatusDTO.getTargetsOpenedAsResult().forEach(s -> {
@@ -510,18 +522,6 @@ public class Target implements Serializable {
                     if (taskStatusDTO.getConfigDTOSim() != null) {
                         this.configSim = new ConfigurationSimulation(taskStatusDTO.getConfigDTOSim());
                     }
-
-
-//                switch (taskStatusDTO.getConfigData().getTaskType()) {
-//                    case COMPILATION:
-//                        ConfigurationDTOCompilation configDataComp = (ConfigurationDTOCompilation) taskStatusDTO.getConfigData();
-//                        this.config = new ConfigurationCompilation(configDataComp);
-//                        break;
-//                    case SIMULATION:
-//                        ConfigurationDTOSimulation configDataSim = (ConfigurationDTOSimulation) taskStatusDTO.getConfigData();
-//                        this.config = new ConfigurationSimulation(configDataSim);
-//                        break;
-//                }
                 } catch (Exception ignore) {
                 }
             }
@@ -533,17 +533,12 @@ public class Target implements Serializable {
 
         public void reset(int executionNumber, Configuration configuration) {
             this.executionNum = executionNumber;
-            this.participatesInExecution = false;
             startInstant = null;
             endInstant = null;
-
-
-//            this.config = configuration;
             this.configComp = null;
             this.configSim = null;
 
             if (configuration != null) {
-
                 switch (configuration.getTaskType()) {
                     case COMPILATION:
                         this.configComp = (ConfigurationCompilation) configuration;
@@ -554,7 +549,7 @@ public class Target implements Serializable {
                 }
             }
 
-            taskResult = TargetDTO.TaskStatusDTO.TaskResult.UNPROCESSED;
+            taskResult = TaskResult.UNPROCESSED;
             targetState = TargetDTO.TargetState.FROZEN;
             targetsOpenedAsResult = new ArrayList<>();
             targetsSkippedAsResult = new ArrayList<>();
@@ -562,20 +557,16 @@ public class Target implements Serializable {
             errorDetails = null;
         }
 
+        public String getExecutionName() { return this.executionName; }
+
+        public void setExecutionName(String executionName) { this.executionName = executionName; }
+
         public int getExecutionNum() {
             return executionNum;
         }
 
         public void setExecutionNum(int executionNum) {
             this.executionNum = executionNum;
-        }
-
-        public boolean isParticipatesInExecution() {
-            return participatesInExecution;
-        }
-
-        public void setParticipatesInExecution(boolean participatesInExecution) {
-            this.participatesInExecution = participatesInExecution;
         }
 
         public Instant getStartInstant() {
@@ -594,14 +585,6 @@ public class Target implements Serializable {
             this.endInstant = endInstant;
         }
 
-//        public Optional<Configuration> getConfig() {
-//            return Optional.ofNullable(config);
-//        }
-//
-//        public void setConfig(Configuration config) {
-//            this.config = config;
-//        }
-
         public ConfigurationCompilation getConfigComp() {
             return configComp;
         }
@@ -618,11 +601,11 @@ public class Target implements Serializable {
             this.configSim = configSim;
         }
 
-        public TargetDTO.TaskStatusDTO.TaskResult getTaskResult() {
+        public TaskResult getTaskResult() {
             return taskResult;
         }
 
-        public void setTaskResult(TargetDTO.TaskStatusDTO.TaskResult taskResult) {
+        public void setTaskResult(TaskResult taskResult) {
             this.taskResult = taskResult;
         }
 
@@ -687,31 +670,12 @@ public class Target implements Serializable {
         public TaskStatus clone() {
             TaskStatus clone = new TaskStatus();
 
-
+            clone.executionName = this.executionName;
             clone.executionNum = this.executionNum;
-            clone.participatesInExecution = this.participatesInExecution;
             clone.startInstant = this.startInstant;
             clone.endInstant = this.endInstant;
-
-//            Configuration configClone = null;
-//            if (this.config != null) {
-//                configClone = this.config.clone();
-//            }
-//            clone.config = configClone;
-
-            ConfigurationSimulation newConfigSim = null;
-            if (this.configSim != null) {
-                newConfigSim = this.configSim.clone();
-            }
-            clone.configSim = newConfigSim;
-
-            ConfigurationCompilation newConfigComp = null;
-            if (this.configComp != null) {
-                newConfigComp = this.configComp.clone();
-            }
-            clone.configComp = newConfigComp;
-
-
+            clone.configSim = this.configSim != null ? this.configSim.clone() : null;
+            clone.configComp = this.configComp != null ? this.configComp.clone() : null;
             clone.taskResult = this.taskResult;
             clone.targetState = this.targetState;
             clone.targetsOpenedAsResult = GraphUtils.cloneCollection(targetsOpenedAsResult);
@@ -723,17 +687,14 @@ public class Target implements Serializable {
         }
 
         public TargetDTO.TaskStatusDTO toData() {
-
             ConfigurationDTOSimulation configDTOSim = this.configSim != null ? this.configSim.toDTO() : null;
             ConfigurationDTOCompilation configDTOComp = this.configComp != null ? this.configComp.toDTO() : null;
 
-
             TargetDTO.TaskStatusDTO taskDTO = new TargetDTO.TaskStatusDTO(
+                    this.executionName,
                     this.executionNum,
-                    this.participatesInExecution,
                     this.startInstant,
                     this.endInstant,
-//                    (config != null ? this.config.toDTO() : null),
                     configDTOSim,
                     configDTOComp,
                     this.taskResult,

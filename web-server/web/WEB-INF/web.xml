@@ -35,6 +35,10 @@
         <servlet-name>ExecutionTargetFetchServlet</servlet-name>
         <servlet-class>gpupweb.servlets.ExecutionTargetFetchServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ExecutionTargetTaskUpdate</servlet-name>
+        <servlet-class>gpupweb.servlets.ExecutionTargetTaskUpdateServlet</servlet-class>
+    </servlet>
 
     <!-- MAPPING -->
     <servlet-mapping>
@@ -68,5 +72,9 @@
     <servlet-mapping>
         <servlet-name>ExecutionTargetFetchServlet</servlet-name>
         <url-pattern>/execution/targets</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExecutionTargetTaskUpdate</servlet-name>
+        <url-pattern>/execution/targets/update</url-pattern>
     </servlet-mapping>
 </web-app>

@@ -6,7 +6,7 @@ import file.jaxb.schema.generated.GPUPDescriptor;
 import file.jaxb.schema.generated.GPUPTarget;
 import file.jaxb.schema.generated.GPUPTargetDependencies;
 import graph.*;
-import task.TaskType;
+import task.enums.TaskType;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

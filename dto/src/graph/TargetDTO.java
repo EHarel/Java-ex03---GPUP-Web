@@ -3,6 +3,7 @@ package graph;
 import task.configuration.ConfigurationDTO;
 import task.configuration.ConfigurationDTOCompilation;
 import task.configuration.ConfigurationDTOSimulation;
+import task.enums.TaskResult;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -10,16 +11,12 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-public class TargetDTO implements Serializable, Cloneable {
-//    private static final long serialVersionUID = 4; // 08-Dec-2021 - Added serial sets
-    private static final long serialVersionUID = 5; // 12-Jan-2021 - Made fields protected
-
-
-    public enum TargetState implements Serializable {
+public class TargetDTO implements Cloneable {
+    public enum TargetState {
         FROZEN, SKIPPED, WAITING, IN_PROCESS, FINISHED
     }
 
-    public enum Dependency implements Serializable {
+    public enum Dependency {
         LEAF, ROOT, MIDDLE, INDEPENDENT
     }
 
@@ -68,6 +65,10 @@ public class TargetDTO implements Serializable, Cloneable {
 
     public String getName() {
         return name;
+    }
+
+    public String getExecutionName() {
+        return this.taskStatusDTO != null ? this.taskStatusDTO.getExecutionName() : null;
     }
 
     public Dependency getDependency() {
@@ -139,30 +140,14 @@ public class TargetDTO implements Serializable, Cloneable {
      * (4) All targets that may have opened up for processing due to this one
      * (5) All targets that may have closed down to processing (FROZEN) due to this one (if it FAILED)
      */
-    public static class TaskStatusDTO implements Serializable, Cloneable {
-        public task.configuration.ConfigurationDTO getConfigData() {
-            ConfigurationDTO configDTO = configDTOComp != null ? configDTOComp : configDTOSim;
+    public static class TaskStatusDTO implements Cloneable {
 
-            return configDTO;
-        }
-
-        public enum TaskResult implements Serializable, Cloneable {
-            SUCCESS, SUCCESS_WITH_WARNINGS, FAILURE, UNPROCESSED
-        }
-
-        private static final long serialVersionUID = 6; // 03-Dec-2021 - participates in execution
-
+        private final String executionName;
         private final int executionNum;
-        private final boolean participatesInExecution;
         private final Instant startInstant;
         private final Instant endInstant;
-
-        // Changes for ex03 json constructors
-//        private final ConfigurationDTO configData;
         private ConfigurationDTOSimulation configDTOSim;
         private ConfigurationDTOCompilation configDTOComp;
-
-
         private final TaskResult taskResult;
         private final TargetState targetState;
         private final Collection<String> targetsOpenedAsResult;
@@ -171,11 +156,10 @@ public class TargetDTO implements Serializable, Cloneable {
         private final String errorDetails;
 
         public TaskStatusDTO(
+                            String executionName,
                              int executionNum,
-                             boolean participatesInExecution,
                              Instant startInstant,
                              Instant endInstant,
-//                             ConfigurationDTO configData,
                              ConfigurationDTOSimulation configDTOSim,
                              ConfigurationDTOCompilation configDTOComp,
                              TaskResult taskResult,
@@ -184,15 +168,12 @@ public class TargetDTO implements Serializable, Cloneable {
                              Collection<String> targetsSkippedAsResult,
                              Collection<List<String>> targetsSkippedAsResult_AllPaths,
                              String errorDetails) {
+            this.executionName = executionName;
             this.executionNum = executionNum;
-            this.participatesInExecution = participatesInExecution;
             this.startInstant = startInstant;
             this.endInstant = endInstant;
-
-//            this.configData = configData;
             this.configDTOComp = configDTOComp;
             this.configDTOSim = configDTOSim;
-
             this.taskResult = taskResult;
             this.targetState = taskState;
             this.targetsOpenedAsResult = targetsThatAreWaitingAsResult;
@@ -201,12 +182,16 @@ public class TargetDTO implements Serializable, Cloneable {
             this.errorDetails = errorDetails;
         }
 
+        public String getExecutionName() { return this.executionName; }
+
         public int getExecutionNum() {
             return executionNum;
         }
 
-        public boolean isParticipatesInExecution() {
-            return participatesInExecution;
+        public task.configuration.ConfigurationDTO getConfigData() {
+            ConfigurationDTO configDTO = configDTOComp != null ? configDTOComp : configDTOSim;
+
+            return configDTO;
         }
 
         public Instant getStartInstant() {
@@ -215,10 +200,6 @@ public class TargetDTO implements Serializable, Cloneable {
 
         public Instant getEndInstant() {
             return endInstant;
-        }
-
-        public TaskResult getResult() {
-            return taskResult;
         }
 
         public TargetState getState() { return targetState; }
@@ -234,10 +215,6 @@ public class TargetDTO implements Serializable, Cloneable {
         }
 
         public String getErrorDetails() {return this.errorDetails; }
-
-//        public ConfigurationDTO getConfigData() {
-//            return configData;
-//        }
 
         public ConfigurationDTOSimulation getConfigDTOSim() {
             return configDTOSim;
@@ -268,30 +245,14 @@ public class TargetDTO implements Serializable, Cloneable {
             Collection<String> openedClone = cloneCollection(targetsOpenedAsResult);
             Collection<String> skippedClone = cloneCollection(targetsSkippedAsResult);
             Collection<List<String>> skippedAllPaths = clonePaths(targetsSkippedAsResult_AllPaths);
-
-
-
-//            ConfigurationDTO configData = null;
-//            if (this.configData != null) {
-//                configData = this.configData.clone();
-//            }
-
-            ConfigurationDTOCompilation DTOCompConfig = null;
-            if (this.configDTOComp != null) {
-                DTOCompConfig = this.configDTOComp.clone();
-            }
-
-            ConfigurationDTOSimulation DTOSimConfig = null;
-            if (this.configDTOSim != null) {
-                DTOSimConfig = this.configDTOSim.clone();
-            }
+            ConfigurationDTOCompilation DTOCompConfig = this.configDTOComp != null ? configDTOComp.clone() : null;
+            ConfigurationDTOSimulation DTOSimConfig = this.configDTOSim != null ? configDTOSim.clone() : null;
 
             return new TaskStatusDTO(
+                    this.executionName,
                     this.executionNum,
-                    this.participatesInExecution,
                     this.startInstant,
                     this.endInstant,
-//                    configData,
                     DTOSimConfig,
                     DTOCompConfig,
                     this.taskResult,

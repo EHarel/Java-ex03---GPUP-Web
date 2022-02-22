@@ -5,7 +5,7 @@ import console.menu.system.DoesAction;
 import exception.InvalidInputRangeException;
 import exception.NonexistentElementException;
 import logic.Engine;
-import task.TaskType;
+import task.enums.TaskType;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationCompilation;
 import task.configuration.ConfigurationSimulation;
