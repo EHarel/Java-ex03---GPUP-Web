@@ -16,9 +16,6 @@ import utilsharedall.UserType;
 import java.io.IOException;
 
 public class LoginWorkerController {
-
-    private int counter = 0;
-
     @FXML
     private ScrollPane ScrollPane_Main;
 
@@ -56,8 +53,6 @@ public class LoginWorkerController {
 
     @FXML
     void onButton_LoginAction(ActionEvent event) {
-        resultMessageProperty.set("Hey I'm clicked! Counter is " + ++counter);
-
         String userName = textField_Username.getText();
         if (userName.isEmpty()) {
             resultMessageProperty.set("User name is empty. You can't login with empty user name");

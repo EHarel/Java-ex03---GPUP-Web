@@ -48,4 +48,32 @@ public class UserManager {
 
         return is_exists;
     }
+
+    public synchronized User getUser(String usernameFromSession) {
+        User requestedUser = null;
+
+        for (User user : users) {
+            if (user.getName().equals(usernameFromSession)) {
+                requestedUser = user;
+                break;
+            }
+        }
+
+        return requestedUser;
+    }
+
+    /**
+     * This method updates a user's execution standing, by increasing the number of targets it processed from it to 1,
+     * and adds the payment.
+     */
+    public synchronized void updateUserProcessedTarget(String username, String executionName, int paymentToAdd) {
+        for (User user : users) {
+            if (user.getName().equals(username)) {
+                user.incrementExecutionProcessedTargets(executionName);
+                user.addPaymentToExecution(executionName, paymentToAdd);
+
+                break;
+            }
+        }
+    }
 }

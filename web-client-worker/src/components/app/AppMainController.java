@@ -9,6 +9,7 @@ import components.login.LoginPerformedListenerWorker;
 import components.login.LoginWorkerController;
 import components.menu.MainMenuWorkerController;
 import graph.TargetDTO;
+import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.scene.Parent;
@@ -222,6 +223,13 @@ public class AppMainController {
 
     public synchronized void decrementActiveThreadCount() {
         activeThreadsProperty.set(activeThreadsProperty.get() - 1);
+    }
+
+    public void addPayment(Integer payment) {
+        int currentPoints = getPointsEarned();
+        int newPoints = currentPoints + payment;
+
+        pointsEarnedProperty().set(newPoints);
     }
 
 

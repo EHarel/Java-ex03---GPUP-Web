@@ -1,6 +1,9 @@
 package components.execution.task;
 
 import graph.TargetDTO;
+import task.configuration.ConfigurationDTO;
+import task.configuration.ConfigurationDTOCompilation;
+import task.configuration.ConfigurationDTOSimulation;
 import task.enums.TaskResult;
 
 import java.time.Duration;
@@ -20,6 +23,7 @@ public class TaskUtils {
             String userData = (targetDTO.getUserData() == null || targetDTO.getUserData().trim().isEmpty()) ? "None" : targetDTO.getUserData();
 
             res = "Target Data -- " + targetDTO.getName() +
+                    "\n\tExecution name: " + targetDTO.getExecutionName() +
                     "\n\tUser data: " + userData +
                     "\n\tDependency: " + targetDTO.getDependency() +
                     "\n\tTargets \"" + targetDTO.getName() + "\" is directly dependent on: " + targetDTO.getTargetsThisDirectlyDependsOn() +
@@ -34,13 +38,14 @@ public class TaskUtils {
         String res;
 
         res = "\n\tTask Report: " +
+                "\n\t\tType: " + taskStatusDTO.getConfigData().getTaskType() +
+                getFormalizedConfigurationData(taskStatusDTO) +
                 "\n\t\tTarget state: " + taskStatusDTO.getState() +
                 "\n\t\tTask result:  " + taskStatusDTO.getTaskResult();
 
         if (taskStatusDTO.getTaskResult() != TaskResult.UNPROCESSED) {
             res = res +
-                    "\n\t\tExecution run: " + taskStatusDTO.getExecutionNum() +
-                    "\n\t\tConfiguration: " + taskStatusDTO.getConfigData().getName();
+                    "\n\t\tExecution run: " + taskStatusDTO.getExecutionNum();
 
             String timeStart = getDateTimeFromInstant(taskStatusDTO.getStartInstant());
             String timeEnd = getDateTimeFromInstant(taskStatusDTO.getEndInstant());
@@ -48,14 +53,39 @@ public class TaskUtils {
             res = res +
                     "\n\t\tTotal time:   " + formatTimeDuration(taskStatusDTO.getStartInstant(), taskStatusDTO.getEndInstant()) +
                     "\n\t\t\tTime start: \t" + timeStart +
-                    "\n\t\t\tTime end:   \t" + timeEnd +
-                    "\n\t\tTargets that have opened as a result: " + taskStatusDTO.getTargetsOpenedAsResult() +
-                    "\n\t\tTargets that are skipped as a result: " + taskStatusDTO.getTargetsSkippedAsResult();
+                    "\n\t\t\tTime end:   \t" + timeEnd;
+//                    "\n\t\tTargets that have opened as a result: " + taskStatusDTO.getTargetsOpenedAsResult() +
+//                    "\n\t\tTargets that are skipped as a result: " + taskStatusDTO.getTargetsSkippedAsResult();
+// This data is known only server-side, not from the worker's perspective
 
             if (!isNullOrEmptyStr(taskStatusDTO.getErrorDetails())) {
                 res = res +
                         "\n\t\tError details: \n" + taskStatusDTO.getErrorDetails();
             }
+        }
+
+        return res;
+    }
+
+    private static String getFormalizedConfigurationData(TargetDTO.TaskStatusDTO taskStatusDTO) {
+        ConfigurationDTOCompilation configCompDTO = taskStatusDTO.getConfigDTOComp();
+        ConfigurationDTOSimulation configSimDTO = taskStatusDTO.getConfigDTOSim();
+
+        String res = "\n\t\tConfiguration: " +
+                "\n\t\t\tName: " + taskStatusDTO.getConfigData().getName();
+
+        if (configCompDTO != null) {
+            res = res +
+                    "\n\t\t\tSrc path: " + configCompDTO.getSourceCodePath() +
+                    "\n\t\t\tOut path: " + configCompDTO.getOutPath();
+        }
+
+        if (configSimDTO != null) {
+            res = res +
+                    "\n\t\t\tProcessing time: " + configSimDTO.getProcessingTime() +
+                    "\n\t\t\tIs random time: " + configSimDTO.isRandomProcessingTime() +
+                    "\n\t\t\tSuccess probability " + configSimDTO.getSuccessProbability() +
+                    "\n\t\t\tWarning probability: " + configSimDTO.getWarningsProbability();
         }
 
         return res;
@@ -104,8 +134,8 @@ public class TaskUtils {
             long minute = (overallTimeMillis / (1000 * 60)) % 60;
             long hour = (overallTimeMillis / (1000 * 60 * 60)) % 24;
 
-//            overallTimeStr = String.format("%02d:%02d:%02d.%d", hour, minute, second, millis); // With milliseconds
-            overallTimeStr = String.format("(HH:MM:SS) %02d:%02d:%02d", hour, minute, second);
+            overallTimeStr = String.format("%02d:%02d:%02d.%d", hour, minute, second, millis); // With milliseconds
+//            overallTimeStr = String.format("(HH:MM:SS) %02d:%02d:%02d", hour, minute, second);
         }
 
         return overallTimeStr;

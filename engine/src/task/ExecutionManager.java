@@ -3,11 +3,10 @@ package task;
 import graph.Target;
 import task.enums.ExecutionStatus;
 import task.enums.TaskResult;
+import task.execution.ExecutionDTO;
+import users.User;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class ExecutionManager {
     List<Execution> executions;
@@ -16,6 +15,20 @@ public class ExecutionManager {
     public ExecutionManager() {
         executions = new ArrayList<>();
         indexOfNextExecutionToRelease = 0;
+    }
+
+    public synchronized Integer getExecutionPaymentPerTarget(String executionName) {
+        Integer payment = new Integer(0);
+
+        for (Execution execution :
+                executions) {
+            if (execution.getExecutionName().equals(executionName)) {
+                payment = execution.getPricePerTarget();
+                break;
+            }
+        }
+
+        return payment;
     }
 
     public boolean isExistingExecutionName(String executionName) {
@@ -110,9 +123,9 @@ public class ExecutionManager {
      * From the active executions it checks if the user is part of its work force.
      * Only then does it start releasing targets.
      */
-    public synchronized Collection<Target> getTargetsForUser(String username, Integer targetCount) {
+    public synchronized Collection<Target> getTargetsForUser(User user, Integer targetCount) {
         Collection<Target> chosenTargets = new ArrayList<>();
-        Collection<Execution> activeExecutionsUserIsPartOf = getActiveExecutionsUserIsPartOf(username);
+        Collection<Execution> activeExecutionsUserIsPartOf = getActiveExecutionsUserIsActiveIn(user);
 
         if (activeExecutionsUserIsPartOf.size() != 0) {
             boolean targetsAvailable = true;
@@ -142,12 +155,18 @@ public class ExecutionManager {
         return chosenTargets;
     }
 
-    private Collection<Execution> getActiveExecutionsUserIsPartOf(String username) {
+    /**
+     * This goes over all the executions and checks:
+     *      -   Is the execution active?
+     *      -   Is the user part of it?
+     *      -   Is the user active in it?
+     */
+    private Collection<Execution> getActiveExecutionsUserIsActiveIn(User user) {
         Collection<Execution> activeExecutionsUserIsPartOf = new ArrayList<>();
 
         for (Execution execution : executions) {
             if (execution.getExecutionStatus() == ExecutionStatus.EXECUTING) {
-                if (execution.containsWorker(username)) {
+                if (user.isParticipatingInExecution(execution.getExecutionName(), true)) {
                     activeExecutionsUserIsPartOf.add(execution);
                 }
             }
@@ -175,17 +194,64 @@ public class ExecutionManager {
         return allowsTargetRemoval;
     }
 
-    public synchronized boolean updateTargetTaskResult(String executionName, String targetName, TaskResult taskResult) {
-        boolean updated = false;
+    public synchronized AffectedTargetsData updateTargetTaskResult(String executionName, String targetName, TaskResult taskResult) {
+        AffectedTargetsData affectedTargetsData = null;
 
         for (Execution execution :
                 executions) {
             if (execution.getExecutionName().equals(executionName)) {
-                updated = execution.updateTargetTaskResult(targetName, taskResult);
+                affectedTargetsData = execution.updateTargetTaskResult(targetName, taskResult);
                 break;
             }
         }
 
-        return updated;
+        return affectedTargetsData;
+    }
+
+    /**
+     * This method returns a collection of all the executions a user participates in.
+     * @param filter_executionMustBeRunning determines whether to choose executions that are running or any execution
+     *                                      the user is participating in (paused or stopped as well).
+     * @param filter_userMustBeActive determines whether to choose executions that the user is active in or also
+     *                                executions the user paused his participation in.
+     */
+    public synchronized Collection<Execution> getExecutionsUserParticipates(User user,
+                                                                               boolean filter_executionMustBeRunning,
+                                                                               boolean filter_userMustBeActive) {
+        Collection<Execution> resExecutions = new LinkedList<>();
+
+        for (Execution execution :
+                executions) {
+            boolean addExecution = false;
+
+            if (user.isParticipatingInExecution(execution.getExecutionName(), filter_userMustBeActive)) {
+                if (filter_executionMustBeRunning) {
+                    addExecution = (execution.getExecutionStatus() == ExecutionStatus.EXECUTING);
+                } else {
+                    addExecution = true;
+                }
+            }
+
+            if(addExecution) {
+                resExecutions.add(execution);
+            }
+        }
+
+        return resExecutions;
+    }
+
+    public synchronized boolean removeUserFromConfiguration(String executionName, String userName) {
+        boolean userRemoved = false;
+
+        // TODO: allow removing only if task is not done?
+        for (Execution execution :
+                executions) {
+            if (execution.getExecutionName().equals(executionName)) {
+                userRemoved = execution.removeWorker(userName);
+                break;
+            }
+        }
+
+        return userRemoved;
     }
 }

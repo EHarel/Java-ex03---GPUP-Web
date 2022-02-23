@@ -41,7 +41,7 @@ public class UserTableControllerShared {
                 null, // Aviad code sent something else here
                 this::updateUsersList);
         timer = new Timer();
-        timer.schedule(listRefresher, Constants.REFRESH_RATE, Constants.REFRESH_RATE);
+        timer.schedule(listRefresher, Constants.REFRESH_RATE_USERS, Constants.REFRESH_RATE_USERS);
     }
 
     private void updateUsersList(List<UserDTO> usersNames) {

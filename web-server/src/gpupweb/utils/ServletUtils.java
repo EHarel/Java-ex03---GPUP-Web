@@ -2,6 +2,7 @@ package gpupweb.utils;
 
 //import engine.chat.ChatManager;
 //import engine.users.UserManager;
+import file.FileManager;
 import graph.GraphManager;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +18,7 @@ public class ServletUtils {
 	private static final String GRAPH_MANAGER_ATTRIBUTE_NAME = "graphManager";
 	private static final String CHAT_MANAGER_ATTRIBUTE_NAME = "chatManager";
 	private static final String EXECUTION_MANAGER_ATTRIBUTE_NAME = "executionManager";
+	private static final String FILE_MANAGER_ATTRIBUTE_NAME = "fileManager";
 
 
 	/*
@@ -27,6 +29,8 @@ public class ServletUtils {
 	private static final Object graphManagerLock = new Object();
 	private static final Object chatManagerLock = new Object();
 	private static final Object executionManagerLock = new Object();
+	private static final Object fileManagerLock = new Object();
+
 
 	public static UserManager getUserManager(ServletContext servletContext) {
 		synchronized (userManagerLock) {
@@ -58,6 +62,16 @@ public class ServletUtils {
 		}
 
 		return (GraphManager) servletContext.getAttribute(GRAPH_MANAGER_ATTRIBUTE_NAME);
+	}
+
+	public static FileManager getFileManager(ServletContext servletContext) {
+		synchronized (fileManagerLock) {
+			if (servletContext.getAttribute(FILE_MANAGER_ATTRIBUTE_NAME) == null) {
+				servletContext.setAttribute(FILE_MANAGER_ATTRIBUTE_NAME, new FileManager());
+			}
+		}
+
+		return (FileManager) servletContext.getAttribute(FILE_MANAGER_ATTRIBUTE_NAME);
 	}
 
 //	public static ChatManager getChatManager(ServletContext servletContext) {

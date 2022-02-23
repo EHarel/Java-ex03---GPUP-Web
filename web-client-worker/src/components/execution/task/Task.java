@@ -73,6 +73,10 @@ public abstract class Task implements Runnable {
 //        Collection<SerialSet> lockedSets = acquiredSetLocks();
 //        target.getTaskStatus().setTargetState(TargetDTO.TargetState.IN_PROCESS);
         target.getTaskStatus().setTargetState(TargetDTO.TargetState.IN_PROCESS);
+        Platform.runLater(() -> {
+            executionManager.updateTarget(target, null);
+        });
+
 //        taskManager.getConsumerManager().getTargetStateChangedConsumers().forEach(consumer -> consumer.accept(target.toDTO()));
 //        taskManager.getConsumerManager().getStartTargetConsumers().forEach(consumer -> consumer.accept(target.toDTO()));
         runTaskOnTarget();
@@ -80,7 +84,6 @@ public abstract class Task implements Runnable {
 //        removeTargetFromGraphIfDone();
         updateInstantsIfNecessary(start);
         String formalizedTargetStr = TaskUtils.getFormalizedTargetDataString(target.toDTO());
-        writeToFile(target.toDTO());
 //        taskManager.getConsumerManager().getEndTargetConsumers().forEach(consumer -> consumer.accept(target.toDTO()));
 //        execution.getProcessedData().addTargetData(target.toDTO());
 //        taskManager.getThreadManager().decrementActiveThreads(Thread.currentThread().getId());
@@ -117,19 +120,6 @@ public abstract class Task implements Runnable {
     private void updateInstantsIfNecessary(Instant start) {
         target.getTaskStatus().setStartInstant(start);
         target.getTaskStatus().setEndInstant(Instant.now());
-    }
-
-
-    private void writeToFile(TargetDTO targetDTO) {
-        Path fullDirPath = FileSystemUtils.getExecutionPath(targetDTO.getExecutionName());
-
-        String fullLogPath = fullDirPath.toString() + "/" + targetDTO.getName() + ".log";
-
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(fullLogPath));
-            writer.write(TaskUtils.getFormalizedTargetDataString(targetDTO));
-            writer.close();
-        } catch (IOException ignore) { } // Can't stop the execution for this
     }
 }
 

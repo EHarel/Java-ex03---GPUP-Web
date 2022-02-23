@@ -7,12 +7,14 @@ import file.jaxb.schema.generated.GPUPTarget;
 import file.jaxb.schema.generated.GPUPTargetDependencies;
 import graph.*;
 import task.enums.TaskType;
+import utilsharedall.ConstantsAll;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,6 +28,77 @@ public class FileManager {
     private static final String requiredForStr = "requiredFor";
     private static final String dependsOnStr = "dependsOn";
 
+
+    private Map<String, Path> executionName2Path = new HashMap<>();
+
+    public FileManager() {
+        executionName2Path = new HashMap<>();
+    }
+
+
+
+
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ------------------------------------ EX03 DIRECTORY MANAGEMENT ------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+
+    /**
+     * @return the full directory path of the directory opened for this execution.
+     */
+    public void checkAndOpenExecutionDirectory(String executionName) {
+        Path executionPath = executionName2Path.get(executionName);
+
+        try {
+
+            if (executionPath == null || !Files.isDirectory(executionPath)) {
+                executionPath = createExecutionPath(executionName);
+                Files.createDirectories(executionPath);
+                executionName2Path.put(executionName, executionPath);
+            }
+        } catch (Exception ignore) {}
+    }
+
+    private Path createExecutionPath(String executionName) {
+        Path mainDirPath = getMainDirPath();
+        String executionPathStr = "/" + executionName;
+        String fullExecutionPathStr = mainDirPath.toString() + executionPathStr;
+        Path fullExecutionPath = Paths.get(fullExecutionPathStr);
+
+        return fullExecutionPath;
+    }
+
+    private Path getMainDirPath() {
+        return Paths.get(ConstantsAll.WORKING_DIR);
+    }
+
+    /**
+     * @return the full path of the execution directory, as saved in the map.
+     */
+    public Path getExecutionPath(String executionName) {
+        return executionName2Path.get(executionName);
+    }
+
+    public void saveTargetLog(String targetName, String targetLog, String executionName) {
+        Path fullDirPath = getExecutionPath(executionName);
+
+        String fullLogPath = fullDirPath.toString() + "/" + targetName + ".log";
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fullLogPath));
+            writer.write(targetLog);
+            writer.close();
+        } catch (IOException ignore) {
+        } // Can't stop the execution for this
+    }
+
+
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ------------------------------------------- XML LOADING -------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
     public static SaveObject loadRegular(String pathWithoutSuffix) throws IOException {
         String pathWithSuffix = pathWithoutSuffix.trim() + savedFilesSuffix;
 //        BufferedReader in = new BufferedReader(new FileReader(path));
@@ -61,7 +134,6 @@ public class FileManager {
     }
 
     /**
-     *
      * @return graph if the file is valid, otherwise null or exceptions.
      */
     public static DependenciesGraph getGraphFromXMLInputStreamIfValid(InputStream inputStream, String uploadingUser) throws
@@ -216,9 +288,9 @@ public class FileManager {
     private static void checkDependenciesAreExistingTargets(Map<String, GPUPTarget> name2GPUP) throws DependencyOnNonexistentTargetException {
         for (GPUPTarget gTarget : name2GPUP.values()) {
             // Go over all its dependencies and check that they exist
-            if(gTarget.getGPUPTargetDependencies() != null) {
+            if (gTarget.getGPUPTargetDependencies() != null) {
                 for (GPUPTargetDependencies.GPUGDependency gTargDep : gTarget.getGPUPTargetDependencies().getGPUGDependency()) {
-                    if (! name2GPUP.containsKey(gTargDep.getValue())) {
+                    if (!name2GPUP.containsKey(gTargDep.getValue())) {
                         String dependencyTypeStr = getDependencyTypeStr(gTargDep.getType());
 
                         throw new DependencyOnNonexistentTargetException("ERROR! " +
@@ -285,6 +357,7 @@ public class FileManager {
     /**
      * This method should be called at the end of several checks. It assumes checks have been made to ensure no repeating names,
      * No dependencies on nonexistent targets, and no immediate cyclical dependencies.
+     *
      * @param name2GPUP a map with all targets inserted into it, with names as keys.
      */
     private static DependenciesGraph createGraphFromValidMapAndSets(
@@ -352,7 +425,7 @@ public class FileManager {
         LocalDateTime now = LocalDateTime.now();
         String currTimeStr = dtf.format(now);
         // String dirName = "\\" + type.name() + " (" + taskTypeDirName + ") - " + currTimeStr; // Original format
-        String dirName = "/" + currTimeStr +  " -- " + type.name() + " (" + taskTypeDirName + ")"; // Time first format
+        String dirName = "/" + currTimeStr + " -- " + type.name() + " (" + taskTypeDirName + ")"; // Time first format
         String fullPath = saveFilesLocation + dirName;
         FileManager.createDirectory(fullPath);
 

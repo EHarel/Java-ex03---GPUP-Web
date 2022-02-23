@@ -320,6 +320,7 @@ public class Execution implements Cloneable {
         target = targetQueue.poll();
         if (target != null) {
             target.setTimeOfExitOutOfTaskQueue(Instant.now());
+            target.getTaskStatus().setTargetState(TargetDTO.TargetState.IN_PROCESS);
         }
 
         return target;
@@ -331,28 +332,34 @@ public class Execution implements Cloneable {
     /* ------------------------------------- TASK PROCESS CODE - EX03 ------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
-    public synchronized boolean updateTargetTaskResult(String targetName, TaskResult taskResult) {
+    public synchronized AffectedTargetsData updateTargetTaskResult(String targetName, TaskResult taskResult) {
+        AffectedTargetsData affectedTargetsData = new AffectedTargetsData();
+
         Target target = endGraph.get(targetName);
+
         if (target == null) {
-            return false;
+            return null;
         }
 
         // Code from task process:
         target.getTaskStatus().setTargetState(TargetDTO.TargetState.FINISHED);
         target.getTaskStatus().setTaskResult(taskResult);
         Collection<List<String>> skippedTargetsNames_AllPaths = getSkippedTargetsAllPaths(target);
-        Collection<String> skippedTargetNames = getSkippedTargetNamesFromAllSkippedPathsTrimmed(skippedTargetsNames_AllPaths, target);
+        Set<String> skippedTargetNames = getSkippedTargetNamesFromAllSkippedPathsTrimmed(skippedTargetsNames_AllPaths, target);
 
         target.getTaskStatus().setTargetsSkippedAsResult(skippedTargetNames);
+        affectedTargetsData.setSkippedTargetsNames(skippedTargetNames);
 
-        Collection<String> openedTargets = getOpenedTargets(target);
+
+        Set<String> openedTargets = getOpenedTargets(target);
         target.getTaskStatus().setTargetsOpenedAsResult(openedTargets);
+        affectedTargetsData.setOpenedTargetsNames(openedTargets);
 
         addOpenedTargets(target);
 
         checkAndUpdateIfExecutionIsDone();
 
-        return true;
+        return affectedTargetsData;
     }
 
     private void checkAndUpdateIfExecutionIsDone() {
@@ -413,8 +420,8 @@ public class Execution implements Cloneable {
      * This method returns a trimmed collection of all target names,
      * removing duplicates and the specific parameter target from the collection.
      */
-    protected Collection<String> getSkippedTargetNamesFromAllSkippedPathsTrimmed(Collection<List<String>> skippedTargetsNames_allPaths, Target targetToIgnore) {
-        Collection<String> skippedNames = new LinkedHashSet<>();
+    protected Set<String> getSkippedTargetNamesFromAllSkippedPathsTrimmed(Collection<List<String>> skippedTargetsNames_allPaths, Target targetToIgnore) {
+        Set<String> skippedNames = new LinkedHashSet<>();
 
         for (Collection<String> path : skippedTargetsNames_allPaths) {
             for (String target : path) {
@@ -427,8 +434,8 @@ public class Execution implements Cloneable {
         return skippedNames;
     }
 
-    protected Collection<String> getOpenedTargets(Target target) {
-        Collection<String> openedTargets = new ArrayList<>();
+    protected Set<String> getOpenedTargets(Target target) {
+        Set<String> openedTargets = new LinkedHashSet<>();
         TaskResult result = target.getTaskStatus().getTaskResult();
 
         if (result != TaskResult.UNPROCESSED) {
@@ -571,12 +578,29 @@ public class Execution implements Cloneable {
             added = true;
         }
 
-
         return added;
+    }
+
+    public synchronized boolean removeWorker(String userName) {
+        boolean removed = participatingWorkerNames.remove(userName);
+
+        return removed;
     }
 
     public boolean containsWorker(String username) {
         return getParticipatingWorkerNames().contains(username);
+    }
+
+    public Integer getPricePerTarget() {
+        TaskType taskType = getTaskType();
+
+        Integer price = startingGraph.getPrice(taskType);
+
+        return price;
+    }
+
+    public int getTotalWorkers() {
+        return participatingWorkerNames.size();
     }
 
 

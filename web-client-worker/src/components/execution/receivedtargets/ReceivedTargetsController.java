@@ -1,9 +1,9 @@
 package components.execution.receivedtargets;
 
-import graph.GraphDTO;
-import javafx.collections.ObservableList;
+import graph.TargetDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -23,13 +23,17 @@ public class ReceivedTargetsController {
     @FXML    private TableColumn<TargetDTOWorkerDetails, String> tableColumn_ExecutionName;
     @FXML    private TableColumn<TargetDTOWorkerDetails, TaskType> tableColumn_TaskType;
     @FXML    private TableColumn<TargetDTOWorkerDetails, String> tableColumn_TargetName;
+    @FXML    private TableColumn<TargetDTOWorkerDetails, TargetDTO.TargetState> tableColumn_TargetState;
     @FXML    private TableColumn<TargetDTOWorkerDetails, TaskResult> tableColumn_TaskResult;
     @FXML    private TableColumn<TargetDTOWorkerDetails, Integer> tableColumn_Paycheck;
+
+
 
     @FXML    private TextArea textArea_Logs;
 
 
     /* ------------------------------------------ CUSTOM FIELDS ------------------------------------------- */
+    private TargetDTOWorkerDetails currentlySelectedRow;
 
     
 
@@ -41,8 +45,28 @@ public class ReceivedTargetsController {
         tableColumn_ExecutionName.setCellValueFactory(new PropertyValueFactory<TargetDTOWorkerDetails, String>("executionName"));
         tableColumn_TaskType.setCellValueFactory(new PropertyValueFactory<TargetDTOWorkerDetails, TaskType>("taskType"));
         tableColumn_TargetName.setCellValueFactory(new PropertyValueFactory<TargetDTOWorkerDetails, String>("targetName"));
+        tableColumn_TargetState.setCellValueFactory(new PropertyValueFactory<TargetDTOWorkerDetails, TargetDTO.TargetState>("targetState"));
         tableColumn_TaskResult.setCellValueFactory(new PropertyValueFactory<TargetDTOWorkerDetails, TaskResult>("taskResult"));
         tableColumn_Paycheck.setCellValueFactory(new PropertyValueFactory<TargetDTOWorkerDetails, Integer>("paycheck"));
+
+        setDoubleClickEvent();
+    }
+
+    private void setDoubleClickEvent() {
+        tableView_Targets.setRowFactory( tv -> {
+            TableRow<TargetDTOWorkerDetails> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    TargetDTOWorkerDetails rowData = row.getItem();
+                    System.out.println("[Received Targets TableView] chosen row data: " + rowData);
+
+                    currentlySelectedRow = row.getItem();
+                    textArea_Logs.setText(currentlySelectedRow.getResLog());
+                }
+            });
+
+            return row ;
+        });
     }
 
 

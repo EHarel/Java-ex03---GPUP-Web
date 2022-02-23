@@ -43,14 +43,10 @@ public class TargetFetcher extends TimerTask {
             return;
         }
 
-        shouldUpdate.set(false); // TODO: delete once done debugging
-
-
         final int finalRequestNumber = ++requestNumber;
 //        httpRequestLoggerConsumer.accept("About to invoke: " + utilsharedclient.Constants.USERS_LIST + " | Users Request # " + finalRequestNumber);
 
-        int availableThreads = executionManager.getAvailableThreads(); // TODO uncomment and implement
-//        int availableThreads = 3;
+        int availableThreads = executionManager.getAvailableThreads();
 
         if (availableThreads == 0) {
             return;
@@ -68,7 +64,6 @@ public class TargetFetcher extends TimerTask {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
 //                httpRequestLoggerConsumer.accept("Users Request # " + finalRequestNumber + " | Ended with failure...");
-                shouldUpdate.set(true); // TODO: delete once done debugging
             }
 
             @Override
@@ -88,7 +83,6 @@ public class TargetFetcher extends TimerTask {
                         mainController.newTargetsReceived(Arrays.asList(targetDTOs));
                     }
                 }
-                shouldUpdate.set(true); // TODO: delete once done debugging
             }
         });
     }

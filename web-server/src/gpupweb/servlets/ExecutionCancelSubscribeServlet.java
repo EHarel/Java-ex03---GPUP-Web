@@ -13,7 +13,8 @@ import utilsharedall.ConstantsAll;
 
 import java.io.IOException;
 
-public class ExecutionSubscribeServlet extends HttpServlet {
+
+public class ExecutionCancelSubscribeServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/plain;charset=UTF-8");
@@ -26,13 +27,13 @@ public class ExecutionSubscribeServlet extends HttpServlet {
             String executionNameFromParameter = request.getParameter(ConstantsAll.QP_EXECUTION_NAME);
             ExecutionManager executionManager = ServletUtils.getExecutionManager(getServletContext());
 
-            if (executionManager.addUserToConfiguration(executionNameFromParameter, usernameFromSession)) {
+            if (executionManager.removeUserFromConfiguration(executionNameFromParameter, usernameFromSession)) {
                 UserManager userManager = ServletUtils.getUserManager(getServletContext());
                 User user = userManager.getUser(usernameFromSession);
-                user.addNewParticipatingExecution(executionNameFromParameter);
+                user.removeParticipatingExecution(executionNameFromParameter);
 
                 response.setStatus(HttpServletResponse.SC_OK);
-                response.getOutputStream().print("User added!");
+                response.getOutputStream().print("User removed from execution!");
             } else {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
                 response.getOutputStream().print("User already part of execution work force.");

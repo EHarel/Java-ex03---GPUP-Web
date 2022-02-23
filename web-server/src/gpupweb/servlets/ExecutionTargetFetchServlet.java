@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import task.ExecutionManager;
+import users.User;
+import users.UserManager;
 import utilsharedall.ConstantsAll;
 
 import java.io.IOException;
@@ -39,9 +41,11 @@ public class ExecutionTargetFetchServlet extends HttpServlet {
                 if (targetCount > 0) {
                     try (PrintWriter out = response.getWriter()) {
                         ExecutionManager executionManager = ServletUtils.getExecutionManager(getServletContext());
+                        UserManager userManager = ServletUtils.getUserManager(getServletContext());
+                        User user = userManager.getUser(usernameFromSession);
 
                         System.out.println("[ExecutionTargetFetchServlet] - Pre-Invoking getTargetsForUser() from executionManager.");
-                        Collection<Target> chosenTargets = executionManager.getTargetsForUser(usernameFromSession, targetCount);
+                        Collection<Target> chosenTargets = executionManager.getTargetsForUser(user, targetCount);
                         System.out.println("[ExecutionTargetFetchServlet] - Post-Invoking getTargetsForUser() from executionManager.");
 
                         Set<TargetDTO> chosenTargetsDTOs = new HashSet<>();

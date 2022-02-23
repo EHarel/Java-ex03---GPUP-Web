@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import task.ExecutionManager;
 import task.enums.ExecutionStatus;
 import utilsharedall.ConstantsAll;
 
@@ -36,7 +37,12 @@ public class ExecutionStatusUpdateServlet extends HttpServlet {
                 ExecutionStatus executionStatus = ExecutionStatus.valueOf(request.getParameter(ConstantsAll.QP_EXECUTION_STATUS));
 
                 // TODO: code to check current status
-                if (ServletUtils.getExecutionManager(getServletContext()).updateExecutionStatus(executionNameFromParameter, executionStatus)) {
+                ExecutionManager executionManager = ServletUtils.getExecutionManager(getServletContext());
+                if (executionManager.updateExecutionStatus(executionNameFromParameter, executionStatus)) {
+                    if (executionStatus == ExecutionStatus.EXECUTING) {
+                        ServletUtils.getFileManager(getServletContext()).checkAndOpenExecutionDirectory(executionNameFromParameter);
+                    }
+
                     response.setStatus(HttpServletResponse.SC_OK);
                     response.getOutputStream().print("Status updated.");
                 } else {

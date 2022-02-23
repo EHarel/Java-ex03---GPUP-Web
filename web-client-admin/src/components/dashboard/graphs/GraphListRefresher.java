@@ -31,7 +31,7 @@ public class GraphListRefresher extends TimerTask {
         this.shouldUpdate = shouldUpdate;
 //        this.httpRequestLoggerConsumer = httpRequestLoggerConsumer;
         this.GraphListConsumer = usersListConsumer;
-        requestNumber = 0;
+        this.requestNumber = 0;
         this.dashboardController = dashboardController;
     }
 

@@ -33,7 +33,6 @@ public class ExecutionUploadServlet extends HttpServlet {
 
         String executionDTOStr = prop.getProperty(ConstantsAll.BP_EXECUTION_DTO);
         try {
-
 //            Gson gson = new GsonBuilder().serializeNulls().create();
 
             ExecutionDTO executionDTO = new Gson().fromJson(executionDTOStr, ExecutionDTO.class);

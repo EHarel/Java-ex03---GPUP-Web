@@ -36,9 +36,24 @@
         <servlet-class>gpupweb.servlets.ExecutionTargetFetchServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>WorkerParticipatingExecutionsReportServlet</servlet-name>
+        <servlet-class>gpupweb.servlets.WorkerParticipatingExecutionsReportServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>WorkerUpdateExecutionActivityServlet</servlet-name>
+        <servlet-class>gpupweb.servlets.WorkerUpdateExecutionActivityServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ExecutionCancelSubscribeServlet</servlet-name>
+        <servlet-class>gpupweb.servlets.ExecutionCancelSubscribeServlet</servlet-class>
+    </servlet>
+
+    <!--
+    <servlet>
         <servlet-name>ExecutionTargetTaskUpdate</servlet-name>
         <servlet-class>gpupweb.servlets.ExecutionTargetTaskUpdateServlet</servlet-class>
     </servlet>
+    -->
 
     <!-- MAPPING -->
     <servlet-mapping>
@@ -47,7 +62,7 @@
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>UsersListServlet</servlet-name>
-        <url-pattern>/userlist</url-pattern>
+        <url-pattern>/user/list</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>GraphsListServlet</servlet-name>
@@ -74,7 +89,24 @@
         <url-pattern>/execution/targets</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>WorkerParticipatingExecutionsReportServlet</servlet-name>
+        <url-pattern>/user/participatingexecutions</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>WorkerUpdateExecutionActivityServlet</servlet-name>
+        <url-pattern>/user/activeinexecution</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ExecutionCancelSubscribeServlet</servlet-name>
+        <url-pattern>/execution/cancelsubscribe</url-pattern>
+    </servlet-mapping>
+
+
+
+    <!--
+    <servlet-mapping>
         <servlet-name>ExecutionTargetTaskUpdate</servlet-name>
         <url-pattern>/execution/targets/update</url-pattern>
     </servlet-mapping>
+    -->
 </web-app>
