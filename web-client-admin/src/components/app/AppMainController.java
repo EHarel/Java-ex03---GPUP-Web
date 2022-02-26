@@ -1,6 +1,7 @@
 package components.app;
 
 import componentcode.executiontable.ExecutionDTOTable;
+import componentcode.executiontable.ExecutionListRefresher;
 import components.css.Themes;
 import components.dashboard.DashboardController;
 import components.graph.alldata.GraphAllDataController;
@@ -10,16 +11,14 @@ import components.graph.targettable.TargetTableController;
 import components.task.execution.main.TaskExecutionMainController;
 import components.task.settings.TaskSettingsController;
 //import console.task.TaskGeneral;
-import events.ExecutionEndListener;
-import events.ExecutionStartListener;
-import events.FileLoadedListener;
-import events.GraphChosenListener;
+import events.*;
 import exception.*;
 import graph.DependenciesGraph;
 import graph.GraphDTO;
 import httpclient.HttpClientUtil;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -41,6 +40,7 @@ import task.configuration.ConfigurationCompilation;
 import task.configuration.ConfigurationDTO;
 import task.configuration.ConfigurationSimulation;
 import utilsharedall.ConstantsAll;
+import utilsharedclient.Constants;
 
 import javax.naming.NameNotFoundException;
 import java.io.File;
@@ -100,6 +100,12 @@ public class AppMainController {
     private DependenciesGraph chosenGraph;
     private GraphManager graphManager;
     private ConfigurationManager configManager;
+    private ExecutionManager executionManager;
+
+    private final BooleanProperty shouldUpdateExecution;
+    private ExecutionListRefresher executionListRefresher;
+    private Timer executionListTimer;
+
 
 
     // Events
@@ -107,6 +113,8 @@ public class AppMainController {
     private List<ExecutionStartListener> executionStartListeners;
     private List<ExecutionEndListener> executionEndListeners;
     private List<GraphChosenListener> graphChosenListeners;
+    private List<ExecutionChosenListener> executionChosenListeners;
+
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -117,8 +125,13 @@ public class AppMainController {
         executionStartListeners = new LinkedList<>();
         executionEndListeners = new LinkedList<>();
         graphChosenListeners = new LinkedList<>();
+        executionChosenListeners = new LinkedList<>();
         graphManager = new GraphManager();
         configManager = new ConfigurationManager();
+        executionManager = new ExecutionManager();
+
+        this.shouldUpdateExecution = new SimpleBooleanProperty(false);
+        startExecutionListRefresher();
     }
 
 
@@ -208,11 +221,13 @@ public class AppMainController {
         graphChosenListeners.add(newListener);
     }
 
+    public void addEventListener_ExecutionChosen(ExecutionChosenListener newListener) { executionChosenListeners.add(newListener); }
+
     @FXML
     public void initialize() {
         if (headerComponentController != null) {
             headerComponentController.setMainController(this);
-            headerComponentController.disableTaskSettingsButton();
+//            headerComponentController.disableTaskSettingsButton();
         }
 
         if (targetTableController != null) {
@@ -225,8 +240,6 @@ public class AppMainController {
     }
 
     public void loadFile() {
-        boolean loaded = false;
-
         FileChooser fileChooser = new FileChooser();
         File selectedFile = fileChooser.showOpenDialog(GPUPAdmin.getStage());
         if (selectedFile != null) {
@@ -247,7 +260,6 @@ public class AppMainController {
 
 
 //        updateHttpStatusLine("New request is launched for: " + finalUrl); // Aviad Code
-
             HttpClientUtil.runAsync(finalUrl, body, new Callback() {
 
                 @Override
@@ -264,7 +276,7 @@ public class AppMainController {
                     if (response.code() != 200) {
                         Platform.runLater(() ->
 //                                    resultMessageProperty.set("Something went wrong: " + responseBody));
-                                showFileLoadingErrorMessage("Something went wrong with the file upload!"));
+                                showFileLoadingErrorMessage(responseBody));
                     } else {
                         Platform.runLater(() -> {
                             fileLoadedListeners.forEach(FileLoadedListener::fileLoaded);
@@ -357,8 +369,6 @@ public class AppMainController {
         this.menuController = controller;
 
         menuController.setMainController(this);
-        menuController.disableTaskSettingsButton();
-
 
         menuController.getButtonDisableAnimations().selectedProperty().addListener((observable, oldValue, newValue) -> {
             allowAnimations.set(!menuController.getButtonDisableAnimations().isSelected());
@@ -511,8 +521,20 @@ public class AppMainController {
     public void loginSuccessful(String userName) {
         this.username = userName;
         this.primaryStage.setTitle(this.primaryStage.getTitle() + " - Logged in as: " + userName);
+
+        this.executionListRefresher.setUsername(username);
+        this.shouldUpdateExecution.set(true);
+
         displayMainApp();
     }
+
+    public void startExecutionListRefresher() {
+        this.executionListRefresher = new ExecutionListRefresher(shouldUpdateExecution, null, null);
+
+        this.executionListTimer = new Timer();
+        this.executionListTimer.schedule(executionListRefresher, Constants.REFRESH_RATE_EXECUTIONS, Constants.REFRESH_RATE_EXECUTIONS);
+    }
+
 
     private void displayMainApp() {
         this.root.setTop(menu);
@@ -535,7 +557,7 @@ public class AppMainController {
      * This event is responsible for handling all the implications of a new graph being chosen by the admin.
      * This graph must be read from the dashboard, and then be made relevant to all the other components.
      */
-    public void newGraphChosen() {
+    public void event_NewGraphSelected() {
         String chosenGraphName = dashboardController.getChosenGraphName();
 
         chosenGraph = null;
@@ -545,6 +567,10 @@ public class AppMainController {
         }
 
         graphChosenListeners.forEach(GraphChosenListener::graphChosen);
+    }
+
+    public void event_NewExecutionSelected(ExecutionDTOTable executionDTOTable) {
+        executionChosenListeners.forEach(executionChosenListener -> { executionChosenListener.executionChosen(executionDTOTable);} );
     }
 
     public DependenciesGraph getChosenGraph() {
@@ -557,6 +583,10 @@ public class AppMainController {
 
     public boolean addConfiguration(Configuration configuration) {
         return configManager.addConfiguration(configuration);
+    }
+
+    public boolean removeConfiguration(TaskType taskType, String configName) {
+        return configManager.removeConfiguration(taskType, configName);
     }
 
     public Collection<ConfigurationDTO> getConfigDataAll(TaskType taskType) {
@@ -579,10 +609,6 @@ public class AppMainController {
         this.primaryStage = primaryStage;
     }
 
-    public void event_ExecutionRowSelected(ExecutionDTOTable currentlySelectedRow) {
-        taskExecutionController.event_ExecutionSelected(currentlySelectedRow);
-    }
-
 
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
@@ -596,6 +622,10 @@ public class AppMainController {
         taskExecutionController.sendServerRequest_ExecutionStart();
     }
 
+    public void event_ButtonPressed_ContinueExecution() {
+        taskExecutionController.sendServerRequest_ExecutionContinue();
+    }
+
     public String getChosenExecutionName() {
         return dashboardController.getChosenExecutionName();
     }
@@ -607,6 +637,36 @@ public class AppMainController {
 
     public void event_ButtonPressed_StopExecution() {
         taskExecutionController.sendServerRequest_ExecutionStop();
+    }
+
+    public void addConfigurationIfMissing(ExecutionDTOTable executionDTOTable) {
+        configManager.addConfigurationIfMissing(executionDTOTable);
+    }
+
+    /**
+     * Set active config based on the configuration of the given execution.
+     */
+    public void setActiveConfig(ExecutionDTOTable executionDTOTable) {
+        configManager.setActiveConfig(executionDTOTable);
+    }
+
+    public Integer getExecutionCount(String executionName) {
+        return executionManager.getExecutionCount(executionName);
+    }
+
+    /**
+     * Adds a new execution to the list of executions user has created.
+     */
+    public void addExecution(String executionName) {
+        executionManager.addExecution(executionName);
+    }
+
+    public ExecutionListRefresher getExecutionListRefresher() {
+        return executionListRefresher;
+    }
+
+    public void increaseExecutionCount(String executionOriginalName) {
+        executionManager.increaseExecutionCount(executionOriginalName);
     }
 
 

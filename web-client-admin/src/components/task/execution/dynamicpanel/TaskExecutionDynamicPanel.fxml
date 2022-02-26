@@ -17,17 +17,12 @@
                <top>
                   <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="41.0" prefWidth="600.0" BorderPane.alignment="CENTER">
                      <content>
-                        <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="598.0" spacing="10.0">
+                        <HBox alignment="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="598.0" spacing="10.0">
                            <children>
                               <Button fx:id="startButton" mnemonicParsing="false" onAction="#startButtonActionListener" prefWidth="65.0" text="Start" />
                               <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pauseButtonActionListener" prefWidth="65.0" text="Pause" />
                               <Button fx:id="continueButton" mnemonicParsing="false" onAction="#continueButtonActionListener" prefWidth="65.0" text="Continue" />
                               <Button fx:id="buttonStop" mnemonicParsing="false" onAction="#buttonStopActionListener" prefWidth="65.0" text="Stop" />
-                              <Button fx:id="buttonResetForNewExecution" mnemonicParsing="false" onAction="#buttonResetForNewExecutionActionListener" text="Reset for New Execution">
-                                 <HBox.margin>
-                                    <Insets left="100.0" />
-                                 </HBox.margin>
-                              </Button>
                            </children>
                            <padding>
                               <Insets left="10.0" />

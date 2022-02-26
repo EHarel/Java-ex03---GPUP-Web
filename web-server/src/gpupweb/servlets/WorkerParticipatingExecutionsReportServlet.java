@@ -50,9 +50,8 @@ public class WorkerParticipatingExecutionsReportServlet extends HttpServlet {
             executionsUserParticipates.forEach(execution -> {
 
                 String executionName = execution.getExecutionName();
-//                float executionProgress = execution.getProgress(); // todo: IMPLEMENT!
-                float executionProgress = 0.666f;
-
+                float executionProgress = execution.getExecutionProgress();
+//                float executionProgress = 0.666f;
 
                 int targetsUserProcessedWithAnyResult = user.getNumberOfProcessedTargetsOfExecution(executionName);
                 int totalCreditsEarned = user.getCreditsEarnedForExecution(executionName);

@@ -1,11 +1,11 @@
 package components.dashboard;
 
 import componentcode.executiontable.ExecutionDTOTable;
+import componentcode.executiontable.ExecutionListRefresher;
 import components.app.AppMainController;
 import components.dashboard.execution.ExecutionTableAdminController;
 import components.dashboard.graphs.UploadedGraphsTableController;
 import components.dashboard.users.UserTableController;
-import events.LoginPerformedListener;
 import graph.GraphDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -58,7 +58,6 @@ public class DashboardController {
 //        });
 
         component_GraphTableController.setDashboardController(this);
-        component_ExecutionTableController.setMainController(mainController);
         component_ExecutionTableController.setDashboardController(this);
     }
 
@@ -73,6 +72,7 @@ public class DashboardController {
     /* ---------------------------------------------------------------------------------------------------- */
     public void setMainController(AppMainController mainController) {
         this.mainController = mainController;
+        this.component_ExecutionTableController.setMainController(mainController);
     }
 
     public UploadedGraphsTableController getGraphTableController() {
@@ -120,36 +120,40 @@ public class DashboardController {
 
         label_SelectedGraphName.setText(name);
 
-        mainController.newGraphChosen();
+        mainController.event_NewGraphSelected();
     }
 
     public void event_ExecutionRowSelected(ExecutionDTOTable currentlySelectedRow) {
+        String msg = "";
+        Color color = Color.BLACK;
         if (validNewExecution(currentlySelectedRow)) {
-            String successMsg = "Execution selected! You may view its details in the panel.";
-            AppMainController.AnimationFadeSingle(null, label_ExecutionSelectionMessage, successMsg, Color.GREEN);
-
-            currentlyChosenExecutionName = currentlySelectedRow.getExecutionName();
-            label_SelectedExecution.setText(currentlyChosenExecutionName);
-            mainController.event_ExecutionRowSelected(currentlySelectedRow);
+            msg = "Execution selected! You may view its details in the panel.";
+            color = Color.GREEN;
         } else {
-            String failMsg = "You can only choose executions you uploaded.";
-            AppMainController.AnimationFadeSingle(null, label_ExecutionSelectionMessage, failMsg, Color.RED);
+            msg = "You are not the creator. Limited options available (only graph analysis)";
+            color = Color.RED;
         }
+
+        AppMainController.AnimationFadeSingle(null, label_ExecutionSelectionMessage, msg, color);
+        currentlyChosenExecutionName = currentlySelectedRow.getExecutionName();
+        label_SelectedExecution.setText(currentlyChosenExecutionName);
+        mainController.event_NewExecutionSelected(currentlySelectedRow);
     }
 
     private boolean validNewExecution(ExecutionDTOTable currentlySelectedRow) {
         boolean validNewExecution = true;
 
         // TODO: change after debugging!
-//        // Check if execution uploader is current user
-//        if (! currentlySelectedRow.getCreatingUser().equals(mainController.getUsername())) {
-//            validNewExecution = false;
-//        }
-
-        // Check if already selected
-        if ( currentlySelectedRow.getExecutionName().equals(label_SelectedExecution.getText())) {
+        // Check if execution uploader is current user
+        if (! currentlySelectedRow.getCreatingUser().equals(mainController.getUsername())) {
             validNewExecution = false;
         }
+
+        // Check if already selected
+  // TODO: is this bad?
+//        if ( currentlySelectedRow.getExecutionName().equals(label_SelectedExecution.getText())) {
+//            validNewExecution = false;
+//        }
 
         return validNewExecution;
     }

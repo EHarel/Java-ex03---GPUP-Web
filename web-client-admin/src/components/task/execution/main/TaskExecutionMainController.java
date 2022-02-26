@@ -4,8 +4,10 @@ import componentcode.executiontable.ExecutionDTOTable;
 import components.app.AppMainController;
 import components.graph.targettable.TargetDTOTable;
 import components.task.execution.dynamicpanel.TaskExecutionDynamicPanelController;
+import components.task.execution.executiondetail.ExecutionDetailsController;
 import components.task.execution.statustables.ExecutionStatusTablesController;
 import components.task.settings.TaskSettingsController;
+import events.ExecutionChosenListener;
 import events.ExecutionEndListener;
 import events.ExecutionStartListener;
 import events.FileLoadedListener;
@@ -13,6 +15,7 @@ import graph.DependenciesGraph;
 import graph.TargetDTO;
 import httpclient.HttpClientUtil;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
@@ -28,8 +31,9 @@ import task.enums.ExecutionStatus;
 import utilsharedall.ConstantsAll;
 
 import java.io.IOException;
+import java.util.List;
 
-public class TaskExecutionMainController implements FileLoadedListener, ExecutionStartListener, ExecutionEndListener {
+public class TaskExecutionMainController implements FileLoadedListener, ExecutionStartListener, ExecutionEndListener, ExecutionChosenListener {
     /* ---------------------------------------------------------------------------------------------------- */
     /* ------------------------------------------- DATA MEMBERS ------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
@@ -52,12 +56,16 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
     @FXML
     private TaskExecutionDynamicPanelController dynamicPanelComponentController;
 
+    @FXML    private ScrollPane component_ExecutionDetails;
+    @FXML    private ExecutionDetailsController component_ExecutionDetailsController;
+
 
     /* ------------------------------------------ CUSTOM FIELDS ------------------------------------------- */
     private AppMainController mainController;
     private boolean isFirstFileLoaded = false;
     private DependenciesGraph workingGraph;
     private DependenciesGraph taskProcessWorkingGraph;
+    private String chosenExecutionName;
 
 
     /* ---------------------------------------------------------------------------------------------------- */
@@ -104,8 +112,24 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
         mainController.addEventListener_FileLoaded(this);
         mainController.addEventListener_ExecutionStarted(this);
         mainController.addEventListener_ExecutionEnded(this);
+        mainController.addEventListener_ExecutionChosen(this);
 
         dynamicPanelComponentController.setMainAppController(mainController);
+
+        mainController.getExecutionListRefresher().addConsumer(this::updateExecutionList);
+    }
+
+    public void updateExecutionList(List<ExecutionDTOTable> list) {
+        Platform.runLater(() -> {
+            for (ExecutionDTOTable executionDTO : list) {
+                if (executionDTO.getExecutionName().equals(chosenExecutionName)) {
+                    chosenExecutionName = chosenExecutionName;
+                    executionChosen(executionDTO);
+                    this.dynamicPanelComponentController.executionChosen(executionDTO);
+                    break;
+                }
+            }
+        });
     }
 
     public ExecutionStatusTablesController getStatusTablesComponentController() {
@@ -164,6 +188,10 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
         mainController.event_ButtonPressed_PauseExecution();
     }
 
+    public void event_ButtonPressed_ContinueExecution() {
+        mainController.event_ButtonPressed_ContinueExecution();
+    }
+
     public void finishedProcessingTarget(TargetDTO targetDTO) {
         statusTablesComponentController.finishedProcessingTarget(targetDTO);
         dynamicPanelComponentController.finishedProcessingTarget(targetDTO);
@@ -193,6 +221,28 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
         dynamicPanelComponentController.endExecution(execution);
     }
 
+    /**
+     * This method handles the event of a new execution being selected.
+     * It clears the current execution displayed and shows the new one.
+     */
+    @Override
+    public void executionChosen(ExecutionDTOTable executionDTOTable) {
+        reset();
+        if (! executionDTOTable.getCreatingUser().equals(mainController.getUsername())) {
+            return;
+        }
+
+        setWorkingGraph(new DependenciesGraph(executionDTOTable.getStartGraphDTO()));
+
+        this.chosenExecutionName = executionDTOTable != null ? executionDTOTable.getExecutionName() : null;
+
+        component_ExecutionDetailsController.executionChosen(executionDTOTable);
+        statusTablesComponentController.executionChosen(executionDTOTable);
+        dynamicPanelComponentController.executionChosen(executionDTOTable);
+
+        progressBar.setProgress(executionDTOTable.getExecutionProgress());
+    }
+
 
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
@@ -204,6 +254,7 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
         taskProcessWorkingGraph = null;
         statusTablesComponentController.clear();
         dynamicPanelComponentController.clear();
+        component_ExecutionDetailsController.clear();
         progressBar.setProgress(0);
     }
 
@@ -217,15 +268,6 @@ public class TaskExecutionMainController implements FileLoadedListener, Executio
 
     public void reset() {
         clear();
-    }
-
-    /**
-     * This method handles the event of a new execution being selected.
-     * It clears the current execution displayed and shows the new one.
-     */
-    public void event_ExecutionSelected(ExecutionDTOTable currentlySelectedRow) {
-        reset();
-        setWorkingGraph(new DependenciesGraph(currentlySelectedRow.getGraphDTO()));
     }
 
     public void sendServerRequest_ExecutionStart() {

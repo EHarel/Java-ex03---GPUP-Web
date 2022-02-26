@@ -32,49 +32,49 @@ public class FileUploadServlet extends HttpServlet {
         Collection<Part> parts = request.getParts();
         String usernameFromSession = SessionUtils.getUsername(request);
 
-        out.println("[FileUploadServlet - doPost] Total parts : " + parts.size());
-
         StringBuilder fileContent = new StringBuilder();
 
+        int servletResponse = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+        String resMsg = "";
         for (Part part : parts) {
-
-            // Aviad Code
-//            printPart(part, out);
-
-            //to write the content of the file to an actual file in the system (will be created at c:\samplefile)
-//            part.write("samplefile");
-
-            //to write the content of the file to a string
             fileContent.append(readFromInputStream(part.getInputStream()));
 
-//            Engine engine = Engine.getInstance();
-
             try {
-//                engine.loadXMLFromInputStream(part.getInputStream(), usernameFromSession);
-
                 DependenciesGraph graph = FileManager.getGraphFromXMLInputStreamIfValid(part.getInputStream(), usernameFromSession);
                 ServletUtils.getGraphManager(getServletContext()).addGraph(graph);
-
+                servletResponse = HttpServletResponse.SC_OK;
+                resMsg = "File uploaded!";
             } catch (JAXBException e) {
                 e.printStackTrace();
             } catch (ExistingItemException e) {
                 e.printStackTrace();
+                servletResponse = HttpServletResponse.SC_BAD_REQUEST;
+                resMsg = "Error! Existing item exception";
             } catch (DependencyOnNonexistentTargetException e) {
-                e.printStackTrace();
+                servletResponse = HttpServletResponse.SC_BAD_REQUEST;
+                resMsg = "Error! Dependency on non-existent target";
             } catch (ImmediateCircularDependencyException e) {
-                e.printStackTrace();
+                servletResponse = HttpServletResponse.SC_BAD_REQUEST;
+                resMsg = "Error! Immediate circular dependency!";
             } catch (NullOrEmptyStringException e) {
-                e.printStackTrace();
+                servletResponse = HttpServletResponse.SC_BAD_REQUEST;
+                resMsg = "Error! Null or empty string";
             } catch (InvalidInputRangeException e) {
-                e.printStackTrace();
+                servletResponse = HttpServletResponse.SC_BAD_REQUEST;
+                resMsg = "Error! Invalid input range";
             } catch (NonexistentTargetException e) {
-                e.printStackTrace();
+                servletResponse = HttpServletResponse.SC_BAD_REQUEST;
+                resMsg = "Error! Non-existent target";
             } catch (SerialSetNameRepetitionException e) {
                 e.printStackTrace();
             }
         }
 
-        printFileContent(fileContent.toString(), out);
+//        printFileContent(fileContent.toString(), out);
+
+        response.setStatus(servletResponse);
+//        response.getOutputStream().print(resMsg);
+        response.getWriter().print(resMsg);
     }
 
     private void printPart(Part part, PrintWriter out) {

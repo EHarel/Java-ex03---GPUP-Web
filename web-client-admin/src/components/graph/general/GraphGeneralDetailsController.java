@@ -6,6 +6,7 @@ import graph.GraphDTO;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 
 public class GraphGeneralDetailsController {
     private GraphAllDataController setGraphController;
@@ -41,13 +42,25 @@ public class GraphGeneralDetailsController {
     @FXML private Label numberOfLeavesLabel;
     @FXML private Label numberOfIndependentsLabel;
 
+    @FXML private Tooltip tooltip_GraphName;
+
+
     private Parent scene;
 
 
     public void populateData(DependenciesGraph graph) {
         if (graph != null) {
             GraphDTO graphDTO = graph.toDTO();
-            this.getGraphNameLabel().setText(graph.getName());
+
+            populateData(graphDTO);
+        }
+    }
+
+    public void populateData(GraphDTO graphDTO) {
+        if (graphDTO != null) {
+            String graphName = graphDTO.getGraphName();
+            this.getGraphNameLabel().setText(graphName);
+            this.tooltip_GraphName.setText(graphName);
             this.getNumberOfIndependentsLabel().setText(String.valueOf(graphDTO.getCountIndependents()));
             this.getNumberOfLeavesLabel().setText(String.valueOf(graphDTO.getCountLeaves()));
             this.getNumberOfMiddlesLabel().setText(String.valueOf(graphDTO.getCountMiddles()));

@@ -1,7 +1,5 @@
 package components.execution;
 
-import com.google.gson.GsonBuilder;
-import com.sun.org.apache.xerces.internal.xs.LSInputList;
 import components.app.AppMainController;
 import components.app.FileSystemUtils;
 import components.execution.receivedtargets.TargetDTOWorkerDetails;
@@ -20,7 +18,6 @@ import task.enums.TaskResult;
 import task.enums.TaskType;
 import task.configuration.*;
 import utilsharedall.ConstantsAll;
-import utilsharedall.UserType;
 import utilsharedclient.Constants;
 
 import java.io.BufferedWriter;
@@ -228,16 +225,12 @@ public class ExecutionManager {
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                String responseBody = response.body().string();
                 if (response.code() != 200) {
 //                    Platform.runLater(() ->
 //                            executionSubmissionFailure());
                 } else {
-
-//                    String responseString = response.body().string();
-//                    Integer payment = Integer.valueOf(responseString);
-
-                    int payment = 5;
+                    String responseString = response.body().string();
+                    Integer payment = Integer.valueOf(responseString);
 
                     Platform.runLater(() -> {
                         addPaymentToTarget(target, payment);
@@ -248,7 +241,7 @@ public class ExecutionManager {
     }
 
     private void addPaymentToTarget(Target target, int payment) {
-        if (targetFinishedWithSuccessOrWarnings(target)) {
+        if (targetFinished(target)) {
             for (TargetDTOWorkerDetails targetDTOWorker :
                     allTargetsUserWorkedOn) {
                 if (isSameExecutionTarget(targetDTOWorker, target)) {
@@ -260,25 +253,18 @@ public class ExecutionManager {
         }
     }
 
-    private boolean targetFinishedWithSuccessOrWarnings(Target target) {
-        boolean finishedWithSuccessOrWarnings = false;
+    private boolean targetFinished(Target target) {
+        boolean finishedProcessing = false;
 
         if (target != null) {
             TaskResult taskResult = target.getTaskStatus().getTaskResult();
 
-            switch (taskResult) {
-                case SUCCESS:
-                case SUCCESS_WITH_WARNINGS:
-                    finishedWithSuccessOrWarnings = true;
-                    break;
-                case FAILURE:
-                case UNPROCESSED:
-                default:
-                    finishedWithSuccessOrWarnings = false;
+            if (taskResult != TaskResult.UNPROCESSED) {
+                finishedProcessing = true;
             }
         }
 
-        return finishedWithSuccessOrWarnings;
+        return finishedProcessing;
     }
 
     private boolean isSameExecutionTarget(TargetDTOWorkerDetails targetDTOWorker, Target target) {
@@ -300,7 +286,7 @@ public class ExecutionManager {
     private int getTaskPayment(Target target) {
         int payment = 0;
 
-        if (targetFinishedWithSuccessOrWarnings(target)) {
+        if (targetFinished(target)) {
 
         }
 

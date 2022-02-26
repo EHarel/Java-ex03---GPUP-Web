@@ -5,6 +5,7 @@ import exception.NonexistentElementException;
 import task.enums.TaskType;
 
 import javax.naming.NameNotFoundException;
+import java.io.File;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -54,6 +55,9 @@ public class ConfigurationCompilation extends Configuration implements Serializa
             throw new NullPointerException("No source path given");
         }
 
+
+        sourceCodePath = replaceSlashWithFileSeparator(sourceCodePath);
+
         Path path = Paths.get(sourceCodePath);
         if (!Files.isDirectory(path)) { // Non-existing directory
             throw new NonexistentElementException("There is no opened directory at given path \"" + sourceCodePath
@@ -63,10 +67,23 @@ public class ConfigurationCompilation extends Configuration implements Serializa
         }
     }
 
+    private String replaceSlashWithFileSeparator(String path) {
+        String newPath = null;
+        try {
+            newPath = path.replaceAll("\\\\", "/");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        return newPath;
+    }
+
     private void setOutPath(String outPath) throws InvalidPathException {
         if (outPath == null) {
             throw  new NullPointerException("No out path given");
         }
+
+        outPath = replaceSlashWithFileSeparator(outPath);
 
         if (isValidPath(outPath)) {
             this.outPath = outPath;

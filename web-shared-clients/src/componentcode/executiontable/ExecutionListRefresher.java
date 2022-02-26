@@ -10,6 +10,8 @@ import task.execution.ExecutionDTO;
 import utilsharedall.ConstantsAll;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TimerTask;
 import java.util.function.Consumer;
@@ -19,19 +21,32 @@ import static utilsharedall.ConstantsAll.GSON_INSTANCE;
 public class ExecutionListRefresher extends TimerTask {
 
     //    private final Consumer<String> httpRequestLoggerConsumer;
-    private final Consumer<List<ExecutionDTOTable>> listConsumer;
+    private Collection<Consumer<List<ExecutionDTOTable>>> listConsumer;
     private String username;
     private int requestNumber;
     private final BooleanProperty shouldUpdate;
 
 
-    public ExecutionListRefresher(BooleanProperty shouldUpdate, Consumer<String> httpRequestLoggerConsumer, Consumer<List<ExecutionDTOTable>> listConsumer, String username) {
+    public ExecutionListRefresher(BooleanProperty shouldUpdate, Consumer<String> httpRequestLoggerConsumer, String username) {
         this.shouldUpdate = shouldUpdate;
 //        this.httpRequestLoggerConsumer = httpRequestLoggerConsumer;
-        this.listConsumer = listConsumer;
+        this.listConsumer = new LinkedList<>();
         this.username = username;
         requestNumber = 0;
     }
+
+    public void addConsumer(Consumer<List<ExecutionDTOTable>> newConsumer) {
+        if (newConsumer == null) {
+            return;
+        }
+
+        if (listConsumer == null) {
+            listConsumer = new LinkedList<>();
+        }
+
+        listConsumer.add(newConsumer);
+    }
+
 
     @Override
     public void run() {
@@ -47,7 +62,6 @@ public class ExecutionListRefresher extends TimerTask {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
 //                httpRequestLoggerConsumer.accept("Users Request # " + finalRequestNumber + " | Ended with failure...");
-
             }
 
             @Override
@@ -60,7 +74,8 @@ public class ExecutionListRefresher extends TimerTask {
 
                 List<ExecutionDTOTable> tableDTOList = ExecutionTableControllerShared.toTableList(executionDTOS, username);
 
-                listConsumer.accept(tableDTOList);
+                listConsumer.forEach(listConsumer1 -> {listConsumer1.accept(tableDTOList);});
+//                listConsumer.accept(tableDTOList);
             }
         });
     }

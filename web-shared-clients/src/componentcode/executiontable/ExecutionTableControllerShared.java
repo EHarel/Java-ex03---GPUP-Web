@@ -25,7 +25,7 @@ public class ExecutionTableControllerShared {
         this.usersTable = usersTable;
         this.username = null;
 
-        startListRefresher();
+//        startListRefresher();
     }
 
     public BooleanProperty getAutoUpdateProperty() {
@@ -36,13 +36,14 @@ public class ExecutionTableControllerShared {
         listRefresher = new ExecutionListRefresher(
                 autoUpdate,
                 null, // Aviad code sent something else here
-                this::updateExecutionList,
                 this.username);
         timer = new Timer();
         timer.schedule(listRefresher, Constants.REFRESH_RATE_EXECUTIONS, Constants.REFRESH_RATE_EXECUTIONS);
+
+        listRefresher.addConsumer(this::updateExecutionList);
     }
 
-    private void updateExecutionList(List<ExecutionDTOTable> list) {
+    public void updateExecutionList(List<ExecutionDTOTable> list) {
         Platform.runLater(() -> {
             ObservableList<ExecutionDTOTable> items = usersTable.getItems();
             items.clear();

@@ -154,6 +154,8 @@ public class TargetDTO implements Cloneable {
         private final Collection<String> targetsSkippedAsResult;
         private final Collection<List<String>> targetsSkippedAsResult_AllPaths;
         private final String errorDetails;
+        private Collection<String> targetsThisIsFrozenAndWaitingToFinish;
+        private final String targetLog;
 
         public TaskStatusDTO(
                             String executionName,
@@ -167,7 +169,10 @@ public class TargetDTO implements Cloneable {
                              Collection<String> targetsThatAreWaitingAsResult,
                              Collection<String> targetsSkippedAsResult,
                              Collection<List<String>> targetsSkippedAsResult_AllPaths,
-                             String errorDetails) {
+                             String errorDetails,
+                            Collection<String> targetsThisIsFrozenAndWaitingToFinish,
+                            String targetLog
+                            ) {
             this.executionName = executionName;
             this.executionNum = executionNum;
             this.startInstant = startInstant;
@@ -180,6 +185,12 @@ public class TargetDTO implements Cloneable {
             this.targetsSkippedAsResult = targetsSkippedAsResult;
             this.targetsSkippedAsResult_AllPaths = targetsSkippedAsResult_AllPaths;
             this.errorDetails = errorDetails;
+            this.targetsThisIsFrozenAndWaitingToFinish = targetsThisIsFrozenAndWaitingToFinish;
+            this.targetLog = targetLog;
+        }
+
+        public Collection<String> getTargetsThisIsFrozenAndWaitingToFinish() {
+            return targetsThisIsFrozenAndWaitingToFinish;
         }
 
         public String getExecutionName() { return this.executionName; }
@@ -240,11 +251,16 @@ public class TargetDTO implements Cloneable {
             return targetState;
         }
 
+        public String getTargetLog() {
+            return targetLog;
+        }
+
         @Override
         public TaskStatusDTO clone() {
             Collection<String> openedClone = cloneCollection(targetsOpenedAsResult);
             Collection<String> skippedClone = cloneCollection(targetsSkippedAsResult);
             Collection<List<String>> skippedAllPaths = clonePaths(targetsSkippedAsResult_AllPaths);
+            Collection<String> frozenWaitingClone = cloneCollection(targetsThisIsFrozenAndWaitingToFinish);
             ConfigurationDTOCompilation DTOCompConfig = this.configDTOComp != null ? configDTOComp.clone() : null;
             ConfigurationDTOSimulation DTOSimConfig = this.configDTOSim != null ? configDTOSim.clone() : null;
 
@@ -260,7 +276,9 @@ public class TargetDTO implements Cloneable {
                     openedClone,
                     skippedClone,
                     skippedAllPaths,
-                    this.errorDetails
+                    this.errorDetails,
+                    frozenWaitingClone,
+                    this.targetLog
             );
         }
 

@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import task.ExecutionManager;
+import task.enums.ExecutionStatus;
 import users.User;
 import users.UserManager;
 import utilsharedall.ConstantsAll;
@@ -26,16 +27,23 @@ public class ExecutionSubscribeServlet extends HttpServlet {
             String executionNameFromParameter = request.getParameter(ConstantsAll.QP_EXECUTION_NAME);
             ExecutionManager executionManager = ServletUtils.getExecutionManager(getServletContext());
 
-            if (executionManager.addUserToConfiguration(executionNameFromParameter, usernameFromSession)) {
-                UserManager userManager = ServletUtils.getUserManager(getServletContext());
-                User user = userManager.getUser(usernameFromSession);
-                user.addNewParticipatingExecution(executionNameFromParameter);
+            ExecutionStatus exeStatus = executionManager.getExecutionStatus(executionNameFromParameter);
 
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getOutputStream().print("User added!");
+            if (exeStatus == ExecutionStatus.ENDED || exeStatus == ExecutionStatus.COMPLETED || exeStatus == ExecutionStatus.STOPPED) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getOutputStream().print("Execution status is " + exeStatus.name());
             } else {
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-                response.getOutputStream().print("User already part of execution work force.");
+                if (executionManager.addUserToConfiguration(executionNameFromParameter, usernameFromSession)) {
+                    UserManager userManager = ServletUtils.getUserManager(getServletContext());
+                    User user = userManager.getUser(usernameFromSession);
+                    user.addNewParticipatingExecution(executionNameFromParameter);
+
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getOutputStream().print("User added!");
+                } else {
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
+                    response.getOutputStream().print("User already part of execution work force.");
+                }
             }
         }
     }

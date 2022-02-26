@@ -9,7 +9,7 @@ of the user of this class to handle the synchronization of isUserExists with oth
  */
 public class UserManager {
 
-    private final Collection<User> users;
+    private final List<User> users;
 
     public UserManager() {
         users = new LinkedList<>();

@@ -1,5 +1,6 @@
 package components.task.execution.statustables;
 
+import componentcode.executiontable.ExecutionDTOTable;
 import components.graph.targettable.TargetTableController;
 import graph.DependenciesGraph;
 import graph.TargetDTO;
@@ -207,5 +208,15 @@ public class ExecutionStatusTablesController {
     /* ---------------------------------------------------------------------------------------------------- */
     public void updateTargetStateChanged(TargetDTO targetDTO) {
         updateInAllTable(targetDTO);
+    }
+
+    public void executionChosen(ExecutionDTOTable executionDTOTable) {
+        if (executionDTOTable != null) {
+            if (executionDTOTable.getEndGraphDTO() != null) {
+                setWorkingGraph(new DependenciesGraph(executionDTOTable.getEndGraphDTO()));
+            } else if (executionDTOTable.getStartGraphDTO() != null) {
+                setWorkingGraph(new DependenciesGraph(executionDTOTable.getStartGraphDTO()));
+            }
+        }
     }
 }

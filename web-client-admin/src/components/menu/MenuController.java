@@ -60,9 +60,6 @@ public class MenuController implements ExecutionStartListener, ExecutionEndListe
     @FXML
     void dashboardButtonActionListener(ActionEvent event) {
         mainController.dashboardButtonPressed();
-//        newlyClickedButton = dashboardButton;
-
-//        buttonClicked();
     }
 
     @FXML
@@ -120,9 +117,9 @@ public class MenuController implements ExecutionStartListener, ExecutionEndListe
         loadFileButton.disableProperty().set(false);
     }
 
-    public void disableTaskSettingsButton() {
-        taskButton.disableProperty().set(true);
-    }
+//    public void disableTaskSettingsButton() {
+//        taskButton.disableProperty().set(true);
+//    }
 
     public void enableTaskSettingsButton() {
         taskButton.disableProperty().set(false);

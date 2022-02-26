@@ -1,9 +1,11 @@
 package components.graph.specifictarget;
 
 import algorithm.DFS;
+import componentcode.executiontable.ExecutionDTOTable;
 import components.app.AppUtils;
 import components.graph.alldata.GraphAllDataController;
 import graph.DependenciesGraph;
+import graph.GraphDTO;
 import graph.TargetDTO;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -28,6 +30,9 @@ public class SpecificTargetController {
 
     /* --------------------------------------- EXTERNAL COMPONENTS ---------------------------------------- */
     private GraphAllDataController graphController;
+
+    private String lastExecutionChosen;
+    private String lastTargetChosen;
 
 
     /* ------------------------------------------ CUSTOM FIELDS ------------------------------------------- */
@@ -130,6 +135,30 @@ public class SpecificTargetController {
     }
 
     public void clear() {
-        targetNameLabel.setText("[None selected]");
+        String noneSelectedText = "[None selected]";
+
+        String currText = targetNameLabel.getText();
+        if (!currText.equals(noneSelectedText)) {
+            lastTargetChosen = currText;
+        }
+
+        targetNameLabel.setText(noneSelectedText);
+    }
+
+    public void executionChosen(ExecutionDTOTable executionDTOTable) {
+        String chosenTargetName = targetNameLabel.getText();
+        if (chosenTargetName != null && !chosenTargetName.isEmpty()) {
+
+            // Find the target in the graph
+            GraphDTO endGraphDTO = executionDTOTable.getEndGraphDTO();
+            if (endGraphDTO != null) {
+                for (TargetDTO targetDTO : endGraphDTO.getTargetDTOs()) {
+                    if (targetDTO.getName().equals(lastTargetChosen)) {
+                        populateData(targetDTO, new DependenciesGraph(endGraphDTO));
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

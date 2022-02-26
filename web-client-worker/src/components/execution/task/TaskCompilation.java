@@ -13,11 +13,14 @@ import task.configuration.ConfigurationCompilation;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.List;
 
+
 public class TaskCompilation extends Task {
+    private static String errorDirPath = "C:/Temp/gpup comp error/";
     private static final int SUCCESS_CODE = 0;
 
     public TaskCompilation(@NotNull Target target,
@@ -51,7 +54,9 @@ public class TaskCompilation extends Task {
             try {
                 String fileNameOnly = getFileNameOnly(target);
                 String errorFileName = fileNameOnly + "Error";
-                File errorFile = File.createTempFile(errorFileName, ".txt", new File("C:/Temp/Error")); // TODO: read the location directory from WorkingDirectory in XML
+//                File errorFile = File.createTempFile(errorFileName, ".txt", new File("C:/Temp/Error")); // TODO: read the location directory from WorkingDirectory in XML
+                File errorFile = File.createTempFile(errorFileName, ".txt", null); // TODO: read the location directory from WorkingDirectory in XML
+
                 processBuilderCompilation.redirectError(errorFile);
                 target.getTaskStatus().setStartInstant(Instant.now());
                 Process process = processBuilderCompilation.start();

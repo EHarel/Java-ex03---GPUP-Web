@@ -5,7 +5,6 @@ import componentcode.executiontable.ExecutionTableControllerShared;
 import components.app.AppMainController;
 import components.dashboard.DashboardWorkerController;
 import components.login.LoginPerformedListenerWorker;
-import events.LoginPerformedListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -78,16 +77,47 @@ public class ExecutionTableWorkerController implements LoginPerformedListenerWor
         tableColumn_Subscribed.setCellValueFactory(new PropertyValueFactory<ExecutionDTOTable, Boolean>("userIsSubscribed"));
 
 
-        setDoubleClickEvent();
+        setRowDefinition();
 
         sharedController = new ExecutionTableControllerShared(tableView_Executions);
         setActive(false);
         sharedController.startListRefresher();
     }
 
-    private void setDoubleClickEvent() {
+
+    private void setRowDefinition() {
         tableView_Executions.setRowFactory( tv -> {
-            TableRow<ExecutionDTOTable> row = new TableRow<>();
+            TableRow<ExecutionDTOTable> row = new TableRow<ExecutionDTOTable>() {
+                @Override
+                protected void updateItem(ExecutionDTOTable item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item != null) {
+                        String styleValue = null;
+                        ExecutionStatus executionStatus = item.getExecutionStatus();
+
+                        switch (executionStatus) {
+                            case NEW:
+                            case PAUSED:
+                            case EXECUTING:
+                                if (item.getUserIsSubscribed().booleanValue()) {
+                                    styleValue = "-fx-background-color:lightgreen;";
+                                } else {
+                                    styleValue = null;
+                                }
+                                break;
+                            case STOPPED:
+                            case ENDED:
+                                styleValue = "-fx-background-color:darkgrey";
+                                break;
+                            case COMPLETED:
+                                styleValue = "-fx-background-color:gold";
+                                break;
+                        }
+
+                        setStyle(styleValue);
+                    }
+                }
+            };
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
                     ExecutionDTOTable rowData = row.getItem();
@@ -101,6 +131,24 @@ public class ExecutionTableWorkerController implements LoginPerformedListenerWor
             return row ;
         });
     }
+
+
+//    private void setDoubleClickEvent() {
+//        tableView_Executions.setRowFactory( tv -> {
+//            TableRow<ExecutionDTOTable> row = new TableRow<>();
+//            row.setOnMouseClicked(event -> {
+//                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+//                    ExecutionDTOTable rowData = row.getItem();
+//                    System.out.println("[Execution TableView] chosen row data: " + rowData);
+//
+//                    currentlySelectedRow = row.getItem();
+//                    dashboardController.rowChangedEvent(currentlySelectedRow);
+//                }
+//            });
+//
+//            return row ;
+//        });
+//    }
 
     public void setActive(boolean isActive) {
         sharedController.getAutoUpdateProperty().set(isActive);

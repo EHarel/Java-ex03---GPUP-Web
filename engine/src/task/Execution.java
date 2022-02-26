@@ -1,12 +1,10 @@
 package task;
 
 import algorithm.DFS;
-import datastructure.TaskQueueStateUpdate;
 import graph.DependenciesGraph;
 import graph.Target;
 import graph.TargetDTO;
 import logic.EngineUtils;
-import task.OldCode.TaskFactory;
 import task.configuration.*;
 import task.consumer.ConsumerUpdateState;
 import task.enums.TaskResult;
@@ -25,11 +23,13 @@ public class Execution implements Cloneable {
     /* ------------------------------------------ DATA MEMBERS -------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
     protected String executionName;
+    protected String executionOriginalName;
     private final String creatingUser;
     protected final TaskType taskType;
     protected TaskStartPoint taskStartPoint;
     protected final int executionNumber;
-    private final DependenciesGraph startingGraph;
+    private DependenciesGraph originalGraph;
+    private DependenciesGraph startingGraph;
     private DependenciesGraph endGraph;
     private Configuration configuration;
     private ProcessedData processedData;
@@ -39,6 +39,16 @@ public class Execution implements Cloneable {
     private final Integer pricePerTarget;
     private ExecutionStatus executionStatus;
     private Collection<String> participatingWorkerNames;
+    private boolean isExecutionFullyCompleted;
+
+    private int targetStateCount_FROZEN;
+    private int targetStateCount_WAITING;
+    private int targetStateCount_IN_PROCESS;
+    private int targetStateCount_FINISHED;
+    private int targetStateCount_SKIPPED;
+    private float executionProgress;
+
+    private String executionLog;
 
     private boolean startedRunning = false;
 //    TaskQueueStateUpdate queue;
@@ -67,6 +77,7 @@ public class Execution implements Cloneable {
 
     public Execution(ExecutionDTO executionDTO) {
         this.executionName = executionDTO.getExecutionName();
+        this.executionOriginalName = executionDTO.getExecutionOriginalName();
         this.creatingUser = executionDTO.getCreatingUser();
         this.taskType = executionDTO.getTaskType();
         this.taskStartPoint = executionDTO.getTaskStartPoint();
@@ -82,7 +93,10 @@ public class Execution implements Cloneable {
             }
         } catch (Exception ignore) {
         }
-        this.startingGraph = new DependenciesGraph(executionDTO.getGraphDTO());
+
+        this.originalGraph = new DependenciesGraph(executionDTO.getOriginalGraphDTO());
+        this.startingGraph = new DependenciesGraph(executionDTO.getStartGraphDTO());
+        this.endGraph = executionDTO.getEndGraphDTO() != null ? new DependenciesGraph(executionDTO.getEndGraphDTO()) : null;
 
         this.startingGraph.setExecutionNameForGraphAndTargets(this.executionName);
 
@@ -97,11 +111,21 @@ public class Execution implements Cloneable {
 
         this.startingGraph.setConfigurationForTargets(configuration);
         this.targetQueue = new LinkedList<>();
+        this.isExecutionFullyCompleted = new Boolean(executionDTO.getIsExecutionFullyCompleted().booleanValue());
+        this.targetStateCount_WAITING = 0;
+        this.targetStateCount_IN_PROCESS = 0;
+        this.targetStateCount_FINISHED = 0;
+        this.targetStateCount_SKIPPED = 0;
+        this.executionProgress = 0;
     }
 
 
     public String getExecutionName() {
         return executionName;
+    }
+
+    public String getExecutionOriginalName() {
+        return executionOriginalName;
     }
 
     public void setExecutionName(String executionName) {
@@ -141,12 +165,16 @@ public class Execution implements Cloneable {
 //        this.startPoint = startPoint;
 //    }
 
+    public String getExecutionLog() {
+        return executionLog;
+    }
+
     public void setTaskComplete(boolean taskComplete) {
         this.taskComplete = taskComplete;
     }
 
     public boolean getTaskComplete() {
-        return this.taskComplete;
+        return this.isExecutionFullyCompleted;
     }
 
     public DependenciesGraph getEndGraph() {
@@ -189,6 +217,14 @@ public class Execution implements Cloneable {
         return executionStatus;
     }
 
+    public float getExecutionProgress() {
+        return executionProgress;
+    }
+
+    public boolean isExecutionFullyCompleted() {
+        return isExecutionFullyCompleted;
+    }
+
     public Collection<String> getParticipatingWorkerNames() {
         return participatingWorkerNames;
     }
@@ -205,6 +241,11 @@ public class Execution implements Cloneable {
         }
     }
 
+    public void setExecutionFullyCompleted(boolean executionFullyCompleted) {
+        isExecutionFullyCompleted = executionFullyCompleted;
+    }
+
+
 
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
@@ -216,14 +257,61 @@ public class Execution implements Cloneable {
 //            return;
 //        }
 
+        this.startInstant = Instant.now();
+        this.executionLog = "Starting execution.";
+        this.executionProgress = 0;
+        this.targetStateCount_FINISHED = 0;
+        this.targetStateCount_SKIPPED = 0;
         this.endGraph = this.startingGraph.duplicate();
         this.endGraph.setConfigurationForTargets(this.configuration);
+        prepareEndGraphForExecution();
         prepareQueue();
 
 //        executionHistory.add(execution);
 //        activeConfiguration = rememberConfigurationBetweenExecutions ? activeConfiguration : null;
 //        checkIfTaskCompleted(execution);
 //        execution.setEndInstant(Instant.now());
+    }
+
+    /**
+     * This sets all the targets to FROZEN, and also prepares the list of targets they wait for.
+     */
+    private void prepareEndGraphForExecution() {
+        for (Target target :
+                endGraph.targets()) {
+//            updateTargetState(target, TargetDTO.TargetState.FROZEN);
+            updateTargetStateNoOldUpdate(target, TargetDTO.TargetState.FROZEN);
+            Collection<TargetDTO> allTargetsThisDependsOn = endGraph.getAllDependencies_Transitive(target.getName(), DFS.EdgeDirection.DEPENDENT_ON);
+
+            target.getTaskStatus().setTargetsThisIsFrozenFrom(allTargetsThisDependsOn);
+        }
+
+    }
+
+    private void updateTargetStateNoOldUpdate(Target target, TargetDTO.TargetState newState) {
+        if (target == null || newState == null) {
+            return;
+        }
+
+        switch (newState) {
+            case FINISHED:
+                targetStateCount_FINISHED++;
+                break;
+            case FROZEN:
+                targetStateCount_FROZEN++;
+                break;
+            case WAITING:
+                targetStateCount_WAITING++;
+                break;
+            case SKIPPED:
+                targetStateCount_SKIPPED++;
+                break;
+            case IN_PROCESS:
+                targetStateCount_IN_PROCESS++;
+                break;
+        }
+
+        target.getTaskStatus().setTargetState(newState);
     }
 
     private void prepareQueue() {
@@ -304,10 +392,57 @@ public class Execution implements Cloneable {
     }
 
     private void addTargetToQueue(Target target) {
-        target.getTaskStatus().setTargetState(TargetDTO.TargetState.WAITING);
+        updateTargetState(target, TargetDTO.TargetState.WAITING);
+
         target.setTimeOfEntryIntoTaskQueue(Instant.now());
 
         targetQueue.add(target);
+    }
+
+    private void updateTargetState(Target target, TargetDTO.TargetState newState) {
+        if (target == null || newState == null) {
+            return;
+        }
+
+        TargetDTO.TargetState currState = target.getTaskStatus().getTargetState();
+        
+        switch (currState) {
+            case FINISHED:
+                targetStateCount_FINISHED--;
+                break;
+            case FROZEN:
+                targetStateCount_FROZEN--;
+                break;
+            case WAITING:
+                targetStateCount_WAITING--;
+                break;
+            case SKIPPED:
+                targetStateCount_SKIPPED--;
+                break;
+            case IN_PROCESS:
+                targetStateCount_IN_PROCESS--;
+                break;
+        }
+        
+        switch (newState) {
+            case FINISHED:
+                targetStateCount_FINISHED++;
+                break;
+            case FROZEN:
+                targetStateCount_FROZEN++;
+                break;
+            case WAITING:
+                targetStateCount_WAITING++;
+                break;
+            case SKIPPED:
+                targetStateCount_SKIPPED++;
+                break;
+            case IN_PROCESS:
+                targetStateCount_IN_PROCESS++;
+                break;
+        }
+        
+        target.getTaskStatus().setTargetState(newState);
     }
 
     public synchronized Target removeTargetFromQueue() {
@@ -320,7 +455,9 @@ public class Execution implements Cloneable {
         target = targetQueue.poll();
         if (target != null) {
             target.setTimeOfExitOutOfTaskQueue(Instant.now());
-            target.getTaskStatus().setTargetState(TargetDTO.TargetState.IN_PROCESS);
+            updateTargetState(target, TargetDTO.TargetState.IN_PROCESS);
+
+            executionLog = executionLog + "\n\nRemoved " + target.getName() + " from the queue.";
         }
 
         return target;
@@ -342,14 +479,17 @@ public class Execution implements Cloneable {
         }
 
         // Code from task process:
-        target.getTaskStatus().setTargetState(TargetDTO.TargetState.FINISHED);
+        updateTargetState(target, TargetDTO.TargetState.FINISHED);
+
         target.getTaskStatus().setTaskResult(taskResult);
         Collection<List<String>> skippedTargetsNames_AllPaths = getSkippedTargetsAllPaths(target);
         Set<String> skippedTargetNames = getSkippedTargetNamesFromAllSkippedPathsTrimmed(skippedTargetsNames_AllPaths, target);
+        targetStateCount_SKIPPED += skippedTargetNames.size();
+
+        updateProgress();
 
         target.getTaskStatus().setTargetsSkippedAsResult(skippedTargetNames);
         affectedTargetsData.setSkippedTargetsNames(skippedTargetNames);
-
 
         Set<String> openedTargets = getOpenedTargets(target);
         target.getTaskStatus().setTargetsOpenedAsResult(openedTargets);
@@ -362,11 +502,55 @@ public class Execution implements Cloneable {
         return affectedTargetsData;
     }
 
+    private void updateProgress() {
+
+        int totalTargetsDone = targetStateCount_SKIPPED + targetStateCount_FINISHED;
+        int targetCount = startingGraph.size();
+
+
+        this.executionProgress = (float) (totalTargetsDone) / targetCount;
+    }
+
     private void checkAndUpdateIfExecutionIsDone() {
         boolean areTargetsLeftToProcess = areTargetsLeftToProcess();
         if (!areTargetsLeftToProcess) {
             setExecutionStatus(ExecutionStatus.ENDED);
+
+            isExecutionFullyCompleted = areAllTargetsSuccessful();
+            if (isExecutionFullyCompleted) {
+                setExecutionStatus(ExecutionStatus.COMPLETED);
+                isExecutionFullyCompleted = true;
+            }
+
+            endInstant = Instant.now();
+
+            String executionReport = EngineUtils.getFormalizedExecutionReportString(this);
+
+            this.executionLog = this.executionLog + "\n\n" + executionReport;
+
         }
+    }
+
+    private boolean areAllTargetsSuccessful() {
+        boolean allTargetsSuccessful = true;
+
+        for (Target target : endGraph.targets()) {
+            switch (target.getTaskStatus().getTaskResult()) {
+                case SUCCESS:
+                case SUCCESS_WITH_WARNINGS:
+                    break;
+                case UNPROCESSED:
+                case FAILURE:
+                    allTargetsSuccessful = false;
+                    break;
+            }
+
+            if (!allTargetsSuccessful) {
+                break;
+            }
+        }
+
+        return allTargetsSuccessful;
     }
 
     private boolean areTargetsLeftToProcess() {
@@ -518,11 +702,16 @@ public class Execution implements Cloneable {
 
 //        clone.setStartPoint(this.startPoint); // Old ex01-ex02
         clone.setTaskComplete(this.taskComplete);
+
+        clone.originalGraph = this.originalGraph.duplicate();
         clone.setEndGraph(this.endGraph.duplicate());
+
+
         clone.setStartInstant(this.startInstant);
         clone.setEndInstant(this.endInstant);
         clone.setProcessedData(this.processedData.clone());
         clone.setTaskStartPoint(this.taskStartPoint);
+        clone.setExecutionFullyCompleted(this.isExecutionFullyCompleted);
 
         return clone;
     }
@@ -542,9 +731,11 @@ public class Execution implements Cloneable {
 
         ExecutionDTO executionDTO = new ExecutionDTO(
                 this.executionName,
+                this.executionOriginalName,
                 this.creatingUser,
-                // this.configuration.toDTO(),
+                this.originalGraph.toDTO(),
                 this.startingGraph.toDTO(),
+                this.endGraph != null ? this.endGraph.toDTO() : null,
                 this.taskType,
                 this.taskStartPoint,
                 this.pricePerTarget,
@@ -552,7 +743,12 @@ public class Execution implements Cloneable {
                 this.executionStatus,
                 configCompDTO,
                 configSimDTO,
-                this.participatingWorkerNames
+                this.participatingWorkerNames,
+                this.isExecutionFullyCompleted,
+                this.targetStateCount_WAITING,
+                this.targetStateCount_IN_PROCESS,
+                this.executionProgress,
+                this.executionLog
         );
 
         return executionDTO;
@@ -601,6 +797,28 @@ public class Execution implements Cloneable {
 
     public int getTotalWorkers() {
         return participatingWorkerNames.size();
+    }
+
+    public void addTargetLog(String targetName, String targetLog) {
+        if (endGraph == null) {
+            return;
+        }
+
+        for (Target target : endGraph.targets()) {
+            if (target.getName().equals(targetName)) {
+
+                target.setTargetLog(targetLog);
+
+                if (executionLog == null || executionLog.isEmpty()) {
+                    executionLog = targetLog;
+                } else {
+                    this.executionLog = this.executionLog + "\n\n" + targetLog;
+                }
+
+                break;
+            }
+        }
+
     }
 
 

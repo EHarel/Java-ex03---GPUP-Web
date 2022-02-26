@@ -157,9 +157,9 @@ public class ExecutionManager {
 
     /**
      * This goes over all the executions and checks:
-     *      -   Is the execution active?
-     *      -   Is the user part of it?
-     *      -   Is the user active in it?
+     * -   Is the execution active?
+     * -   Is the user part of it?
+     * -   Is the user active in it?
      */
     private Collection<Execution> getActiveExecutionsUserIsActiveIn(User user) {
         Collection<Execution> activeExecutionsUserIsPartOf = new ArrayList<>();
@@ -210,14 +210,15 @@ public class ExecutionManager {
 
     /**
      * This method returns a collection of all the executions a user participates in.
+     *
      * @param filter_executionMustBeRunning determines whether to choose executions that are running or any execution
      *                                      the user is participating in (paused or stopped as well).
-     * @param filter_userMustBeActive determines whether to choose executions that the user is active in or also
-     *                                executions the user paused his participation in.
+     * @param filter_userMustBeActive       determines whether to choose executions that the user is active in or also
+     *                                      executions the user paused his participation in.
      */
     public synchronized Collection<Execution> getExecutionsUserParticipates(User user,
-                                                                               boolean filter_executionMustBeRunning,
-                                                                               boolean filter_userMustBeActive) {
+                                                                            boolean filter_executionMustBeRunning,
+                                                                            boolean filter_userMustBeActive) {
         Collection<Execution> resExecutions = new LinkedList<>();
 
         for (Execution execution :
@@ -232,7 +233,7 @@ public class ExecutionManager {
                 }
             }
 
-            if(addExecution) {
+            if (addExecution) {
                 resExecutions.add(execution);
             }
         }
@@ -253,5 +254,29 @@ public class ExecutionManager {
         }
 
         return userRemoved;
+    }
+
+    public synchronized ExecutionStatus getExecutionStatus(String executionNameFromParameter) {
+        ExecutionStatus executionStatus = null;
+
+        for (Execution execution :
+                executions) {
+            if (execution.getExecutionName().equals(executionNameFromParameter)) {
+                executionStatus = execution.getExecutionStatus();
+                break;
+            }
+        }
+
+        return executionStatus;
+    }
+
+    public synchronized void addTargetLog(String executionName, String targetName, String targetLog) {
+        for (Execution execution :
+                executions) {
+            if (execution.getExecutionName().equals(executionName)) {
+                execution.addTargetLog(targetName, targetLog);
+                break;
+            }
+        }
     }
 }

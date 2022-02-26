@@ -149,6 +149,10 @@ public class AppUtils {
     }
 
     public static long getMillisecondsBetweenTwoInstants(Instant earlyInstant, Instant laterInstant) {
+        if (earlyInstant == null || laterInstant == null) {
+            return -1;
+        }
+
         Duration duration = Duration.between(earlyInstant, laterInstant);
 
         return duration.toMillis();

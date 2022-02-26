@@ -3,6 +3,8 @@ package graph;
 import users.User;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 /*
@@ -12,10 +14,10 @@ of the user of this class to handle the synchronization of isUserExists with oth
  */
 public class GraphManager {
 
-    private final Set<DependenciesGraph> graphs;
+    private final List<DependenciesGraph> graphs;
 
     public GraphManager() {
-        graphs = new HashSet<>();
+        graphs = new LinkedList<>();
     }
 
     public synchronized void addGraph(DependenciesGraph graph) {
@@ -31,7 +33,7 @@ public class GraphManager {
         graphs.add(graph);
     }
 
-    public synchronized Set<DependenciesGraph> getGraphs() {
+    public synchronized List<DependenciesGraph> getGraphs() {
 //        return Collections.unmodifiableSet(users); // Aviad code
         return graphs;
     }

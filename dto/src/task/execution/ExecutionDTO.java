@@ -13,26 +13,35 @@ import java.util.Collection;
 
 public class ExecutionDTO {
     private String executionName;
+    private String executionOriginalName;
     private String creatingUser;
-
-    //    private ConfigurationDTO configDTO;
     private ConfigurationDTOSimulation configDTOSim;
     private ConfigurationDTOCompilation configDTOComp;
-
-    private GraphDTO graphDTO;
+    private GraphDTO originalGraphDTO;
+    private GraphDTO startGraphDTO;
+    private GraphDTO endGraphDTO;
     private TaskType taskType;
     private TaskStartPoint taskStartPoint;
     private Integer pricePerTarget;
     private Integer totalWorkers;
     private ExecutionStatus executionStatus;
     private Collection<String> participatingUsersNames;
+    private Boolean isExecutionFullyCompleted;
+    private int targetStateCount_WAITING;
+    private int targetStateCount_IN_PROCESS;
+    private Float executionProgress;
+    private String executionLog;
+
 
     public ExecutionDTO() {
     }
 
     public ExecutionDTO(String executionName,
+                        String executionOriginalName,
                         String creatingUser,
-                        GraphDTO graphDTO,
+                        GraphDTO originalGraphDTO,
+                        GraphDTO startGraphDTO,
+                        GraphDTO endGraphDTO,
                         TaskType taskType,
                         TaskStartPoint taskStartPoint,
                         Integer pricePerTarget,
@@ -40,11 +49,18 @@ public class ExecutionDTO {
                         ExecutionStatus executionStatus,
                         ConfigurationDTOCompilation configCompDTO,
                         ConfigurationDTOSimulation configSimDTO,
-                        Collection<String> participatingUsersNames) {
+                        Collection<String> participatingUsersNames,
+                        boolean isExecutionFullyCompleted,
+                        int targetStateCount_WAITING,
+                        int targetStateCount_IN_PROCESS,
+                        float executionProgress,
+                        String executionLog) {
         this.executionName = executionName;
+        this.executionOriginalName = executionOriginalName;
         this.creatingUser = creatingUser;
-//        this.configDTOSim = configDTO;
-        this.graphDTO = graphDTO;
+        this.originalGraphDTO = originalGraphDTO;
+        this.startGraphDTO = startGraphDTO;
+        this.endGraphDTO = endGraphDTO;
         this.taskType = taskType;
         this.pricePerTarget = pricePerTarget;
         this.totalWorkers = totalWorkers;
@@ -61,10 +77,20 @@ public class ExecutionDTO {
         }
 
         this.taskStartPoint = taskStartPoint;
+        this.isExecutionFullyCompleted = new Boolean(isExecutionFullyCompleted);
+
+        this.targetStateCount_WAITING =  targetStateCount_WAITING;
+        this.targetStateCount_IN_PROCESS = targetStateCount_IN_PROCESS;
+        this.executionProgress = executionProgress;
+        this.executionLog = executionLog;
     }
 
     public String getExecutionName() {
         return executionName;
+    }
+
+    public String getExecutionOriginalName() {
+        return executionOriginalName;
     }
 
     public String getCreatingUser() {
@@ -82,8 +108,16 @@ public class ExecutionDTO {
         return configDTO;
     }
 
-    public GraphDTO getGraphDTO() {
-        return graphDTO;
+    public GraphDTO getOriginalGraphDTO() {
+        return originalGraphDTO;
+    }
+
+    public GraphDTO getStartGraphDTO() {
+        return startGraphDTO;
+    }
+
+    public GraphDTO getEndGraphDTO() {
+        return endGraphDTO;
     }
 
     public TaskType getTaskType() {
@@ -110,28 +144,9 @@ public class ExecutionDTO {
         this.executionName = executionName;
     }
 
-    public void setCreatingUser(String creatingUser) {
-        this.creatingUser = creatingUser;
-    }
-
-//    public void setConfigDTO(ConfigurationDTO configDTO) {
-//        this.configDTOSim = configDTO;
-//    }
-
-    public void setGraphDTO(GraphDTO graphDTO) {
-        this.graphDTO = graphDTO;
-    }
 
     public void setTaskType(TaskType taskType) {
         this.taskType = taskType;
-    }
-
-    public void setPricePerTarget(Integer pricePerTarget) {
-        this.pricePerTarget = pricePerTarget;
-    }
-
-    public void setTotalWorkers(Integer totalWorkers) {
-        this.totalWorkers = totalWorkers;
     }
 
     public void setExecutionStatus(ExecutionStatus executionStatus) {
@@ -150,8 +165,24 @@ public class ExecutionDTO {
         return participatingUsersNames;
     }
 
-    public void setParticipatingUsersNames(Collection<String> participatingUsersNames) {
-        this.participatingUsersNames = participatingUsersNames;
+    public Boolean getIsExecutionFullyCompleted() {
+        return isExecutionFullyCompleted;
+    }
+
+    public Boolean getExecutionFullyCompleted() {
+        return isExecutionFullyCompleted;
+    }
+
+    public int getTargetStateCount_WAITING() {
+        return targetStateCount_WAITING;
+    }
+
+    public int getTargetStateCount_IN_PROCESS() {
+        return targetStateCount_IN_PROCESS;
+    }
+
+    public float getExecutionProgress() {
+        return executionProgress;
     }
 
     public Boolean isUserInList(String username) {
@@ -166,5 +197,9 @@ public class ExecutionDTO {
         }
 
         return userInList;
+    }
+
+    public String getExecutionLog() {
+        return this.executionLog;
     }
 }

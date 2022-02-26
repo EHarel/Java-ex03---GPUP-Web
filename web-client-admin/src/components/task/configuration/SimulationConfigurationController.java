@@ -221,7 +221,10 @@ public class SimulationConfigurationController {
     public void openForNewConfig() {
         unlockControls();
         String currName = textFieldConfigName.getText();
-        textFieldConfigName.setText(currName + " (New)");
+        String newName = currName + " (New)";
+        newName = newName.trim();
+
+        textFieldConfigName.setText(newName);
     }
 
     public void clear() {

@@ -21,20 +21,12 @@ public class ExecutionUploadServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         System.out.println("[ExecutionUploadServlet] - starting");
-
-        // Set content type
-        // Check if available execution name
-
         response.setContentType("text/plain");
-
-
         Properties prop = new Properties();
         prop.load(request.getInputStream());
-
         String executionDTOStr = prop.getProperty(ConstantsAll.BP_EXECUTION_DTO);
         try {
 //            Gson gson = new GsonBuilder().serializeNulls().create();
-
             ExecutionDTO executionDTO = new Gson().fromJson(executionDTOStr, ExecutionDTO.class);
 
             synchronized (this) {
@@ -63,74 +55,3 @@ public class ExecutionUploadServlet extends HttpServlet {
         return ServletUtils.getExecutionManager(getServletContext()).isExistingExecutionName(executionName);
     }
 }
-
-
-// Old code
-
-//                gson = new Gson();
-//        ExecutionDTO executionDTO = gson.fromJson(executionDTOJson, ExecutionDTO.class);
-
-
-// Old code:
-/*
-        PrintWriter out = response.getWriter();
-
-        Collection<Part> parts = request.getParts();
-
-        String usernameFromSession = SessionUtils.getUsername(request);
-
-        StringBuilder fileContent = new StringBuilder();
-
-
-        BufferedReader streamReader;
-        StringBuilder responseStrBuilder;
-        String executionDTOJson;
-        Gson gson;
-
-        for (Part part : parts) {
-
-            // Aviad Code
-//            printPart(part, out);
-
-            //to write the content of the file to an actual file in the system (will be created at c:\samplefile)
-//            part.write("samplefile");
-
-            //to write the content of the file to a string
-
-            InputStream in = part.getInputStream();
-            streamReader = new BufferedReader((new InputStreamReader(in, StandardCharsets.UTF_8)));
-            responseStrBuilder = new StringBuilder();
-            String inputStr;
-
-            while ((inputStr = streamReader.readLine()) != null) {
-                responseStrBuilder.append(inputStr);
-            }
-
-            executionDTOJson = responseStrBuilder.toString();
-
-            gson = new Gson();
-            ExecutionDTO executionDTO = gson.fromJson(executionDTOJson, ExecutionDTO.class);
-*/
-
-
-//            Engine engine = Engine.getInstance();
-//
-//            try {
-//                engine.loadXMLFromInputStream(part.getInputStream(), usernameFromSession);
-//            } catch (JAXBException e) {
-//                e.printStackTrace();
-//            } catch (ExistingItemException e) {
-//                e.printStackTrace();
-//            } catch (DependencyOnNonexistentTargetException e) {
-//                e.printStackTrace();
-//            } catch (ImmediateCircularDependencyException e) {
-//                e.printStackTrace();
-//            } catch (NullOrEmptyStringException e) {
-//                e.printStackTrace();
-//            } catch (InvalidInputRangeException e) {
-//                e.printStackTrace();
-//            } catch (NonexistentTargetException e) {
-//                e.printStackTrace();
-//            } catch (SerialSetNameRepetitionException e) {
-//                e.printStackTrace();
-//            }

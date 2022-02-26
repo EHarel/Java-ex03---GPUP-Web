@@ -1,6 +1,7 @@
 package components.dashboard.execution;
 
 import componentcode.executiontable.ExecutionDTOTable;
+import componentcode.executiontable.ExecutionListRefresher;
 import componentcode.executiontable.ExecutionTableControllerShared;
 import components.app.AppMainController;
 import components.dashboard.DashboardController;
@@ -78,8 +79,10 @@ public class ExecutionTableAdminController {
         setDoubleClickEvent();
 
         sharedController = new ExecutionTableControllerShared(tableView_Executions);
-        setActive(false);
-        sharedController.startListRefresher();
+
+
+//        setActive(false);
+//        sharedController.startListRefresher();
     }
 
     private void setDoubleClickEvent() {
@@ -105,6 +108,9 @@ public class ExecutionTableAdminController {
 
     public void setMainController(AppMainController mainController) {
         this.mainController = mainController;
+
+        ExecutionListRefresher executionListRefresher = this.mainController.getExecutionListRefresher();
+        executionListRefresher.addConsumer(this.sharedController::updateExecutionList);
     }
 
     public void setDashboardController(DashboardController dashboardController) {

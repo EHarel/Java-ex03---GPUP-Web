@@ -38,6 +38,7 @@ public class Target {
     private Collection<String> targetsThisIsDirectlyDependentOnNames;
 
 
+
     /* ---------------------------------------------------------------------------------------------------- */
     /* ------------------------------------------- CONSTRUCTOR -------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
@@ -460,6 +461,12 @@ public class Target {
         return dependencyWithTarget;
     }
 
+    public void setTargetLog(String targetLog) {
+        taskStatus.setTargetLog(targetLog);
+    }
+
+    public String getTargetLog() { return taskStatus.getTargetLog(); }
+
     public static class TaskStatus implements  Cloneable {
 
         private String executionName;
@@ -474,6 +481,9 @@ public class Target {
         private Collection<String> targetsSkippedAsResult;
         private Collection<List<String>> targetsSkippedAsResult_AllPaths;
         private String errorDetails;
+        private Collection<String> targetsThisIsFrozenAndWaitingToFinish;
+        private String targetLog;
+
 
         public TaskStatus() {
             reset();
@@ -500,6 +510,14 @@ public class Target {
                     this.targetsSkippedAsResult.add(s);
                 });
 
+                this.targetsThisIsFrozenAndWaitingToFinish = new LinkedList<>();
+                Collection<String> frozenWaitingCollection = taskStatusDTO.getTargetsThisIsFrozenAndWaitingToFinish();
+                if (frozenWaitingCollection != null) {
+                    frozenWaitingCollection.forEach(s -> {
+                        this.targetsThisIsFrozenAndWaitingToFinish.add(s);
+                    });
+                }
+
                 this.errorDetails = getErrorDetails();
 
                 this.targetsSkippedAsResult_AllPaths = new ArrayList<>();
@@ -524,6 +542,8 @@ public class Target {
                     }
                 } catch (Exception ignore) {
                 }
+
+                this.targetLog = taskStatusDTO.getTargetLog();
             }
         }
 
@@ -555,6 +575,11 @@ public class Target {
             targetsSkippedAsResult = new ArrayList<>();
             targetsSkippedAsResult_AllPaths = new ArrayList<>();
             errorDetails = null;
+            targetLog = "";
+        }
+
+        public Collection<String> getTargetsThisIsFrozenAndWaitingToFinish() {
+            return targetsThisIsFrozenAndWaitingToFinish;
         }
 
         public String getExecutionName() { return this.executionName; }
@@ -682,6 +707,7 @@ public class Target {
             clone.targetsSkippedAsResult = GraphUtils.cloneCollection(targetsSkippedAsResult);
             clone.targetsSkippedAsResult_AllPaths = GraphUtils.cloneListCollection(targetsSkippedAsResult_AllPaths);
             clone.errorDetails = this.errorDetails;
+            clone.targetLog = this.targetLog;
 
             return clone;
         }
@@ -702,7 +728,9 @@ public class Target {
                     getTargetsOpenedAsResultString(),
                     getTargetsSkippedAsResultString(),
                     getTargetsSkippedAsResult_AllPaths_String(),
-                    this.errorDetails
+                    this.errorDetails,
+                    getTargetsThisIsFrozenAndWaitingToFinish(),
+                    this.targetLog
             );
 
             return taskDTO;
@@ -719,6 +747,44 @@ public class Target {
                         break;
                 }
             }
+        }
+
+        /**
+         * This method receives collection of targets this target depends on.
+         * It adds all of them which are in the appropriate status to the list of targets this is still waiting on.
+         * This only works if target is FROZEN.
+         * @param allTargetsThisDependsOn
+         */
+        public void setTargetsThisIsFrozenFrom(Collection<TargetDTO> allTargetsThisDependsOn) {
+            if (allTargetsThisDependsOn == null || getTargetState() != TargetDTO.TargetState.FROZEN) {
+                return;
+            }
+
+            if (targetsThisIsFrozenAndWaitingToFinish == null) {
+                targetsThisIsFrozenAndWaitingToFinish = new LinkedList<>();
+            }
+
+            allTargetsThisDependsOn.forEach(targetDTO -> {
+                switch (targetDTO.getTaskStatusDTO().getTargetState()) {
+                    case IN_PROCESS:
+                    case WAITING:
+                    case FROZEN:
+                        targetsThisIsFrozenAndWaitingToFinish.add(targetDTO.getName());
+                        break;
+                    case SKIPPED:
+                        break;
+                    case FINISHED:
+                        break;
+                }
+            });
+        }
+
+        public void setTargetLog(String targetLog) {
+            this.targetLog = targetLog;
+        }
+
+        public String getTargetLog() {
+            return this.targetLog;
         }
     }
 }

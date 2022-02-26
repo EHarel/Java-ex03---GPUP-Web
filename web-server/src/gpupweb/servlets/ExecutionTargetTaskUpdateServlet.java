@@ -59,10 +59,12 @@ public class ExecutionTargetTaskUpdateServlet extends HttpServlet {
             FileManager fileManager = ServletUtils.getFileManager(getServletContext());
             fileManager.saveTargetLog(targetName, targetLog, executionName);
 
-            int payment = handleUserPayment(taskResult, executionName, username);
+            executionManager.addTargetLog(executionName, targetName, targetLog);
 
+
+            int payment = handleUserPayment(taskResult, executionName, username);
             response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().println(payment); // TODO: how to send this to client?! wtf
+            response.getWriter().print(payment);
         } catch (IllegalArgumentException iae) {
 
         }
@@ -71,7 +73,7 @@ public class ExecutionTargetTaskUpdateServlet extends HttpServlet {
     private int handleUserPayment(TaskResult taskResult, String executionName, String username) {
         int payment = 0;
 
-        if (taskResult == TaskResult.SUCCESS || taskResult == TaskResult.SUCCESS_WITH_WARNINGS) {
+        if (taskResult != TaskResult.UNPROCESSED) {
             ExecutionManager executionManager = ServletUtils.getExecutionManager(getServletContext());
             payment = executionManager.getExecutionPaymentPerTarget(executionName);
 

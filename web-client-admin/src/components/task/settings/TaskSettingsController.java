@@ -3,6 +3,7 @@ package components.task.settings;
 import algorithm.DFS;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import componentcode.executiontable.ExecutionDTOTable;
 import components.app.AppMainController;
 import components.app.AppUtils;
 import components.graph.general.GraphGeneralDetailsController;
@@ -10,9 +11,11 @@ import components.graph.targettable.TargetTableController;
 import components.graph.targettable.selection.TableSelectionController;
 import components.task.configuration.CompilationConfigurationController;
 import components.task.configuration.SimulationConfigurationController;
+import events.ExecutionChosenListener;
 import events.FileLoadedListener;
 import events.GraphChosenListener;
 import graph.DependenciesGraph;
+import graph.GraphDTO;
 import graph.TargetDTO;
 import httpclient.HttpClientUtil;
 import javafx.application.Platform;
@@ -27,6 +30,7 @@ import logic.Engine;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import task.Execution;
+import task.enums.TaskStartPoint;
 import task.enums.TaskType;
 import task.configuration.Configuration;
 import task.configuration.ConfigurationDTO;
@@ -40,7 +44,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 
-public class TaskSettingsController implements FileLoadedListener, GraphChosenListener {
+public class TaskSettingsController implements GraphChosenListener, ExecutionChosenListener {
     /* ---------------------------------------------------------------------------------------------------- */
     /* ------------------------------------------- DATA MEMBERS ------------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
@@ -98,6 +102,10 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
     private Button button_SubmitExecution;
     @FXML
     private TextField textField_ExecutionName;
+    @FXML
+    private Tab tab_Configuration;
+    @FXML
+    private TabPane tabPane;
 
 
     /* --------------------------------------- EXTERNAL COMPONENTS ---------------------------------------- */
@@ -137,6 +145,8 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
     private CompilationConfigurationController compilationConfigurationController;
     private SimulationConfigurationController simulationConfigurationController;
     private SimpleBooleanProperty isEditingNewConfig;
+    private ExecutionDTOTable chosenExecution;
+    private String executionOriginalName;
     private DependenciesGraph chosenGraph;
     private DependenciesGraph graphOfChosenTargets;
 
@@ -165,7 +175,9 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
             updateActiveConfig(taskType);
             if (taskType != null) {
                 paneStartPoint.setDisable(false);
-                boolean isDisableIncremental = true;
+
+
+//                boolean isDisableIncremental = true;
                 // TODO: old code from ex02
 //                try {
 //                    ExecutionData lastExecution = Engine.getInstance().getExecutionLast(taskType);
@@ -174,7 +186,7 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
 //                    isDisableIncremental = true;
 //                }
 
-                startPointIncrementalRadioButton.setDisable(isDisableIncremental);
+//                startPointIncrementalRadioButton.setDisable(isDisableIncremental);
             }
         });
 
@@ -224,8 +236,8 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
 
     public void SetMainController(AppMainController mainController) {
         this.mainController = mainController;
-//        mainController.addEventListener_FileLoaded(this);
         mainController.addEventListener_GraphChosen(this);
+        mainController.addEventListener_ExecutionChosen(this);
     }
 
     public void SetCompilationConfigurationController(Parent parent, CompilationConfigurationController controller) {
@@ -257,6 +269,7 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
 
         DependenciesGraph graph = null;
 
+
         if (isRunFromScratch()) {
 //            graph = (DependenciesGraph) Engine.getInstance().getGraph();
 //            graph = mainController.getChosenGraph();
@@ -285,18 +298,6 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
 
         return startPoint;
     }
-
-//    public TaskProcess.StartPoint GetTaskStartPoint() {
-//        TaskProcess.StartPoint startPoint = null;
-//
-//        if (startPointFromScratchRadioButton.isSelected()) {
-//            startPoint = TaskProcess.StartPoint.FROM_SCRATCH;
-//        } else if (startPointIncrementalRadioButton.isSelected()) {
-//            startPoint = TaskProcess.StartPoint.INCREMENTAL;
-//        }
-//
-//        return startPoint;
-//    }
 
     public SimpleBooleanProperty getIsEditingNewConfigProperty() {
         return isEditingNewConfig;
@@ -346,16 +347,7 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
             String configName = existingConfigurationsListView.getSelectionModel().getSelectedItem();
             TaskType taskType = getChosenTaskType();
 
-            if (configName != null && taskType != null) {
-                switch (taskType) {
-                    case COMPILATION:
-                        compilationConfigurationController.loadConfig(configName, mainController);
-                        break;
-                    case SIMULATION:
-                        simulationConfigurationController.loadConfig(configName, mainController);
-                        break;
-                }
-            }
+            loadConfiguration(taskType, configName);
         });
     }
 
@@ -640,7 +632,18 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
     @FXML
     void startPointFromScratchRadioButtonListener(ActionEvent event) {
         startPointRBSwitched();
+//        populateAvailableGraphData(chosenGraph);
+
+//        startPointRBSwitched();
+
+        updateWorkingGraph();
+
         populateAvailableGraphData(chosenGraph);
+
+        textField_ExecutionName.setDisable(false);
+
+        setIncrementalExecutionName();
+
 //        loadInitialGraph(); // TODO: leftover from ex02
     }
 
@@ -659,10 +662,13 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
         }
 
         startPointRBSwitched();
+        updateWorkingGraph();
+        populateAvailableGraphData(chosenGraph);
+        setIncrementalExecutionName();
 
-        populateAvailableGraphData(chosenGraph); // TODO: quick-and-dirty, before I deal with incremental
-
-// TODO: ex02 code
+//
+//
+//// TODO: ex02 code
 //        ExecutionData lastExecution = Engine.getInstance().getExecutionLast(taskType);
 //        if (lastExecution == null) {
 //            loadInitialGraph();
@@ -672,16 +678,166 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
 //        }
     }
 
-    @Override
-    public void graphChosen() {
-        clear();
-        chosenGraph = mainController.getChosenGraph();
+    private void setIncrementalExecutionName() {
+        if (chosenExecution == null) {
+            return;
+        }
+
+        String newName = "";
+
+        if (startPointIncrementalRadioButton.isSelected()) {
+            Integer count = mainController.getExecutionCount(chosenExecution.getExecutionOriginalName());
+            if (count == null) {
+                return;
+            }
+
+            int newCount = count + 1;
+            newName = chosenExecution.getExecutionOriginalName() + " (" + newCount + ")";
+
+            textField_ExecutionName.setDisable(true);
+        } else if (startPointFromScratchRadioButton.isSelected()) {
+            newName = chosenExecution.getExecutionOriginalName() + " (from scratch)";
+        }
+
+        textField_ExecutionName.setText(newName);
+    }
+
+    private void updateWorkingGraph() {
+        if (chosenExecution != null) {
+            if (startPointIncrementalRadioButton.isSelected()) {
+                if (chosenExecution.getEndGraphDTO() != null) {
+                    this.chosenGraph = new DependenciesGraph(chosenExecution.getEndGraphDTO());
+                }
+            } else if (startPointFromScratchRadioButton.isSelected()) {
+                if (chosenExecution.getOriginalGraphDTO() != null) {
+                    this.chosenGraph = new DependenciesGraph(chosenExecution.getOriginalGraphDTO());
+                }
+            }
+        }
     }
 
     @Override
-    public void fileLoaded() {
-////        AppMainController.setThreadNumberChoiceBox(threadNumberChoiceBox);
-//        clear();
+    public void executionChosen(ExecutionDTOTable executionDTOTable) {
+        if (executionDTOTable == null) {
+            return;
+        }
+
+        if (! executionDTOTable.getCreatingUser().equals(mainController.getUsername())) {
+            clear();
+            tabPane.setDisable(true);
+            return;
+        }
+
+        ExecutionStatus exeStatus = executionDTOTable.getExecutionStatus();
+
+        if (exeStatus == ExecutionStatus.COMPLETED) {
+            tabPane.setDisable(true);
+            Alert errorAlert = new Alert(Alert.AlertType.INFORMATION);
+            errorAlert.setHeaderText("Task Completed");
+            String msg = "Task is completed! You cannot start a new execution for it. This is for your own good <3";
+            errorAlert.setContentText(msg);
+            errorAlert.showAndWait();
+        } else  if (
+                exeStatus == ExecutionStatus.ENDED
+                        ||
+                exeStatus == ExecutionStatus.STOPPED) {
+
+            tabPane.setDisable(false);
+            clear();
+            chosenExecution = executionDTOTable;
+            startPointIncrementalRadioButton.setDisable(false);
+            enableOnlyAvailablePrices(executionDTOTable);
+            mainController.addConfigurationIfMissing(executionDTOTable);
+            mainController.setActiveConfig(executionDTOTable);
+            updateConfigurationList(executionDTOTable.getTaskType());
+
+            taskTypeListView.getSelectionModel().select(executionDTOTable.getTaskType());
+
+            TaskType taskType = executionDTOTable.getTaskType();
+            String configurationName = executionDTOTable.getConfigDTO().getName();
+
+            loadConfiguration(taskType, configurationName);
+            tabPane.getSelectionModel().select(0);
+        }
+    }
+
+    private void loadConfiguration(TaskType taskType, String configName) {
+        if (taskType == null || configName == null) {
+            return;
+        }
+
+        if (configName != null && taskType != null) {
+            switch (taskType) {
+                case COMPILATION:
+                    compilationConfigurationController.loadConfig(configName, mainController);
+                    break;
+                case SIMULATION:
+                    simulationConfigurationController.loadConfig(configName, mainController);
+                    break;
+            }
+        }
+    }
+
+    @Override
+    public void graphChosen() {
+        tabPane.setDisable(false);
+        clear();
+        chosenGraph = mainController.getChosenGraph();
+        startPointIncrementalRadioButton.setDisable(true);
+        enableOnlyAvailablePrices(chosenGraph);
+        tabPane.getSelectionModel().select(0);
+    }
+
+    /**
+     * This method receives an execution, and updates the available task types based on the executions' chose type.
+     */
+    private void enableOnlyAvailablePrices(ExecutionDTOTable executionDTOTable) {
+        Integer compPrice = executionDTOTable.getStartGraphDTO().getPriceCompilation();
+        Integer simPrice = executionDTOTable.getStartGraphDTO().getPriceSimulation();
+        TaskType taskType = executionDTOTable.getTaskType();
+
+        switch (taskType) {
+            case COMPILATION:
+                simPrice = null;
+                break;
+            case SIMULATION:
+                compPrice = null;
+                break;
+        }
+
+        updateTaskTypeBasedOnAvailablePrices(compPrice, simPrice);
+    }
+
+    private void enableOnlyAvailablePrices(GraphDTO chosenGraph) {
+        Integer compPrice = chosenGraph.getPriceCompilation();
+        Integer simPrice = chosenGraph.getPriceSimulation();
+
+        updateTaskTypeBasedOnAvailablePrices(compPrice, simPrice);
+    }
+
+    private void enableOnlyAvailablePrices(DependenciesGraph chosenGraph) {
+        Integer compPrice = chosenGraph.getPriceCompilation();
+        Integer simPrice = chosenGraph.getPriceSimulation();
+
+        updateTaskTypeBasedOnAvailablePrices(compPrice, simPrice);
+    }
+
+    private void updateTaskTypeBasedOnAvailablePrices(Integer compPrice, Integer simPrice) {
+        taskTypeListView.getItems().clear();
+
+        TaskType[] taskTypes;
+
+        if (compPrice != null && simPrice != null) {
+            taskTypes = TaskType.values();
+        } else if (compPrice != null) {
+            taskTypes = new TaskType[]{TaskType.COMPILATION};
+        } else {
+            taskTypes = new TaskType[]{TaskType.SIMULATION};
+        }
+
+        for (int i = 0; i < taskTypes.length; i++) {
+            taskTypeListView.getItems().add(taskTypes[i]);
+        }
     }
 
     private void clear() {
@@ -690,6 +846,8 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
         targetTableAvailableTargetsController.clear();
         targetTableChosenTargetsController.clear();
         chosenGraph = null;
+        chosenExecution = null;
+        graphOfChosenTargets = null;
         Toggle selectedToggle = TaskStartPoint.getSelectedToggle();
         if (selectedToggle != null) {
             selectedToggle.setSelected(false);
@@ -735,7 +893,6 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
     }
 
 
-
     @FXML
     void buttonDeleteConfigurationActionListener(ActionEvent event) {
         if (isValidTaskAndConfigChosen()) {
@@ -743,7 +900,10 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
             if (AppMainController.ConfirmationAlert(contentText)) {
                 String configName = getChosenConfiguration();
                 TaskType taskType = getChosenTaskType();
-                boolean removedConfig = Engine.getInstance().removeConfiguration(taskType, configName);
+
+//                boolean removedConfig = Engine.getInstance().removeConfiguration(taskType, configName);
+                boolean removedConfig = mainController.removeConfiguration(taskType, configName);
+
                 if (removedConfig) {
                     displayMsgOnLabelWithFade(labelSetActiveConfigUpdate, configName + " removed", Color.GREEN);
                     updateConfigurationList(taskType);
@@ -761,11 +921,6 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
 
     @FXML
     private void buttonAddConfigurationActionListener(ActionEvent event) {
-        // Gather data
-        // Set error message if wrong
-        // Try to make new
-        // Send message if worked
-
         TaskType taskType = getChosenTaskType();
         if (taskType == null) {
             String msg = "No task type chosen";
@@ -782,8 +937,6 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
             return;
         }
 
-//        boolean added = Engine.getInstance().addConfiguration(taskType, configuration); // Old code
-
         boolean added = mainController.addConfiguration(configuration);
 
         if (added) {
@@ -797,12 +950,13 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
     }
 
 
-
     @FXML
     void button_SubmitExecutionActionListener(ActionEvent event) {
         System.out.println("[TaskSettingsController - button_SubmitExecutionActionListener] Preparing execution data.");
 
         String executionName = textField_ExecutionName.getText();
+        String executionOriginalName = prepareOriginalNameForRequest();
+
 
         if (executionName == null || executionName == "") {
             AppMainController.AnimationFadeSingle(null, label_SubmissionResult, "Cannot send empty name", Color.RED);
@@ -817,9 +971,12 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
 
         DependenciesGraph chosenGraph = getGraphOfChosenTargets();
         if (chosenGraph == null) {
-            AppMainController.AnimationFadeSingle(null, label_SubmissionResult, "Configuration not specified", Color.RED);
+            AppMainController.AnimationFadeSingle(null, label_SubmissionResult, "No targets chosen", Color.RED);
             return;
         }
+
+        GraphDTO chosenGraphDTO = chosenGraph.toDTO();
+        GraphDTO originalGraph = chosenExecution != null ? chosenExecution.getOriginalGraphDTO() : chosenGraphDTO;
 
         TaskType taskType = config.getTaskType();
 
@@ -835,14 +992,15 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
                 break;
         }
 
-        GetTaskStartPoint();
         task.enums.TaskStartPoint startPoint = GetTaskStartPoint();
 
         ExecutionDTO executionDTO = new ExecutionDTO(
                 executionName,
+                executionOriginalName,
                 mainController.getUsername(),
-                // config.toDTO(),
-                chosenGraph.toDTO(),
+                originalGraph,
+                chosenGraphDTO,
+                null,
                 taskType,
                 startPoint,
                 chosenGraph.getPrice(taskType),
@@ -850,6 +1008,11 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
                 ExecutionStatus.NEW,
                 configDTOComp,
                 configDTOSim,
+                null,
+                false,
+                0,
+                0,
+                0,
                 null);
 
         Gson gson = new GsonBuilder().serializeNulls().create();
@@ -874,11 +1037,8 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
                 .build()
                 .toString();
 
-
 //        updateHttpStatusLine("New request is launched for: " + finalUrl); // Aviad Code
 
-
-//        HttpClientUtil.runAsync(finalUrl, body, new Callback() {
         HttpClientUtil.runAsync(finalUrl, bodyStr, new Callback() {
 
             @Override
@@ -900,45 +1060,27 @@ public class TaskSettingsController implements FileLoadedListener, GraphChosenLi
                 } else {
                     Platform.runLater(() -> {
                         executionSubmissionSuccess();
+                        if (startPoint == task.enums.TaskStartPoint.INCREMENTAL) {
+                            mainController.increaseExecutionCount(executionOriginalName);
+                        } else { // FROM SCRATCH
+                            mainController.addExecution(executionName);
+                        }
                     });
                 }
             }
         });
+    }
 
-        /*
-        HttpClientUtil.runAsync(finalUrl, body, new Callback() {
+    private String prepareOriginalNameForRequest() {
+        String executionOriginalName;
 
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-//                showFileLoadingErrorMessage("Something went wrong with the file upload!");
-                        Platform.runLater(() ->
-                                label_SubmissionResult.setText("Something went wrong: " + e.getMessage()));
-//                                resultMessageProperty.set("Something went wrong: " + e.getMessage()));
-            }
+        if (startPointFromScratchRadioButton.isSelected()) {
+            executionOriginalName = textField_ExecutionName.getText();
+        } else { // Incremental
+            executionOriginalName = chosenExecution != null ? chosenExecution.getExecutionOriginalName() : textField_ExecutionName.getText();
+        }
 
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                String responseBody = response.body().string();
-                if (response.code() != 200) {
-                    Platform.runLater(() ->
-//                                    resultMessageProperty.set("Something went wrong: " + responseBody));
-                            showFileLoadingErrorMessage("Something went wrong with the file upload!"));
-                } else {
-                    Platform.runLater(() -> {
-                        fileLoadedListeners.forEach(FileLoadedListener::fileLoaded);
-
-//                            showFileLoadingErrorMessage("Yay, file loaded! :)");
-
-//                                appMainController.loginSuccessful(userName);
-//                        chatAppMainController.updateUserName(userName);   // Aviad code
-//                        chatAppMainController.switchToChatRoom();         // Aviad code
-                    });
-                }
-            }
-        });
-
-
-         */
+        return executionOriginalName;
     }
 
     private void executionSubmissionSuccess() {

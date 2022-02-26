@@ -19,9 +19,6 @@ import utilsharedall.UserType;
 import java.io.IOException;
 
 public class LoginAdminController {
-
-    private int counter = 0;
-
     @FXML
     private ScrollPane ScrollPane_Main;
 
@@ -53,7 +50,7 @@ public class LoginAdminController {
 
     @FXML
     void onButton_LoginAction(ActionEvent event) {
-        resultMessageProperty.set("Hey I'm clicked! Counter is " + ++counter);
+        resultMessageProperty.set("Logging in...");
 
         String userName = textField_Username.getText();
         if (userName.isEmpty()) {

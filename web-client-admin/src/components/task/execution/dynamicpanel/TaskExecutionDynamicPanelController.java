@@ -1,11 +1,14 @@
 package components.task.execution.dynamicpanel;
 
+import componentcode.executiontable.ExecutionDTOTable;
 import components.app.AppMainController;
 import components.graph.specifictarget.SpecificTargetController;
 import components.graph.targettable.TargetDTOTable;
 import components.task.execution.main.TaskExecutionMainController;
+import events.ExecutionChosenListener;
 import graph.DependenciesGraph;
 import graph.TargetDTO;
+import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,23 +20,19 @@ import javafx.scene.layout.BorderPane;
 import logic.Engine;
 import task.Execution;
 
-public class TaskExecutionDynamicPanelController {
+import java.util.List;
+
+public class TaskExecutionDynamicPanelController implements ExecutionChosenListener {
     @FXML private Parent mainScene;
     @FXML private SplitPane splitPane;
     @FXML private BorderPane borderPane;
 
-    @FXML private Button buttonResetForNewExecution;
 
-    @FXML
-    private Button startButton;
-    @FXML
-    private Button pauseButton;
-    @FXML
-    private Button continueButton;
-    @FXML
-    private Button buttonStop;
-    @FXML
-    private TextArea taskExecutionUpdatesTA;
+    @FXML    private Button startButton;
+    @FXML    private Button pauseButton;
+    @FXML    private Button continueButton;
+    @FXML    private Button buttonStop;
+    @FXML    private TextArea taskExecutionUpdatesTA;
 
 
     @FXML private Parent specificTargetDetailsComponent;
@@ -43,6 +42,7 @@ public class TaskExecutionDynamicPanelController {
 
     private SimpleBooleanProperty isExecuting; // Determines if there is an execution underway, whether paused or not
     private SimpleBooleanProperty isPaused;
+    private SimpleBooleanProperty isEnded;
 
     private int threadNumValueDuringPause;
     private int threadNumNewValueDuringExecution;
@@ -51,15 +51,17 @@ public class TaskExecutionDynamicPanelController {
     public TaskExecutionDynamicPanelController() {
         isPaused = new SimpleBooleanProperty(true);
         isExecuting = new SimpleBooleanProperty(false);
+        isEnded = new SimpleBooleanProperty(false);
     }
 
     @FXML
     public void initialize() {
-        startButton.disableProperty().bind(isExecuting);
-        continueButton.disableProperty().bind(isPaused.not());
-        pauseButton.disableProperty().bind(isPaused);
+
+//        startButton.disableProperty().bind(isExecuting);
+//        continueButton.disableProperty().bind(isPaused.not());
+//        pauseButton.disableProperty().bind(isPaused);
 //        threadNumCB.disableProperty().bind(isPaused.not());
-        buttonResetForNewExecution.disableProperty().bind(isExecuting);
+//        buttonResetForNewExecution.disableProperty().bind(isExecuting);
 
 //        setThreadChoiceBoxHandler();
 
@@ -69,7 +71,9 @@ public class TaskExecutionDynamicPanelController {
 
     public void setMainAppController(AppMainController mainController) {
         this.mainAppController = mainController;
+        this.mainAppController.addEventListener_ExecutionChosen(this);
     }
+
 
     private void updateTextAreaWithThreadChange(int oldValue, int newValue) {
         String strIncOrDec = newValue > oldValue ? "Increasing" : "Decreasing";
@@ -116,13 +120,11 @@ public class TaskExecutionDynamicPanelController {
         }
     }
 
-    @FXML
-    void buttonResetForNewExecutionActionListener(ActionEvent event) {
-        mainAppController.resetForNewExecutionButton_FromDynamicPanel();
-    }
 
     @FXML
     void continueButtonActionListener(ActionEvent event) {
+        taskExecutionMainController.event_ButtonPressed_ContinueExecution();
+
         if (isExecuting.get()) {
             taskExecutionUpdatesTA.appendText("Continuing execution...\n\n");
             isPaused.set(false);
@@ -178,6 +180,47 @@ public class TaskExecutionDynamicPanelController {
     }
 
 
+
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ------------------------------------------ EVENTS METHODS ------------------------------------------ */
+    /* ---------------------------------------------------------------------------------------------------- */
+    /* ---------------------------------------------------------------------------------------------------- */
+    @Override
+    public void executionChosen(ExecutionDTOTable executionDTOTable) {
+        switch (executionDTOTable.getExecutionStatus()) {
+            case NEW:
+                enableButtons(true, false, false, false);
+                break;
+            case PAUSED:
+                enableButtons(false, false, true, true);
+                break;
+            case EXECUTING:
+                enableButtons(false, true, false, true);
+                break;
+            case ENDED:
+            case STOPPED:
+            case COMPLETED:
+                enableButtons(false, false, false, false);
+                break;
+        }
+
+        String executionLog = executionDTOTable.getExecutionLog();
+        String currTextArea = taskExecutionUpdatesTA.getText();
+
+        if (! currTextArea.equals(executionLog)) {
+            taskExecutionUpdatesTA.setText(executionLog);
+        }
+
+        specificTargetDetailsComponentController.executionChosen(executionDTOTable);
+    }
+
+    private void enableButtons(boolean startEnable, boolean pauseEnable, boolean continueEnable, boolean stopEnabled) {
+        startButton.setDisable(!startEnable);
+        pauseButton.setDisable(!pauseEnable);
+        continueButton.setDisable(!continueEnable);
+        buttonStop.setDisable(!stopEnabled);
+    }
 
 
 

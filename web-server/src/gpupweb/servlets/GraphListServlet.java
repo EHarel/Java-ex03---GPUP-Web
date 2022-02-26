@@ -14,6 +14,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class GraphListServlet extends HttpServlet {
@@ -23,13 +25,12 @@ public class GraphListServlet extends HttpServlet {
         //returning JSON objects, not HTML
         response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
-//            Gson gson = new Gson();
             Gson gson = new GsonBuilder().serializeNulls().create();
 
             GraphManager graphManager = ServletUtils.getGraphManager(getServletContext());
-            Set<DependenciesGraph> graphList = graphManager.getGraphs();
+            List<DependenciesGraph> graphList = graphManager.getGraphs();
 
-            Set<GraphDTO> graphDataSet = new HashSet<>();
+            List<GraphDTO> graphDataSet = new LinkedList<>();
             graphList.forEach(graph -> {
                 graphDataSet.add(graph.toDTO());
             });

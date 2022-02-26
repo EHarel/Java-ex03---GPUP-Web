@@ -2,14 +2,15 @@
 
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="208.0" prefWidth="263.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.graph.general.GraphGeneralDetailsController">
+<ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="210.0" minHeight="0.0" minWidth="0.0" prefHeight="210.0" prefWidth="263.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.graph.general.GraphGeneralDetailsController">
    <content>
-      <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="206.0" minWidth="261.0" prefHeight="203.0" prefWidth="253.0">
+      <GridPane maxHeight="205.0" maxWidth="1.7976931348623157E308" minHeight="206.0" minWidth="261.0" prefHeight="205.0" prefWidth="253.0">
         <columnConstraints>
             <ColumnConstraints hgrow="NEVER" minWidth="10.0" />
             <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="10.0" />
@@ -35,7 +36,10 @@
             <Label text="Number of Middles:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="5" />
             <Label text="Number of Leaves:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="6" />
             <Label text="Number of Independents:" underline="true" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-            <Label fx:id="graphNameLabel" text="No graph loaded" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+            <Label fx:id="graphNameLabel" text="No graph loaded" GridPane.columnIndex="3" GridPane.rowIndex="2">
+               <tooltip>
+                  <Tooltip fx:id="tooltip_GraphName" text="Empty Tooltip" />
+               </tooltip></Label>
             <Label fx:id="targetCountLabel" GridPane.columnIndex="3" GridPane.rowIndex="3" />
             <Label fx:id="numberOfRootsLabel" GridPane.columnIndex="3" GridPane.rowIndex="4" />
             <Label fx:id="numberOfMiddlesLabel" GridPane.columnIndex="3" GridPane.rowIndex="5" />

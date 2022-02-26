@@ -145,28 +145,28 @@ public abstract class EngineUtils {
         }
 
         // Local variables just for ease of formatting
-        Collection<String> allTargets = getNamesOfTargetsData(execution.getProcessedData().getAllTargetData());
-        Collection<String> allProcessed = getNamesOfTargetsData(execution.getProcessedData().getAllProcessedTargetsOfAllResults());
-        Collection<String> nonFailed = getNamesOfTargetsData(execution.getProcessedData().getProcessedTargetsNoFailure());
-        Collection<String> success = getNamesOfTargetsData(execution.getProcessedData().getSuccessfulTargets());
-        Collection<String> warnings = getNamesOfTargetsData(execution.getProcessedData().getWarningTargets());
-        Collection<String> failed = getNamesOfTargetsData(execution.getProcessedData().getFailedTargets());
-        Collection<String> unprocessed = getNamesOfTargetsData(execution.getProcessedData().getUnprocessedTargets());
-        Collection<String> leftToCompletion = getNamesOfTargetsData(execution.getProcessedData().getTargetsLeftToCompletion());
+//        Collection<String> allTargets = getNamesOfTargetsData(execution.getProcessedData().getAllTargetData());
+//        Collection<String> allProcessed = getNamesOfTargetsData(execution.getProcessedData().getAllProcessedTargetsOfAllResults());
+//        Collection<String> nonFailed = getNamesOfTargetsData(execution.getProcessedData().getProcessedTargetsNoFailure());
+//        Collection<String> success = getNamesOfTargetsData(execution.getProcessedData().getSuccessfulTargets());
+//        Collection<String> warnings = getNamesOfTargetsData(execution.getProcessedData().getWarningTargets());
+//        Collection<String> failed = getNamesOfTargetsData(execution.getProcessedData().getFailedTargets());
+//        Collection<String> unprocessed = getNamesOfTargetsData(execution.getProcessedData().getUnprocessedTargets());
+//        Collection<String> leftToCompletion = getNamesOfTargetsData(execution.getProcessedData().getTargetsLeftToCompletion());
 
         res = res +
                 "\n\tExecution number: " + execution.getExecutionNumber() +
                 "\n\tOverall time:   " + formatTimeDuration(execution.getStartInstant(), execution.getEndInstant()) +
                 "\n\t\tStart time:   " + getDateTimeFromInstant(execution.getStartInstant()) +
                 "\n\t\tEnd time:     " + getDateTimeFromInstant(execution.getEndInstant()) +
-                "\n\tTargets in graph: " + allTargets + " (" + allTargets.size() + ")" +
-                "\n\tProcessed (success\\warnings\\failed): " + allProcessed + " (" + allProcessed.size() + ")" +
-                "\n\t\tNon-failed targets: " + nonFailed + " (" + nonFailed.size() + ")" +
-                "\n\t\t\tSuccess without warnings: " + success + " (" + success.size() + ")" +
-                "\n\t\t\tSuccess   WITH  warnings: " + warnings + " (" + warnings.size() + ")" +
-                "\n\t\tFailed: " + failed + " (" + failed.size() + ")" +
-                "\n\tUnprocessed: " + unprocessed + " (" + unprocessed.size() + ")" +
-                "\n\tTargets left for completion: " + leftToCompletion + " (" + leftToCompletion.size() + ")" +
+//                "\n\tTargets in graph: " + allTargets + " (" + allTargets.size() + ")" +
+//                "\n\tProcessed (success\\warnings\\failed): " + allProcessed + " (" + allProcessed.size() + ")" +
+//                "\n\t\tNon-failed targets: " + nonFailed + " (" + nonFailed.size() + ")" +
+//                "\n\t\t\tSuccess without warnings: " + success + " (" + success.size() + ")" +
+//                "\n\t\t\tSuccess   WITH  warnings: " + warnings + " (" + warnings.size() + ")" +
+//                "\n\t\tFailed: " + failed + " (" + failed.size() + ")" +
+//                "\n\tUnprocessed: " + unprocessed + " (" + unprocessed.size() + ")" +
+//                "\n\tTargets left for completion: " + leftToCompletion + " (" + leftToCompletion.size() + ")" +
                 "\n\n" + getFormalizedConfigurationString(execution.getConfiguration().toDTO());
 
         return res;

@@ -1,5 +1,6 @@
 package components.graph.alldata;
 
+import componentcode.executiontable.ExecutionDTOTable;
 import components.app.AppMainController;
 import components.graph.alldata.menu.GraphChooserMenuController;
 import components.graph.operations.menu.GraphOperationsMenuController;
@@ -10,6 +11,7 @@ import components.graph.operations.targetcycles.TargetCyclesController;
 import components.graph.operations.whatif.WhatIfController;
 import components.graph.targettable.TargetDTOTable;
 import datastructure.Queue;
+import events.ExecutionChosenListener;
 import events.ExecutionEndListener;
 import events.FileLoadedListener;
 import events.GraphChosenListener;
@@ -28,7 +30,7 @@ import task.Execution;
 import java.util.Collection;
 import java.util.List;
 
-public class GraphAllDataController implements FileLoadedListener, ExecutionEndListener, GraphChosenListener {
+public class GraphAllDataController implements FileLoadedListener, ExecutionEndListener, GraphChosenListener, ExecutionChosenListener {
     /* ---------------------------------------------------------------------------------------------------- */
     /* ---------------------------------------- FXML DATA MEMBERS ----------------------------------------- */
     /* ---------------------------------------------------------------------------------------------------- */
@@ -105,6 +107,7 @@ public class GraphAllDataController implements FileLoadedListener, ExecutionEndL
         mainController.addEventListener_FileLoaded(this);
         mainController.addEventListener_ExecutionEnded(this);
         mainController.addEventListener_GraphChosen(this);
+        mainController.addEventListener_ExecutionChosen(this);
     }
 
     public void setGraphOverviewController(GraphOverviewController graphOverviewController) {
@@ -167,6 +170,11 @@ public class GraphAllDataController implements FileLoadedListener, ExecutionEndL
 
     private void setMainScene(Parent mainScene) {
         borderPaneMain.setCenter(mainScene);
+    }
+
+    @Override
+    public void executionChosen(ExecutionDTOTable executionDTOTable) {
+        workingGraph = new DependenciesGraph(executionDTOTable.getOriginalGraphDTO());
     }
 
     @Override
