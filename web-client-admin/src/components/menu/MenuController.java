@@ -25,7 +25,7 @@ public class MenuController implements ExecutionStartListener, ExecutionEndListe
     @FXML private Button loadFileButton;
     @FXML private Label labelFileLoadMsg;
     @FXML private ComboBox<Themes> themesComboBox;
-    @FXML private ToggleButton buttonDisableAnimations;
+    @FXML private Button button_Chat;
 
     private Button currentHighlightedButton;
     private Button newlyClickedButton;
@@ -47,7 +47,6 @@ public class MenuController implements ExecutionStartListener, ExecutionEndListe
     /* ---------------------------------------------------------------------------------------------------- */
     public ComboBox<Themes> getThemesComboBox() { return themesComboBox; }
 
-    public ToggleButton getButtonDisableAnimations() { return buttonDisableAnimations; }
 
     public void setMainController(AppMainController mainController) {
         this.mainController = mainController;
@@ -76,6 +75,12 @@ public class MenuController implements ExecutionStartListener, ExecutionEndListe
         if (mainController.getAllowAnimations()) {
             rotateButton(taskButton);
         }
+    }
+
+
+    @FXML
+    void button_ChatActionListener(ActionEvent event) {
+        mainController.chatButtonPressed();
     }
 
     @FXML
@@ -144,8 +149,5 @@ public class MenuController implements ExecutionStartListener, ExecutionEndListe
         String msg = "Failed to load :(";
         Color color = Color.RED;
         AppMainController.AnimationFadeSingle(null, labelFileLoadMsg, msg, color);
-    }
-
-    private void buttonClicked() {
     }
 }

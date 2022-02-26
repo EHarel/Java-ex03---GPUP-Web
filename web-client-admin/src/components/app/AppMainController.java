@@ -2,6 +2,7 @@ package components.app;
 
 import componentcode.executiontable.ExecutionDTOTable;
 import componentcode.executiontable.ExecutionListRefresher;
+import components.chat.chatroomgeneral.ChatRoomGeneralController;
 import components.css.Themes;
 import components.dashboard.DashboardController;
 import components.graph.alldata.GraphAllDataController;
@@ -40,7 +41,7 @@ import task.configuration.ConfigurationCompilation;
 import task.configuration.ConfigurationDTO;
 import task.configuration.ConfigurationSimulation;
 import utilsharedall.ConstantsAll;
-import utilsharedclient.Constants;
+import utilsharedclient.ConstantsClient;
 
 import javax.naming.NameNotFoundException;
 import java.io.File;
@@ -89,6 +90,9 @@ public class AppMainController {
     private DashboardController dashboardController;
     private Stage primaryStage;
 
+    private Parent chat;
+    private ChatRoomGeneralController chatController;
+
 
     public boolean getAllowAnimations() {
         return allowAnimations.get();
@@ -114,6 +118,7 @@ public class AppMainController {
     private List<ExecutionEndListener> executionEndListeners;
     private List<GraphChosenListener> graphChosenListeners;
     private List<ExecutionChosenListener> executionChosenListeners;
+    private List<LoginPerformedListener> loginPerformedListeners;
 
 
 
@@ -126,6 +131,7 @@ public class AppMainController {
         executionEndListeners = new LinkedList<>();
         graphChosenListeners = new LinkedList<>();
         executionChosenListeners = new LinkedList<>();
+        loginPerformedListeners = new LinkedList<>();
         graphManager = new GraphManager();
         configManager = new ConfigurationManager();
         executionManager = new ExecutionManager();
@@ -211,6 +217,10 @@ public class AppMainController {
 
     public void addEventListener_ExecutionStarted(ExecutionStartListener newListener) {
         executionStartListeners.add(newListener);
+    }
+
+    public void addEventListener_LoginPerformed(LoginPerformedListener newListener) {
+        loginPerformedListeners.add(newListener);
     }
 
     public void addEventListener_ExecutionEnded(ExecutionEndListener newListener) {
@@ -358,6 +368,12 @@ public class AppMainController {
                 });
     }
 
+    public void setChat(Parent parent, ChatRoomGeneralController controller) {
+        this.chat = parent;
+        this.chatController = controller;
+        this.chatController.setMainController(this);
+    }
+
     public void setDashboardComponent(Parent parent, DashboardController dashboardController) {
         this.dashboard = parent;
         this.dashboardController = dashboardController;
@@ -370,10 +386,9 @@ public class AppMainController {
 
         menuController.setMainController(this);
 
-        menuController.getButtonDisableAnimations().selectedProperty().addListener((observable, oldValue, newValue) -> {
-            allowAnimations.set(!menuController.getButtonDisableAnimations().isSelected());
-        });
-
+//        menuController.getButtonDisableAnimations().selectedProperty().addListener((observable, oldValue, newValue) -> {
+//            allowAnimations.set(!menuController.getButtonDisableAnimations().isSelected());
+//        });
 
         root.setTop(menu);
 
@@ -526,13 +541,15 @@ public class AppMainController {
         this.shouldUpdateExecution.set(true);
 
         displayMainApp();
+
+        loginPerformedListeners.forEach(loginPerformedListener -> {loginPerformedListener.loginPerformed(userName);});
     }
 
     public void startExecutionListRefresher() {
         this.executionListRefresher = new ExecutionListRefresher(shouldUpdateExecution, null, null);
 
         this.executionListTimer = new Timer();
-        this.executionListTimer.schedule(executionListRefresher, Constants.REFRESH_RATE_EXECUTIONS, Constants.REFRESH_RATE_EXECUTIONS);
+        this.executionListTimer.schedule(executionListRefresher, ConstantsClient.REFRESH_RATE_EXECUTIONS, ConstantsClient.REFRESH_RATE_EXECUTIONS);
     }
 
 
@@ -547,6 +564,10 @@ public class AppMainController {
     private void displayDashboard() {
         this.root.setCenter(dashboard);
         dashboardController.setActive(true);
+    }
+
+    private void displayChat() {
+        this.root.setCenter(chat);
     }
 
     public void dashboardButtonPressed() {
@@ -667,6 +688,10 @@ public class AppMainController {
 
     public void increaseExecutionCount(String executionOriginalName) {
         executionManager.increaseExecutionCount(executionOriginalName);
+    }
+
+    public void chatButtonPressed() {
+        displayChat();
     }
 
 

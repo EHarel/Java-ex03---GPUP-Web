@@ -1,6 +1,5 @@
 package components.execution.subscribedexecutions;
 
-import graph.GraphDTO;
 import httpclient.HttpClientUtil;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -18,8 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import task.enums.ExecutionStatus;
 import task.execution.WorkerExecutionReportDTO;
 import utilsharedall.ConstantsAll;
-import utilsharedall.UserType;
-import utilsharedclient.Constants;
+import utilsharedclient.ConstantsClient;
 
 import java.io.IOException;
 import java.util.List;
@@ -125,7 +123,7 @@ public class SubscribedExecutionsWorkerController {
                 filter_ExecutionMustBeRunning,
                 filter_UserMustBeActive);
         timer = new Timer();
-        timer.schedule(listRefresher, Constants.REFRESH_RATE_PARTICIPATING_EXECUTIONS, Constants.REFRESH_RATE_PARTICIPATING_EXECUTIONS);
+        timer.schedule(listRefresher, ConstantsClient.REFRESH_RATE_PARTICIPATING_EXECUTIONS, ConstantsClient.REFRESH_RATE_PARTICIPATING_EXECUTIONS);
     }
 
     private void updateTable(List<WorkerExecutionReportDTO> newList) {
@@ -160,7 +158,15 @@ public class SubscribedExecutionsWorkerController {
     /* ---------------------------------------------------------------------------------------------------- */
     @FXML
     void button_CancelParticipationActionListener(ActionEvent event) {
-        removeUserFromExecution();
+        String confirmMsg = "Are you sure you want to remove yourself from the execution?";
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, confirmMsg);
+
+        ButtonType result = alert.showAndWait().orElse(ButtonType.NO);
+
+        if (ButtonType.OK.equals(result)) {
+            removeUserFromExecution();
+        }
+
     }
 
     private void removeUserFromExecution() {

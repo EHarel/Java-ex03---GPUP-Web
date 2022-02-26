@@ -503,12 +503,13 @@ public class Execution implements Cloneable {
     }
 
     private void updateProgress() {
-
         int totalTargetsDone = targetStateCount_SKIPPED + targetStateCount_FINISHED;
         int targetCount = startingGraph.size();
 
-
         this.executionProgress = (float) (totalTargetsDone) / targetCount;
+        if (executionProgress > 1.0f) {
+            executionProgress = 1.0f;
+        }
     }
 
     private void checkAndUpdateIfExecutionIsDone() {

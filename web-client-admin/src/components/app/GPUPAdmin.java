@@ -1,5 +1,6 @@
 package components.app;
 
+import components.chat.chatroomgeneral.ChatRoomGeneralController;
 import components.dashboard.DashboardController;
 import components.graph.alldata.GraphAllDataController;
 import components.graph.operations.overview.GraphOverviewController;
@@ -61,6 +62,7 @@ public class GPUPAdmin extends javafx.application.Application {
         loadTaskSettings(mainController);
         loadGraphAllDataComponentWithSubComponents(mainController);
         loadTaskExecution(mainController);
+        loadChat(mainController);
     }
 
     private void loadLogin(AppMainController mainController) {
@@ -73,6 +75,21 @@ public class GPUPAdmin extends javafx.application.Application {
             LoginAdminController controller = fxmlLoader.getController();
 
             mainController.setLogin(parent, controller);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadChat(AppMainController mainController) {
+        try {
+            System.out.println("[loadChat] Start");
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            URL url = getClass().getResource("/components/chat/chatroomgeneral/ChatRoomGeneral.fxml");
+            fxmlLoader.setLocation(url);
+            Parent parent = fxmlLoader.load(url.openStream());
+            ChatRoomGeneralController controller = fxmlLoader.getController();
+
+            mainController.setChat(parent, controller);
         } catch (IOException e) {
             e.printStackTrace();
         }

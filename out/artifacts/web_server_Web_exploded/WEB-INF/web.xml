@@ -48,6 +48,11 @@
         <servlet-class>gpupweb.servlets.ExecutionCancelSubscribeServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>ChatServlet</servlet-name>
+        <servlet-class>gpupweb.servlets.ChatServlet</servlet-class>
+    </servlet>
+
     <!--
     <servlet>
         <servlet-name>ExecutionTargetTaskUpdate</servlet-name>
@@ -99,6 +104,10 @@
     <servlet-mapping>
         <servlet-name>ExecutionCancelSubscribeServlet</servlet-name>
         <url-pattern>/execution/cancelsubscribe</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ChatServlet</servlet-name>
+        <url-pattern>/chat</url-pattern>
     </servlet-mapping>
 
 
