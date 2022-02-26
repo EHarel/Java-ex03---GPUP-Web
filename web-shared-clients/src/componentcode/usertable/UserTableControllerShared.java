@@ -8,7 +8,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableView;
 import users.UserDTO;
-import utilsharedclient.Constants;
+import utilsharedclient.ConstantsClient;
 
 import java.util.List;
 import java.util.Timer;
@@ -41,7 +41,7 @@ public class UserTableControllerShared {
                 null, // Aviad code sent something else here
                 this::updateUsersList);
         timer = new Timer();
-        timer.schedule(listRefresher, Constants.REFRESH_RATE_USERS, Constants.REFRESH_RATE_USERS);
+        timer.schedule(listRefresher, ConstantsClient.REFRESH_RATE_USERS, ConstantsClient.REFRESH_RATE_USERS);
     }
 
     private void updateUsersList(List<UserDTO> usersNames) {

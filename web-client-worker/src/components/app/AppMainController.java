@@ -1,6 +1,7 @@
 package components.app;
 
 import componentcode.executiontable.ExecutionDTOTable;
+import components.chat.chatroomgeneral.ChatRoomGeneralController;
 import components.dashboard.DashboardWorkerController;
 import components.execution.ExecutionManager;
 import components.execution.panelworker.ExecutionAndTaskPanelController;
@@ -9,7 +10,6 @@ import components.login.LoginPerformedListenerWorker;
 import components.login.LoginWorkerController;
 import components.menu.MainMenuWorkerController;
 import graph.TargetDTO;
-import javafx.beans.binding.BooleanExpression;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.scene.Parent;
@@ -43,6 +43,9 @@ public class AppMainController {
 
     private Parent executionAndTaskPanel;
     private ExecutionAndTaskPanelController executionAndTaskPanelController;
+
+    private Parent chat;
+    private ChatRoomGeneralController chatController;
 
 
     /* ------------------------------------------ CUSTOM FIELDS ------------------------------------------- */
@@ -133,6 +136,10 @@ public class AppMainController {
         this.root.setCenter(dashboard);
     }
 
+    private void displayChat() {
+        this.root.setCenter(chat);
+    }
+
     private void displayExecutionAndTaskPanel() {
         this.root.setCenter(executionAndTaskPanel);
     }
@@ -209,6 +216,12 @@ public class AppMainController {
         this.executionAndTaskPanelController.setMainController(this);
     }
 
+    public void setChatComponent(Parent parent, ChatRoomGeneralController controller) {
+        this.chat = parent;
+        this.chatController = controller;
+        this.chatController.setMainController(this);
+    }
+
     public void targetHistoryListUpdated() {
         this.executionAndTaskPanelController.targetHistoryListUpdated(executionManager.getTargets());
     }
@@ -230,6 +243,10 @@ public class AppMainController {
         int newPoints = currentPoints + payment;
 
         pointsEarnedProperty().set(newPoints);
+    }
+
+    public void event_ChatButtonPressed() {
+        displayChat();
     }
 
 

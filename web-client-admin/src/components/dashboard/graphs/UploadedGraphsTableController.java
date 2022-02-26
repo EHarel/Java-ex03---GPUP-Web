@@ -9,7 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import utilsharedclient.Constants;
+import utilsharedclient.ConstantsClient;
 
 import java.util.Collection;
 import java.util.List;
@@ -111,7 +111,7 @@ public class UploadedGraphsTableController {
                 this::updateUsersList,
                 dashboardController);
         timer = new Timer();
-        timer.schedule(listRefresher, Constants.REFRESH_RATE_GRAPHS, Constants.REFRESH_RATE_GRAPHS);
+        timer.schedule(listRefresher, ConstantsClient.REFRESH_RATE_GRAPHS, ConstantsClient.REFRESH_RATE_GRAPHS);
     }
 
     private void updateUsersList(List<GraphDTO> usersNames) {

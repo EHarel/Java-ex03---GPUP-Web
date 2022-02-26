@@ -5,10 +5,9 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.HBox?>
 
-<ScrollPane fitToWidth="true" hbarPolicy="ALWAYS" pannable="true" prefHeight="52.0" prefWidth="1113.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.menu.MenuController">
+<ScrollPane fitToWidth="true" hbarPolicy="ALWAYS" pannable="true" prefHeight="52.0" prefWidth="1157.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="components.menu.MenuController">
    <content>
       <HBox alignment="CENTER_LEFT" maxHeight="35.0" maxWidth="1.7976931348623157E308" minHeight="35.0" minWidth="766.0" prefWidth="972.0" spacing="10.0">
          <children>
@@ -16,13 +15,13 @@
             <Button fx:id="graphDetailsButton" mnemonicParsing="false" onAction="#graphDetailsButtonActionListener" prefHeight="25.0" prefWidth="110.0" text="Graph Details" />
             <Button fx:id="taskButton" mnemonicParsing="false" onAction="#taskButtonActionListener" prefHeight="25.0" prefWidth="110.0" text="Task Settings" />
             <Button fx:id="taskExecutionButton" mnemonicParsing="false" onAction="#taskExecutionButtonActionListener" prefHeight="25.0" prefWidth="110.0" text="Task Execution" />
+            <Button fx:id="button_Chat" mnemonicParsing="false" onAction="#button_ChatActionListener" prefWidth="110.0" text="Chat" />
             <Button fx:id="loadFileButton" mnemonicParsing="false" onAction="#loadFileButtonActionListener" prefHeight="25.0" prefWidth="110.0" text="Load File">
                <HBox.margin>
                   <Insets left="60.0" />
                </HBox.margin>
             </Button>
             <Label fx:id="labelFileLoadMsg" prefHeight="17.0" prefWidth="173.0" />
-            <ToggleButton fx:id="buttonDisableAnimations" mnemonicParsing="false" prefHeight="25.0" prefWidth="135.0" text="Disable Animations" />
             <ComboBox fx:id="themesComboBox" prefHeight="25.0" prefWidth="104.0" promptText="Themes" />
          </children>
          <padding>

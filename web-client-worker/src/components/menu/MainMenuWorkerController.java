@@ -7,15 +7,18 @@ import javafx.scene.control.Button;
 
 public class MainMenuWorkerController {
 
-    @FXML
-    private Button button_Dashboard;
-
-    @FXML
-    private Button button_ExecutionAndTaskPanel;
+    @FXML    private Button button_Dashboard;
+    @FXML    private Button button_ExecutionAndTaskPanel;
+    @FXML    private Button button_Chat;
 
 
 
     private AppMainController mainController;
+
+    @FXML
+    void button_ChatActionListener(ActionEvent event) {
+        mainController.event_ChatButtonPressed();
+    }
 
     @FXML
     private void button_DashboardActionListener(ActionEvent event) {

@@ -18,7 +18,7 @@ import task.enums.TaskResult;
 import task.enums.TaskType;
 import task.configuration.*;
 import utilsharedall.ConstantsAll;
-import utilsharedclient.Constants;
+import utilsharedclient.ConstantsClient;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -72,7 +72,7 @@ public class ExecutionManager {
                 this,
                 mainController);
         timer = new Timer();
-        timer.schedule(targetFetcher, Constants.REFRESH_RATE_TARGETS, Constants.REFRESH_RATE_TARGETS);
+        timer.schedule(targetFetcher, ConstantsClient.REFRESH_RATE_TARGETS, ConstantsClient.REFRESH_RATE_TARGETS);
     }
 
 

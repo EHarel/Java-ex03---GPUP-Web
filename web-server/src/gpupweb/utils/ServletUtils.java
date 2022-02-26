@@ -2,6 +2,7 @@ package gpupweb.utils;
 
 //import engine.chat.ChatManager;
 //import engine.users.UserManager;
+import chat.ChatManager;
 import file.FileManager;
 import graph.GraphManager;
 import jakarta.servlet.ServletContext;
@@ -31,6 +32,14 @@ public class ServletUtils {
 	private static final Object executionManagerLock = new Object();
 	private static final Object fileManagerLock = new Object();
 
+	public static ChatManager getChatManager(ServletContext servletContext) {
+		synchronized (chatManagerLock) {
+			if (servletContext.getAttribute(CHAT_MANAGER_ATTRIBUTE_NAME) == null) {
+				servletContext.setAttribute(CHAT_MANAGER_ATTRIBUTE_NAME, new ChatManager());
+			}
+		}
+		return (ChatManager) servletContext.getAttribute(CHAT_MANAGER_ATTRIBUTE_NAME);
+	}
 
 	public static UserManager getUserManager(ServletContext servletContext) {
 		synchronized (userManagerLock) {

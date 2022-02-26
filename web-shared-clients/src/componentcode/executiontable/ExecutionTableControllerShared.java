@@ -6,8 +6,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableView;
 import task.execution.ExecutionDTO;
-import users.UserDTO;
-import utilsharedclient.Constants;
+import utilsharedclient.ConstantsClient;
 
 import java.util.*;
 
@@ -38,7 +37,7 @@ public class ExecutionTableControllerShared {
                 null, // Aviad code sent something else here
                 this.username);
         timer = new Timer();
-        timer.schedule(listRefresher, Constants.REFRESH_RATE_EXECUTIONS, Constants.REFRESH_RATE_EXECUTIONS);
+        timer.schedule(listRefresher, ConstantsClient.REFRESH_RATE_EXECUTIONS, ConstantsClient.REFRESH_RATE_EXECUTIONS);
 
         listRefresher.addConsumer(this::updateExecutionList);
     }

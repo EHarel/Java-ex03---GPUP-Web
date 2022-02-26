@@ -1,5 +1,6 @@
 package components.app;
 
+import components.chat.chatroomgeneral.ChatRoomGeneralController;
 import components.dashboard.DashboardWorkerController;
 import components.execution.panelworker.ExecutionAndTaskPanelController;
 import components.login.LoginWorkerController;
@@ -48,7 +49,7 @@ public class GPUPWorker extends javafx.application.Application {
         loadLogin(mainController);
         loadDashboard(mainController);
         loadExecutionAndTaskPanel(mainController);
-
+        loadChat(mainController);
 //        loadTaskSettings(mainController);
 //        loadGraphAllDataComponentWithSubComponents(mainController);
 //        loadTaskExecution(mainController);
@@ -121,6 +122,21 @@ public class GPUPWorker extends javafx.application.Application {
             ExecutionAndTaskPanelController controller = fxmlLoader.getController();
 
             mainController.setExecutionAndTaskPanelComponent(parent, controller);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadChat(AppMainController mainController) {
+        try {
+            System.out.println("[loadExecutionAndTaskPanel] Start");
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            URL url = getClass().getResource("/components/chat/chatroomgeneral/ChatRoomGeneral.fxml");
+            fxmlLoader.setLocation(url);
+            Parent parent = fxmlLoader.load(url.openStream());
+            ChatRoomGeneralController controller = fxmlLoader.getController();
+
+            mainController.setChatComponent(parent, controller);
         } catch (IOException e) {
             e.printStackTrace();
         }

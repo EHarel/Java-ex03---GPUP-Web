@@ -10,6 +10,10 @@ public class ConstantsAll {
     public final static MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     public final static String LINE_SEPARATOR = System.getProperty("line.separator");
 
+    public static final int INT_PARAMETER_ERROR = Integer.MIN_VALUE;
+
+
+
     // Query Parameter Constants
     public final static String QP_USERTYPE = "usertype";
     public final static String QP_USERNAME = "username";
@@ -25,6 +29,11 @@ public class ConstantsAll {
 
     public static final String QP_IS_ACTIVE_IN_EXECUTION = "isActiveInExecution";
 
+    public static final String QP_CHAT_PARAMETER = "userstring";
+    public static final String QP_CHAT_VERSION = "chatversion";
+    public static final String CHAT_VERSION_PARAMETER = "chatversion";
+
+
 
     public final static String BP_EXECUTION_DTO = "executionDTO";
     public final static String BP_EXECUTION_NAME = QP_EXECUTION_NAME;
@@ -35,6 +44,8 @@ public class ConstantsAll {
 
     // Server resources locations
     public final static String BASE_DOMAIN = "localhost";
+
+
     private final static String BASE_URL = "http://" + BASE_DOMAIN + ":8080";
     private final static String CONTEXT_PATH = "/web_server_Web_exploded";
     private final static String FULL_SERVER_PATH = BASE_URL + CONTEXT_PATH;
@@ -59,6 +70,11 @@ public class ConstantsAll {
     public final static String EXECUTION_CANCEL_SUBSCRIBE = FULL_SERVER_PATH + "/execution/cancelsubscribe";
 
     public final static String EXECUTION_STATUS_UPDATE = FULL_SERVER_PATH + "/execution/status";
+
+    public final static String CHAT_LINES_LIST = FULL_SERVER_PATH + "/chat";
+    public final static String SEND_CHAT_LINE = FULL_SERVER_PATH + "/pages/chatroom/sendChat";
+
+
 
 
 
